@@ -1,0 +1,29 @@
+﻿using UnrealBuildTool;
+
+public class Dialog : ModuleRules
+{
+    public Dialog(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+        
+        PublicDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "Core", "Engine", "AdventureCommon", 
+            }
+        );
+
+        PrivateDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "CoreUObject",
+                "Engine",
+                "Slate",
+                "SlateCore",
+                "AdventureCommon",
+                "UMG"
+            }
+        );
+    }
+    
+}

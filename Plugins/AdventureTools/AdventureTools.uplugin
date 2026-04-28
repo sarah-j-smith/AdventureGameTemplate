@@ -1,0 +1,49 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Adventure Tools",
+	"Description": "A template for 2D Point and Click Games",
+	"Category": "Other",
+	"CreatedBy": "Storybridge Games",
+	"CreatedByURL": "https://github.com/sarah-j-smith/AdventureGame",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Plugins": [
+		{
+			"Name": "Paper2D",
+			"Enabled": true
+		},
+		{
+			"Name": "PaperZD",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/c4b43502026047d89296cd7bffd92828"
+		},
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		}
+	],
+	"Modules": [
+		{
+			"Name": "AdventureTools",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "Dialog",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "AdventureCommon",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
