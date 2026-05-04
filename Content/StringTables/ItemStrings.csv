@@ -1,0 +1,31 @@
+Key,SourceString,Comment
+CloseDefaultText,"Can't close it","Default text for when player tries to close an item that cannot be closed"
+OpenDefaultText,"Can't open it","Default text for when player tries to open an item that cannot be opened"
+GiveDefaultText,"Can't give it","Default text for when player tries to give an item that cannot be given"
+PickUpDefaultText,"Can't pick it up","Default text for when player tries to pick up an item that cannot be picked up"
+TalkToDefaultText,"It's not listening","Default text for when player tries to talk to an item that cannot be talked to"
+LookAtDefaultText,"Doesn't look like much","Default text for when player tries to give an item that has no description"
+PullDefaultText,"Can't pull it","Default text for when player tries to pull a item that can't be pulled"
+PushDefaultText,"Can't push it","Default text for when player tries to push a item that can't be pushed"
+UseDefaultText,"Can't use it","Default text for when player tries to use a item that can't be used"
+WalkToDefaultText,"I'm carrying it","Default text for when player has an item and tries to walk to it"
+ItemUsedDefaultText,"That won't work...","Default text for when player uses an item on another that does not allow it"
+ItemGivenDefaultText,"Could not give it","Default text for when player gives an item to another that does not want it"
+CombineSuccessResultText,"That worked!","Default text for when player uses an item on another successfully"
+GivenSuccessResultText,"Gave it","Default text for when player uses an item on another successfully"
+DefaultCombineDescriptionText,combination thing,"Default text for a thing made from two other things combined"
+DefaultItemDescriptionText,"thing","Default description for any item"
+PlayerInventory,Player Inventory,Title for list of players items in the game editor
+DefaultLongDescriptionText,unknown thing,Default text for a thing with no longer description
+HotSpotWalkAlreadyAt,I'm already at {Subject} what should I do?,Default text for walk to hotspot when already there
+HotSpotWalkArrived,Arrived here. What now?,Default text for arriving at hotspot
+AlreadyUnlocked,It's already unlocked.,Text for when player tries to unlock something that is already unlocked
+AlreadyClosed,It's already closed.,Text for when player tries to close something that is already closed.
+AlreadyOpened,It's already opened.,Text for when player tries to open something that is already opened
+Locked,It's locked.,Text for when player tries to open something that is locked
+UseClosedAndLocked,"It's closed, and locked.",Text for when player tries to use something that's locked
+NotOpenable,Doesn't look like it can open.,"Text for when player tries to open something that makes no sense to open, like a puddle of water."
+UseOnSelfDefaultText,Can't use {Subject} on itself,Text for when player tries to use an item on itself
+GiveToSelfDefaultText,Can't give {Subject} to itself,Text for when player tries to give an item to itself
+UseOnPreview,Use {Subject} on ...,Displayed when choosing which object to use an item on
+GiveToPreview,Give {Subject} to ...,Displayed when choosing which character to give an item on

@@ -1,0 +1,20 @@
+Key,SourceString,Comment
+Pickle,pickled gherkin,Description for any kind of pickle
+Pickle_Key,pickle key,A pickle that has been carved like a key
+Knife,knife,Description for any kind of knife
+Verb_subject,{Verb} {Subject},"Command verb acting on a single subject - ""Pull lever"""
+Use_subject_on_object,Use {Subject} on {Object},"Command for Use a subject on an object ""Use knife on cheese"""
+Give_subject_to_object,Give {Subject} to {Object},"Command for Give a subject to an object ""Give cheese to mouse"""
+Close,Close,"Close as in ""close the door"""
+Open,Open,"Open as in ""open the door"""
+Give,Give,"Give as in ""give the key to the guard"""
+Pick_up,Pick up,"Pick up as in ""pick up key"" from the table"
+Talk_to,Talk to,"Talk to as in ""talk to"" the guard"
+Look_at,Look at,"Look at as in ""Look at painting"""
+Use,Use,"Use as in ""Use keypad"""
+Push,Push,"Push as in ""push trolley"""
+Pull,Pull,"Pull as in ""pull lever"""
+Walk_to,Walk to,"Walk to as in ""walk to doorway"""
+Use_item,Use on,"Use on as in ""use on dirty floor"""
+Give_item,Give to,"Give to as in ""give to guard"""
+None,Unknown,Default text for an item of an unknown kind

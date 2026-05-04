@@ -1,0 +1,8 @@
+Key,SourceString,Comment
+SavingGame,Saving...,Text to indicate that the game is currently being saved
+SavedGame,Saved,Text to indicate that the game was saved successfully
+LoadingGame,Loading...,Text to indicate that the game is currently being loaded
+LoadedGame,Loaded,Text to indicate that the game was loaded successfully
+ErrorSaving,Error saving,There was a problem during saving of the game
+ErrorLoading,Error loading,There was a problem during loading of the game
+Score,Score {ScoreValue},Report the current score as a templated integer

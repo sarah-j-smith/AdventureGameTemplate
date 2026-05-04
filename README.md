@@ -1,5 +1,21 @@
 # Adventure Game in Unreal Engine
 
+This is a free plugin that is based on the blueprint only 
+[Point and Click 2D Adventure Game tutorial]. The assets included in the plugin
+come from there and are _not_ free. 
+
+You should use your own art with any game you ship.
+
+[Point and Click 2D Adventure Game tutorial]: https://www.youtube.com/watch?v=sEy3c5JcLys&t=7s
+
+## How to create a game
+
+### [Start here]
+
+[Start here]: ./Docs/HowTo.md
+
+# Developer Notes
+
 My Dev Environment:
 
 * Mac M3
@@ -14,9 +30,11 @@ My Dev Environment:
 I implemented the main game logic in Unreal C++. At the present time I'm ready to move to using
 the framework to make an original game, and I'm not following the tutorial from this point.
 
-Surface level it looks very much the same as Lesser Dog's [Point and Click 2D Adventure Game tutorial](https://www.youtube.com/watch?v=sEy3c5JcLys&t=7s) on Youtube. See here for the changes:
+Surface level it looks very much the same as Lesser Dog's [Point and Click 2D Adventure Game tutorial] on Youtube. See here for the changes:
 
 * [Differences from Lesser Dog tut](./Docs/Differences.md)
+
+[Point and Click 2D Adventure Game tutorial]: https://www.youtube.com/watch?v=sEy3c5JcLys&t=7s
 
 # Learnings
 

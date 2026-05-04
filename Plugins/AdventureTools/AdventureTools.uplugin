@@ -45,5 +45,6 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
-	]
+	],
+	"EditorCustomVirtualPath": "AdventureToolsPlugin"
 }
