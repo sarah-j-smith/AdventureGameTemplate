@@ -156,6 +156,7 @@ void UAdventureGameInstance::LoadStartingRoom()
 	UE_LOG(LogAdventureGame, Log, TEXT("UAdventureGameInstance::LoadStartingRoom - %s"),
 	       *StartingLevelName.ToString());
 	RoomTransitionPhase = ERoomTransitionPhase::LoadStartingRoom;
+	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 
 	FLatentActionInfo LatentActionInfo = GetLatentActionForHandler(OnRoomLoadedName);
 	UGameplayStatics::LoadStreamLevel(this, StartingLevelName,
@@ -171,11 +172,13 @@ void UAdventureGameInstance::OnRoomLoaded()
 		CurrentLevelName = StartingLevelName;
 		CurrentDoorLabel = StartingDoorLabel;
 		RoomTransitionPhase = ERoomTransitionPhase::NewRoomLoaded;
+		RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 		NewRoomDelay();
 		break;
 	case ERoomTransitionPhase::LoadNewRoom:
 		UE_LOG(LogAdventureGame, Log, TEXT("UAdventureGameInstance::OnRoomLoaded - LoadNewRoom"));
 		RoomTransitionPhase = ERoomTransitionPhase::NewRoomLoaded;
+		RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 		UnloadRoom();
 	default:
 		UE_LOG(LogAdventureGame, Warning, TEXT("Unexpected state during OnRoomLoaded"));
@@ -186,7 +189,7 @@ void UAdventureGameInstance::OnRoomLoaded()
 void UAdventureGameInstance::NewRoomDelay()
 {
 	RoomTransitionPhase = ERoomTransitionPhase::DelayProcessing;
-
+	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 	GetWorld()->GetTimerManager().SetTimer(
 		RoomLoadTimer, this,
 		&UAdventureGameInstance::OnRoomLoadTimerTimeout, RoomLoadDelay, false);
@@ -218,6 +221,10 @@ void UAdventureGameInstance::SetupRoom()
 	{
 		Command->InterruptCurrentAction();
 	}
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+	{
+		StartNewRoom();
+	});
 }
 
 void UAdventureGameInstance::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
@@ -232,6 +239,7 @@ void UAdventureGameInstance::StartNewRoom()
 		Command->SetInputLocked(false);
 	}
 	RoomTransitionPhase = ERoomTransitionPhase::RoomCurrent;
+	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 }
 
 void UAdventureGameInstance::OnRoomUnloaded()
@@ -242,6 +250,7 @@ void UAdventureGameInstance::OnRoomUnloaded()
 void UAdventureGameInstance::TriggerRoomTransition()
 {
 	RoomTransitionPhase = ERoomTransitionPhase::RoomCurrent;
+	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 	OnLoadRoom();
 }
 
@@ -317,7 +326,13 @@ void UAdventureGameInstance::LoadRoom()
 	// Load the room whose level name is in CurrentLevelName, then call OnRoomLoaded.
 	// This is done when there is a scene, and a player controller, we must blank the screen,
 	// stop player input, and unload that previous level (that unload is done in OnRoomLoaded). 
+	// Note that the order is:
+	//    * Load new room
+	//    * Unload old room
+	// So there is a brief period where two rooms are loaded at the same time. This is how level
+	// streaming is supposed to work.
 	RoomTransitionPhase = ERoomTransitionPhase::LoadNewRoom;
+	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 	if (ACommandManager* Command = GetCommandManager())
 	{
 		Command->SetInputLocked(true);
@@ -342,6 +357,7 @@ void UAdventureGameInstance::UnloadRoom()
 		}
 	}
 	RoomTransitionPhase = ERoomTransitionPhase::UnloadOldRoom;
+	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 	const FLatentActionInfo LatentActionInfo = GetLatentActionForHandler(OnRoomUnloadedName);
 	UGameplayStatics::UnloadStreamLevel(GetWorld(), CurrentDoor->CurrentLevel, LatentActionInfo, false);
 }

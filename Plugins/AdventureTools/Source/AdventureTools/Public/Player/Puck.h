@@ -38,15 +38,15 @@ public:
 	FPointAndClickDelegate PointAndClickDelegate;
 
 	FTouchInputDelegate TouchInputDelegate;
-	
-protected:
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	// Called when Pawn is possessed
 	virtual void PawnClientRestart() override;
+
+protected:
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

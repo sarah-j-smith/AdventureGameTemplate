@@ -12,6 +12,7 @@
 #include "Gameplay/AdventureGameInstance.h"
 #include "Internationalization/StringTableRegistry.h"
 #include "Items/InventoryItem.h"
+#include "Items/AssetActionComponent.h"
 #include "Player/ItemManager.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -22,6 +23,8 @@ AHotSpot::AHotSpot()
 	WalkToPoint = CreateDefaultSubobject<USphereComponent>(TEXT("PlayerDetectorSphere"));
 	WalkToPoint->SetupAttachment(RootComponent);
 	WalkToPoint->SetSphereRadius(4.0f);
+	
+	AssetActionComponent = CreateDefaultSubobject<UAssetActionComponent>(TEXT("AssetActionComponent"));
 }
 
 void AHotSpot::BeginPlay()
@@ -40,9 +43,11 @@ void AHotSpot::BeginPlay()
 		UE_LOG(LogAdventureGame, Warning, TEXT("%s %s - BeginPlay()- static mesh NOT valid"), *HotSpotType, *HotSpotName);
 	}
 	Super::BeginPlay();
-	const APawn *PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	WalkToPosition = WalkToPoint->GetComponentLocation();
-	WalkToPosition.Z = PlayerPawn->GetActorLocation().Z;
+	if (const APawn *PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+	{
+		WalkToPosition.Z = PlayerPawn->GetActorLocation().Z;
+	}
 
 	RegisterForSaveAndLoad();
 	DataLoad.ExecuteIfBound(this);
@@ -232,7 +237,7 @@ void AHotSpot::OnItemUsed_Implementation()
 				{
 					UGameplayStatics::PlaySound2D(this, ItemDataAsset->UseSuccessSound);
 				}
-				ItemDataAsset->OnItemUseSuccess();
+				AssetActionComponent->OnItemUseSuccess(ItemDataAsset);
 				return;
 			}
 		}
@@ -253,7 +258,7 @@ void AHotSpot::OnItemGiven_Implementation()
 		{
 			if (ItemManager->SourceItem->ItemKind == ItemDataAsset->SourceItem)
 			{
-				ItemDataAsset->OnItemGiveSuccess();
+				AssetActionComponent->OnItemGiveSuccess(ItemDataAsset);
 				return;
 			}
 		}

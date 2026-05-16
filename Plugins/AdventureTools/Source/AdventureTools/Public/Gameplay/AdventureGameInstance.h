@@ -24,7 +24,11 @@ class UAdventureSave;
 class ADoor;
 class UAdventureGameHUD;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerInventoryChanged, EItemKind, ItemKind, EItemDisposition, ItemDisposition);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerInventoryChanged, EItemKind, ItemKind, 
+	EItemDisposition, ItemDisposition);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomTransitioned, 
+	ERoomTransitionPhase, RoomTransitionPhase);
 
 #define PLAYER_INVENTORY_NAME "PlayerInventory"
 /**
@@ -160,6 +164,8 @@ public:
 
 	/// Run the OnLoadRoom event to load a new level, and unload the current level.
 	void TriggerRoomTransition();
+	
+	ERoomTransitionPhase GetRoomTransitionPhase() { return RoomTransitionPhase; }
 
 	
 	//////////////////////////////////
@@ -186,9 +192,50 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Gameplay")
 	TSubclassOf<UAdventureSave> SaveGameClass;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay")
 	UAdventureSave* CurrentSaveGame;
+	
+/**
+	Connect a listener to this event to be notified when the game levels are loaded.
+
+	<pre>	
+	On game start:
+	
+	Member function called      | State at call
+	--------------------------- | ------------------
+	OnLoadRoom()                | GameNotStarted
+	LoadStartingRoom()          | LoadStartingRoom
+	OnRoomLoaded()              | NewRoomLoaded
+	NewRoomDelay()              | DelayProcessing
+	OnRoomLoadTimerTimeout()    | 
+	SetupRoom()                 | 
+	StartNewRoom()              |   RoomCurrent
+			
+	On transition from one room to the next room:
+
+	Member function called      |    State 
+	--------------------------- | ------------------
+	OnLoadRoom()                | RoomCurrent
+	LoadRoom()                  | LoadNewRoom
+	OnRoomLoaded()              | NewRoomLoaded
+	UnloadRoom()                | UnloadOldRoom
+	OnRoomUnloaded()            | 
+	NewRoomDelay()              | DelayProcessing
+	OnRoomLoadTimerTimeout()    | 
+	SetupRoom()                 |  
+	StartNewRoom()              | RoomCurrent
+	</pre>
+	
+	On Init() calling LoadGame() the StartingDoorLabel
+	and StartingLevelName will be set to values from the save
+	game. Then, when the AdventurePlayerController calls OnLoadRoom
+	with GameNotStarted, the save game room will be loaded.
+	Its important at this point that the Starting Level does _not_
+	have Permanently Loaded set to true in the levels window.
+*/
+	UPROPERTY(VisibleAnywhere, BlueprintAssignable)
+	FRoomTransitioned RoomTransitionedDelegate;
 	
 private:
 	
@@ -207,38 +254,7 @@ private:
 	const FName OnRoomUnloadedName = "OnRoomUnloaded";
 	
 	ERoomTransitionPhase RoomTransitionPhase = ERoomTransitionPhase::GameNotStarted;
-
-	// On game start:
-	//  Member function called           State
-	//     ------------                  ------------------
-	//     OnLoadRoom()                  GameNotStarted
-	//     LoadStartingRoom()            LoadStartingRoom
-	//     OnRoomLoaded()                NewRoomLoaded
-	//     NewRoomDelay()                DelayProcessing
-	//     OnRoomLoadTimerTimeout()
-	//     SetupRoom()
-	//     StartNewRoom()                RoomCurrent
-	//
-	// On room transition to a different room:
-	//  Member function called           State 
-	//     ------------                  ------------------
-	//     OnLoadRoom()                  RoomCurrent
-	//     LoadRoom()                    LoadNewRoom
-	//     OnRoomLoaded()                NewRoomLoaded
-	//     UnloadRoom()                  UnloadOldRoom
-	//     OnRoomUnloaded()
-	//     NewRoomDelay()                DelayProcessing
-	//     OnRoomLoadTimerTimeout()      
-	//     SetupRoom()
-	//     StartNewRoom()                RoomCurrent
-	//
-	// On Init() calling LoadGame() the StartingDoorLabel
-	// and StartingLevelName will be set to values from the save
-	// game. Then, when the AdventurePlayerController calls OnLoadRoom
-	// with GameNotStarted, the save game room will be loaded.
-	// Its important at this point that the Starting Level does _not_
-	// have Permanently Loaded set to true in the levels window.
-
+	
 	/// Load up the room specified by the current door
 	/// Currently this uses streaming levels, which means that the level is never
 	/// truly unloaded. There's a persistent level underlying each room, which is

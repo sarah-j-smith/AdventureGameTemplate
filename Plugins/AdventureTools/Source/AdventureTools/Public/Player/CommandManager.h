@@ -20,6 +20,7 @@ namespace EPathFollowingResult
     enum Type : int;
 }
 
+class UAssetActionComponent;
 class UAdventureGameInstance;
 class UAdventureGameHUD;
 class AAdventureAIController;
@@ -41,8 +42,10 @@ class AHotSpot;
 /// Delegate class used by the Player Controller to manage commands issued
 /// by the player, and to track the current state of command interactions
 /// such as walk to location, hotspot or use verb on item or hotspot
+/// One of these should be dropped into each level.
 UCLASS(BlueprintType, Blueprintable)
-class ADVENTURETOOLS_API ACommandManager : public AActor, public IAdventureControllerProvider, public IBarkProvider
+class ADVENTURETOOLS_API ACommandManager : public AActor,
+        public IAdventureControllerProvider, public IBarkProvider
 {
     GENERATED_BODY()
 
@@ -53,6 +56,10 @@ public:
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
+    
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+    
+    virtual void Destroyed() override;
 
 public:
     // Called every frame
@@ -116,6 +123,9 @@ public:
     ///
     /// PERFORM COMMANDS
     ///
+    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Actions")
+    UAssetActionComponent* AssetActionComponent;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Items")
     UItemManager* ItemManager;
@@ -197,6 +207,8 @@ public:
     };
 
     void ConnectToMoveCompletedDelegate();
+    
+    void DisconnectFromMoveCompletedDelegate();
 
     /**
      * Called by AI Controller to notify that pathing is finished. Can be immediately & synchronously

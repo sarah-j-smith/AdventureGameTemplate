@@ -7,12 +7,6 @@
 #include "Player/CommandManager.h"
 #include "Kismet/GameplayStatics.h"
 
-
-// Add default functionality here for any IItemManagerProvider functions that are not pure virtual.
-
-
-// Add default functionality here for any IItemManagerProvider functions that are not pure virtual.
-
 ACommandManager* IItemManagerProvider::GetCommandManager()
 {
     static TWeakObjectPtr<ACommandManager> CachedCommandManager;
@@ -24,8 +18,8 @@ ACommandManager* IItemManagerProvider::GetCommandManager()
         if (!IsValid(CommandManager))
         {
             // Could happen if the level is being torn down or a loading of a save game is in progress
-            UE_LOG(LogAdventureGame, Warning, TEXT("Command manager not available in %s"),
-                *(WorldContextObject->GetName()));
+            UE_LOG(LogAdventureGame, Warning, TEXT("Command manager %p not available in %s"),
+                CommandManager, *(WorldContextObject->GetName()));
             return nullptr;
         }
         CachedCommandManager = CommandManager;

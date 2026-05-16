@@ -141,7 +141,7 @@ void ADoor::DoorErrors(const FString& Reason)
                                ? (Description.IsEmpty() ? FText::FromString("Door") : Description)
                                : ShortDescription;
     const FString Message = FString::Printf(TEXT("Door %s: %s"), *Description.ToString(), *Reason);
-    GEngine->AddOnScreenDebugMessage(1, 5.0, FColor::Cyan,
+    GEngine->AddOnScreenDebugMessage(DOOR_ERRORS_KEY, 5.0, FColor::Cyan,
                                      *Message, false, FVector2D(2.0, 2.0));
     UE_LOG(LogAdventureGame, Display, TEXT("%s"), *Message);
 #endif

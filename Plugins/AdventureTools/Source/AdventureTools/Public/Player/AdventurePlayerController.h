@@ -29,12 +29,25 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FUpdateSaveGameIndicator, ESaveGameStatus /
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FEndAction, EInteractionType /* Interaction */, int32 /* UID */, bool /* Completed */);
 
 /**
+* Player Controller for the Point & Click 2D Adventure Game. The order of construction and
+* begin play is:
  * 
+* Game launches and main level loads, then:
+ * <pre>
+ *  Instance / class                    Specified in / Loaded by
+ *    AdventureGameInstance          Project settings
+ *    AdventureGameMode              Project settings 
+ *    AdventurePlayerController      AdventureGameMode
+ *    
+ * </pre>
  */
 UCLASS()
 class ADVENTURETOOLS_API AAdventurePlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+protected:
+		virtual void BeginPlay() override;
 public:
 
 	AAdventurePlayerController();
@@ -46,14 +59,13 @@ public:
 	
 	FEndAction EndAction;
 
-	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	//////////////////////////////////
 	///
 	/// SAVE AND LOAD GAME
 	///
-
-public:
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Save Game")
 	FString DefaultSaveGameName = SAVE_GAME_NAME;
 
@@ -89,7 +101,27 @@ public:
 	
 private:
 	FVector2D LastMouseClick = FVector2D(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-
+	
+	bool bCommandManagerNotFound = false;
+	const float CommandCheckInterval = 0.2f;
+	float CommandCheck = CommandCheckInterval;	
+	void CheckSceneForCommandManager(float DeltaTime);
+	void ResetCommandManager();
+	
+	enum class ESceneLoadStatus : uint8
+	{
+		NotLoaded,
+		Loading,
+		Loaded,
+	};
+	ESceneLoadStatus SceneLoadStatus = ESceneLoadStatus::NotLoaded;
+	void CheckForLoadStartingScene();
+	
+	void DisplayWarningIfCommandManagerNotAdded();
+	
+	UFUNCTION()
+	void HandleRoomTransition(const ERoomTransitionPhase RoomPhase);
+	
 public:
 	//////////////////////////////////
 	///
@@ -104,7 +136,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Commands")
 	TSubclassOf<ACommandManager> CommandManagerToSpawn = ACommandManager::StaticClass();
 
-	void SetupCommandManager();
+	void SetupCommandManager(ACommandManager *NewCommandManager);
 	
 	/// Has the player currently issued a command?
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Commands")
@@ -156,6 +188,9 @@ private:
 	void EndTaskAction(EInteractionType InteractionType, int32 UID, bool Complete);
 
 public:
+	UFUNCTION()
+	void HandlePossessedPawnChanged(APawn *OldPawn, APawn *NewPawn);
+	
 	//////////////////////////////////
 	///
 	/// DETECT HOTSPOT INTERACTION

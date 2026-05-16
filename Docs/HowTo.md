@@ -129,6 +129,7 @@ Now its time to import the background texture for your main level, the first roo
 The general approach for importing assets is: 
 
 * Use the folder `MyAdventure/Textures/...` and put all the graphics (PNG files) in there
+  * Organise them in **_subfolders_** as suggested below, or in a suitable folder heirarchy
 * Unreal will import them automatically but Paper2D requires some extra setup
   - right click and Sprite Actions > Apply Paper2D Texture Settings
     - ensure the background changes to the checkerboard
@@ -173,18 +174,36 @@ because it points the opposite of what you'd expect:
 * We have +Y to the left, and +X pointing down (see screenshot)
 
 ![Top view axes](images/top-down-axes.png)
+_Unreal Engine viewport in v5.6 and above_
+
+**Note:** Don't see the axes, bottom left? Check "Game" mode is off in the "Camera Options" menu
 
   * The options for dealing with the confusion is to:
-    * Not use ortho camera
-      * Use perspective and try to position the camera
+    * Use perspective and try to position the camera
+      * Not use ortho 2D camera
       * bad, inconvenient, have to orient the perspective view often
     * Use top and ortho but set the sprites and camera to match
-      * also bad, have to rotate sprites every time
+      * means migrating this code base to use different axes
 
-My current approach is the latter, I set the view to "Top", and it means for every sprite you place in 
-your scene you need to rotate them like this:
+My current approach is to use the perspective view. If you use the plugin with ortho viewport and
+set the view to "Top", it means for every sprite you place in your scene you need to rotate
+them like this:
 
 ![Axes changes for every sprite](images/axes-changes.png)
+_Transform changes for every object added to the level_
+
+Also the camera and some of the logic in the codebase would need to migrate.
+
+Good luck with it if you try it, and let me know if you get it to work. For now the
+way I can support is using the perspective camera.
+
+## 3.3 Navigate the Viewport
+
+Using the perspective camera with a 2D project is a pain. I find often after running the game it is
+messed up in the viewport. To navigate and get the viewport in a workable state do this:
+
+* Ensure you're not in "Game mode" is off in the camera options menu
+* Make sure you're in Perspective view and Unlit
 
 [UE 5.6 the axes changed]: https://forums.unrealengine.com/t/the-top-view-axis-has-changed-in-version-5-6-what-was-the-reasoning-behind-this-change/2552694/7
 
@@ -272,9 +291,12 @@ For this you'll need a 2D character sprite with enough animations for your game.
 I used the [Point and Click Adventure Game Sprite Template] by DangerGoose which I paid `$12`
 for on Itch.io. Its available on a "Name a price" offer, and I think its worth at least that.
 
+![Dangergoose purchase](./images/dangergoose-purchase.png)
+
 [Point and Click Adventure Game Sprite Template]: https://danger-goose.itch.io/point-and-click-adventure-game-sprite-template
 
-Here's gifs of what it looks like:
+The idea is you could paint over the coloured sprites using them as a guide to create your own 
+characters. For this demo I just used it as is. Here's gifs of what it looks like:
 
 | Walking                         | Can't do it                    | Interacting                   |
 |---------------------------------|--------------------------------|-------------------------------|
@@ -283,9 +305,12 @@ Here's gifs of what it looks like:
 
 The "temp guy" sprite sheet posted by Lesser Dog's Justin is also good, and allows you to work along
 with his tutorial if you want to. **It doesn't have as many animations** however, and it also comes in 3 
-movement directions, so you'll need to duplicate the 6 frames of walking animations and flip them left
-to right in a graphics program like Gimp. In Justin's tutorial he uses a simple Unreal scale trick to flip them 
-in software which technically saves on storage, but unfortunately that does not work well with PaperZD.
+movement directions only. So to get the 4 directions needed you'll have to duplicate the 6 frames of walking animations and flip them left
+to right in a graphics program like Gimp. 
+
+In Justin's tutorial he uses a simple Unreal scale trick to flip them 
+in software which technically saves on storage compared with flipping them in a graphics program. 
+But unfortunately **that does not work well with PaperZD**.
 
 Also Justin gives some instructions on how to adjust the frames in the flipbook to get a nice walk
 animation as (see below) its a bit jerky by default. Follow [Justin's excellent instruction] on how
@@ -346,4 +371,34 @@ _Resizing the height and width of the capsule_
 ![Character setup](./images/character-setup.png)
 _Character in the viewport of `BP_PlayerCharacter` after capsule sizing_
 
-## 5.3
+## 5.3 Character Controller and Modes
+
+* Inside the `PlayerCharacter` folder right-click and create a blueprint sub-class of `Puck`
+  * Name it `BP_Puck`
+  * Double-click to open it and set the values in the `Inputs` section
+
+![Inputs](./images/Inputs.png)
+_These inputs and the context are defined inside the plugins contents_
+
+  * The puck is responsible for sending the point and click UI operations to the game
+  * Its seperate from the character because that is controlled by the nav AI
+  * Under the **Pawn** section ensure the settings are as in this screenshot
+
+![Possession](./images/Puck-AI-settings.png)
+
+  * `Auto Possess Player: Disabled` - that's the most important setting
+  * Once set, compile and save
+
+* Inside the `Blueprints` folder create a `Gameplay` folder
+  * Right-click inside `Gameplay` and create a blueprint sub-class of `CommandManager`
+    * Name it `BP_CommandManager`
+
+  * Right-click inside `Gameplay` and create a blueprint sub-class of `AdventureGameMode`
+    * Name it `BP_AdventureGameMode`
+    * Double-click and open it up and set the default pawn class and player controller class
+
+![Mode](./images/BP_AdvventureMode.png)
+
+* Inside `Edit > Project Settings > Maps & Modes`:
+  * Set `Default GameMode: BP_AdventureGameMode`
+  * 

@@ -18,6 +18,7 @@
 
 enum class EVerbType : uint8;
 class USphereComponent;
+class UAssetActionComponent;
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FHotSpotDataSave, AHotSpot *, HotSpot);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FHotSpotDataLoad, AHotSpot *, HotSpot);
@@ -175,6 +176,9 @@ public:
 	/// PLAYER ACTIONS
 	///
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Actions")
+	UAssetActionComponent* AssetActionComponent;
+	
 	/// True if this HotSpot is a <b>Pickup</b>, which has a sprite component
 	/// for displaying an in-game appearance - or is it just a hotspot with
 	/// a clickable mesh?

@@ -2,10 +2,10 @@
 
 
 #include "Items/InventoryItem.h"
+#include "Items/AssetActionComponent.h"
 
 #include "Constants.h"
 #include "AdventureTools.h"
-
 #include "VerbType.h"
 #include "Player/AdventurePlayerController.h"
 #include "Player/ItemManager.h"
@@ -38,7 +38,10 @@ void UInventoryItem::OnItemUseSuccess_Implementation()
     
     if (UItemDataAsset *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
     {
-        ItemDataAsset->OnItemUseSuccess();
+        if (const ACommandManager *Command = GetCommandManager())
+        {
+            Command->AssetActionComponent->OnItemUseSuccess(ItemDataAsset);
+        }
         return;
     }
     OnItemUseFailure();
@@ -53,7 +56,10 @@ void UInventoryItem::OnItemGiveSuccess_Implementation()
 {
     if (UItemDataAsset *ItemDataAsset = ItemDataAssetForAction(EVerbType::GiveItem))
     {
-        ItemDataAsset->OnItemGiveSuccess();
+        if (const ACommandManager *Command = GetCommandManager())
+        {
+            Command->AssetActionComponent->OnItemGiveSuccess(ItemDataAsset);
+        }
         return;
     }
     OnItemGiveFailure();
