@@ -616,7 +616,11 @@ void ACommandManager::SetupHUD()
 
     // Create the HUD and put it on the screen
     APlayerController *PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+    if (!ensureAlwaysMsgf(AdventureHUDClass, TEXT("Edit the Command Manager and ensure AdventureHUDClass is set"))) return;
     AdventureGameHUD = UAdventureGameHUD::Create(PlayerController, AdventureHUDClass);
+    
+    // Probably pointed the AdventureHUDClass at the base class, not a Blueprint Widget UI design
+    if (!ensureAlwaysMsgf(AdventureGameHUD->BlackScreen, TEXT("The AdventureHUDClass must be a sub-class which has the UI widgets bound"))) return;
     AdventureGameHUD->ShowBlackScreen(); // Hide the game while its being loaded
     
     // Send button presses from the HUD to the Command Manager

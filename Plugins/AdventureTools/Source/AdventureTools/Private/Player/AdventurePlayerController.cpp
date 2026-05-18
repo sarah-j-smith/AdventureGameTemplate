@@ -55,6 +55,8 @@ void AAdventurePlayerController::BeginPlay()
 
     Puck = SetupPuck(PlayerCharacter);
     SetupAIController(PlayerCharacter);
+    PlayerCharacter->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+    
     Possess(Puck);
 
     SaveGameToSlotDelegate.BindUObject(this, &AAdventurePlayerController::OnSaveGameComplete);

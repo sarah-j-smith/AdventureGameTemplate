@@ -90,12 +90,18 @@ void UAdventureGameHUD::BindNotifierHandlers(UInteractionNotifier* Notifier)
 
 void UAdventureGameHUD::ShowBlackScreen()
 {
-    BlackScreen->SetVisibility(ESlateVisibility::Visible);
+    if (IsValid(BlackScreen))
+    {
+        BlackScreen->SetVisibility(ESlateVisibility::Visible);
+    }
 }
 
 void UAdventureGameHUD::HideBlackScreen()
 {
-    BlackScreen->SetVisibility(ESlateVisibility::Hidden);
+    if (IsValid(BlackScreen))
+    {
+        BlackScreen->SetVisibility(ESlateVisibility::Hidden);
+    }
 }
 
 void UAdventureGameHUD::SetInteractionText()
