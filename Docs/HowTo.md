@@ -128,26 +128,36 @@ If you have very small sprites for your character (less than 15 pixels) may need
 
 Now its time to import the background texture for your main level, the first room in your game.
 
-The general approach for importing assets is: 
+![Tower background](./images/TowerBackground.png)
 
-* Use the folder `MyAdventure/Textures/...` and put all the graphics (PNG files) in there
+* _481px x 146px Tower_background.png from Lesser Dog's [Point and Click 2D Adventure Game tutorial]_
+
+**The general approach you'll use for importing all your assets is:** 
+
+* A) Drag graphics files from your Finder/Explorer into Unreal
+  * Use the folder `MyAdventure/Textures/...` and drag the graphics (PNG files) in there
   * Organise them in **_subfolders_** as suggested below, or in a suitable folder heirarchy
   * I like to have an `Environments` folder for room backgrounds
-* Unreal will import your graphics automatically when you drag them into the folder
-  - but **Paper2D requires some extra setup**
-    - right click and Sprite Actions > Apply Paper2D Texture Settings
-      - ensure the background changes to the checkerboard
+  * Each PNG (or whatever format) you drag in will become a `Texture` asset
+* B) Paper2D Settings 
+  * Unreal will import your graphics automatically when you drag them into the folder
+  - but we use **Paper2D** for our sprites, and that means **extra setup** on each import
+  - right click and `Sprite Actions > Apply Paper2D Texture Settings` on your new asset
+    - ensure the background changes to the checkerboard (alpha channel)
     - ensure textures are set to the `TranslucentUnlitSpriteMaterial` sprite material
       - if this doesn't appear then
         - click the ⚙️ settings cog wheel right of "Browse 🔍 Search Assets" box
         - check the box "Plugin Content"
-* From each texture right-click and Sprite Action > Create Sprite
-  - drag the resulting sprite into a new `Assets/Sprites` folder
-* Select sequences of sprites to create Flipbooks from the sprites
-  - save flipbooks into the flipbooks folder
+* C) Create sprites or flipbooks
+  * From each texture right-click and Sprite Action > Create Sprite
+    - drag the resulting sprite into a new `/Sprites` folder
+  * Select sequences of sprites to create Flipbooks from the sprites
+    - save flipbooks into a `/Flipbooks` folder
 
 _This guide will show the assets from Justin of Lesser Dog's tutorial, which are in the Content
-folder of the plugin. Use your own assets to ship any game you make - these assets are **not free**._
+folder of this plugin._
+
+_Note: Use your own assets to ship any game you make - these assets are **not free**._
 
 _They're included to allow you to follow along and to provide demo content that matches with Justin's [Point and Click 2D Adventure Game tutorial]._
 
@@ -192,7 +202,7 @@ _Unreal Engine viewport in v5.6 and above_
 
 * The options are:
   - A: Use perspective viewport camera setting and re-position 
-    * insted of using ortho 2D camera
+    * instead of using proper ortho 2D camera
     * inconvenient, have to re-orient the perspective view often
   - B: Use top and ortho but rotate the sprites and camera to match
      * Every sprite would need to be: x: -90, y: 0.0, z: -90.0 

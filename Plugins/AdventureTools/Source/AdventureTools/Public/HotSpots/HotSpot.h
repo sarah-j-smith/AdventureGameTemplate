@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DescribableItem.h"
 #include "GameplayTagContainer.h"
 
 #include "Engine/StaticMeshActor.h"
@@ -28,7 +29,7 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FHotSpotDataLoad, AHotSpot *, HotSpot);
  */
 UCLASS()
 class ADVENTURETOOLS_API AHotSpot : public AStaticMeshActor, public IVerbInteractions,
-		public IItemManagerProvider, public IBarkProvider
+		public IItemManagerProvider, public IBarkProvider, public IDescribableItem
 {
 	GENERATED_BODY()
 	
@@ -39,6 +40,17 @@ protected:
 
 public:
 	AHotSpot();
+		
+	//////////////////////////////////
+	///
+	/// IDescribableItem
+	///
+	
+	virtual FText GetShortDescription() const override { return ShortDescription; };
+
+	virtual FText GetLongDescription() const override { return Description; };
+
+	virtual EItemKind GetItemKind() const override { return EItemKind::None; }
 	
 	//////////////////////////////////
 	///
