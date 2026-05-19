@@ -15,11 +15,13 @@ UCLASS()
 class ADVENTURETOOLS_API AAdventureGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+	
+protected:
+	virtual void BeginPlay() override;
+
 public:
 	AAdventureGameModeBase();
 	
-	virtual void BeginPlay() override;
-
 	FScoreDelegate ScoreDelegate;
     
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

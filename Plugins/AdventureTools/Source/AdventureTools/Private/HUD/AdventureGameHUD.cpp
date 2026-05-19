@@ -48,7 +48,7 @@ UAdventureGameHUD* UAdventureGameHUD::Create(APlayerController *PlayerController
     if (AdventureHUDWidget)
     {
         AdventureHUDWidget->AddToViewport();
-        UE_LOG(LogAdventureGame, VeryVerbose, TEXT("AAdventureGameModeBase::SetupHUD - AddToViewport"));
+        UE_LOG(LogAdventureGame, VeryVerbose, TEXT("AdventureGameHUD::SetupHUD - AddToViewport"));
     }
     else
     {

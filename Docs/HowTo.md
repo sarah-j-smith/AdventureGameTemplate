@@ -173,9 +173,9 @@ your games content folder first, then add them from there.
   * You might need to filter the content browser for plug in content if using the ones mentioned above
   * Make sure its the **sprite**, and not the texture 
 * Drag the sprite out and drop it into the 3D viewport
-* Zero out the transforms so that it's X, Y and Z are as per the **Transform** screenshot
-* Set the rotations to x: -90, y: 0.0, z: 0.0 as below
-  * All plain sprites, will need to be set with this transform
+* Zero out the Location transforms so that it's X, Y and Z are as per the **Transform** screenshot
+* Set the Rotation to x: -90, y: 0.0, z: 0.0 as below
+  * All sprite assets you add to your scenes will need to be set with this transform
 
 ![Axes for every sprite](images/axes-changes.png)
 
@@ -221,13 +221,30 @@ _You should be able to see your background art now_
 
 ### 3.2.3 Tips for Orienting the Perspective Viewport
 
-Cannot see background / environment art properly in the viewport?
+_Cannot see background / environment art properly in the viewport?_
 
 * Double-check that the background image is a **PaperSpriteActor** in the scene outliner
   * Make sure its transform is X: -90, Y: 0, Z: 0
 * Make sure you're in **Perspective view and Unlit**
+
+_Confused about where scene objects are rotating to?_
+
+![Axes](./images/axes-xyz.png)
+_Viewport axes. If not visible, press "G" to disable "Game View"_
+
 * Axes not visible, bottom left? 
   * Ensure you're not in "Game mode", in the camera options menu
+
+![Right hand rule axes](./images/aircraft-flight-mechanics.png)
+
+* Which way is Z pointing? The axes are a right-hand rule. 
+  * Hold your right hand as shown below, like a handshake, but with middle finger bent in.
+  * Line up index finger paralell to your monitor screen and horizontal
+    * Rotate yourself in your chair to avoid a cramp!
+  * Rotate your arm so the middle finger points down
+  * Observe that your thumb (Z axis) points _into_ the screen
+  * So in the image above you see X and Y, but Z is into the screen (not towards the viewer)
+
 * Orient the axes, X to the right, and Y down, Z pointing away from you.
   * To do this, select the Background image (transform as above) and **orbit around it**
   * This [video on the Unreal site explains orbiting]
@@ -244,20 +261,30 @@ Cannot see background / environment art properly in the viewport?
 # 4.0 Add the Camera
 
 The camera follows the player as they move around the scene, and is a custom camera that comes with
-the AdventureTemplate.
+the AdventureTemplate. A blueprint will created off the `FollowCamera` class for this.
+
+There's some setup that has to be done on the **_blueprint_**, so its ready to 
+drop into every scene. Then, there are per-scene changes as well, to suit the size of the scene.
+
+Finally to get the viewport working with the UI a `SplitScreenManager` class is needed.
+
+Let's get to it.
 
 ## 4.1 Create the Camara Blueprint
 
 * Right-click in the folder `MyAdventure/Blueprints` select "Blueprint Class"
   * Expand "All classes", search for `FollowCamera`
-  * This is a C++ class in the AdventureTools plugin
-  * Select, create it and name it `BP_FollowCamera`
+    * This is a C++ class in the AdventureTools plugin
+    * Select, create it and name it `BP_FollowCamera`
   * Drag the new blueprint into the 3D viewport
   * Select it in the outliner:
 
 ![Camera in outliner](./images/Camera-added-outliner.png)
 
-* With the base of the camera selected in the outliner as above
+_In the outliner select the BP_FollowCamera you added to the scene, _
+
+* With the camera selected in the outliner as above
+  * Select the base `BP_FollowCamera` object in the details panel
   * Zero out the `Location` in the Transform for the top level camera object
 
 ![Camera base translation](./images/Camera-top-level-transform.png)
@@ -268,7 +295,7 @@ the AdventureTemplate.
 Note that there is already a pre-made `BP_FollowCamera` in the plugin folder that you can copy or use, but
 its easy to make your own as above, and it might be handy if you want to customize it later.
 
-# 4.1 Edit Camera Confines and _Confines of Camera_ ...?
+## 4.2 Edit Camera Confines and _Confines of Camera_ ...?
 
 Every scene has a different background size - it can be taller and wider than the camera aperture/field-of-view. So
 the camera carries with it a box that constrains how far it can move, and this box must exactly contain the 
@@ -291,15 +318,24 @@ The code then _forces_ the actual `Camera Confines` collision box to those `Conf
 So in a sense its pointless setting these values, but again I find its a lot easier to setup the scene when 
 you have this box correctly sized, to _match_ the `Confines of Camera` field.
 
-* In the 👉 Blueprint editor for the `BP_FollowCamera` select `Camera Confines` in the component tree, top-left
-  * Set the Dimensions to 
-    * `x: 1/2 width of texture`
-    * `y: 1/2 height of texture`
-    * `z: 10`
+* In the 👉 Blueprint editor for the `BP_FollowCamera` 
+1. Select `Camera Confines` in the component tree, top-left
+2. Locate the `Box Extent` under the Shape heading the Details panel
+3. Set the Dimensions to 
+     * `x: 1/2 width of texture`
+     * `y: 1/2 height of texture`
+     * `z: 10`
 * So for a background that is 480px x 145px, use `x: 240, y: 72.5, z: 10`
-* Select the root Follow Camera and set the `Confines of Camera` to the same values
 
-# 4.2 Edit Spring Arm values
+![Camera confines box](./images/Camera-confines-setting.png)
+
+_Visualising the confines by making the box the same size as the `Confines of Camera` setting_
+
+* As mentioned above these values set on the `Camera Confines` box are **overwritten at run-time**
+  * Therefore, select the root Follow Camera 
+  * Ensure the `Confines of Camera` are set to the same values
+
+## 4.3 Edit Spring Arm values
   * Select the `Spring Arm Component` in the details for the blueprint
   * Set the rotations as shown below, y: -90, z: -90
   * Set the `Target Arm Length` to 200
@@ -316,16 +352,17 @@ you have this box correctly sized, to _match_ the `Confines of Camera` field.
 
 **_For each room that you create_** as mentioned you'll need to set the camera box extents.
 
-Make a sticky note to do this each time you create a new room: add a `BP_FollowCamera` and
+Make a sticky note to do this each time you create a new room. You'll add a `BP_FollowCamera` and
 then change these `Confines of Camera` to the values for that rooms background. You can
 also set the size of the box as well, if you like.
 
 ![Camera confines](./images/camera-confines.png)
+
 _At run-time these values are set forced onto the Camera Confines box._
 
-## 4.2 Camera Blueprint Configuration
+## 4.4 Camera Blueprint Configuration
 
-These are the settings that are the same for every camera in the game, so set them on to
+These are the settings that are the same for every camera in the game. Set them on to
 the blueprint so they'll be there for every scene.
 
 * Double-click the `BP_FollowCamera` you created in the blueprints folder to open it
@@ -345,7 +382,8 @@ the blueprint so they'll be there for every scene.
 Regarding this magic number of `2.206897`, you get this by dividing the camera view width by
 its height. The height comes from the game area height defined by the game UI. 
 
-If you type in `320 / 145` into the field and press enter Unreal will calculate the above and enter it for you.
+If you type in `320 / 145` into the `Aspect ratio` field and press enter Unreal will calculate
+the value and enter it for you.
 
 * Click on the **Spring Arm Component**
     * Use Pawn Control Rotation - `[  ]` (unchecked)
@@ -353,6 +391,91 @@ If you type in `320 / 145` into the field and press enter Unreal will calculate 
 See detailed instructions in [screen and camera setup how-to] for other screen sizes.
 
 [screen and camera setup how-to]: ./ScreenAndCamera.md
+
+## 4.5 Split Screen Manager
+
+This C++ class was directly taken from Justin of Lesser Dog Tutorials, so all props to him for this. Its job
+is to divide the screen into two halves so that the game view from the camera can occupy the top part, and the
+UI with the class 9-button layout and the inventory can take up the lower part.
+
+Setting this up is a 3 step process, involving migrating our game to use streaming levels. Although _some_ of
+the last step is _optional_ and has to do with how you move items **_between the different levels_**. Book mark it
+though as I find I need to do this one quite often while building a game.
+
+### 4.5.1 Set up Streaming Levels
+
+_**First** we have to set up streaming levels, so the split screen manager can live in the persistent level_
+
+* Close all tabs except your main level editor window
+* Open the Levels folder in the Content Pane
+  * Right click on your level and rename it to match whatever the room is
+  * In my example its an image of the outside of a tower. 
+    * I rename my level to be `TowerExterior`
+    * If you're using the art in the plugin you can follow along or choose your own
+    * Don't worry about the warning, you will fix the references in step 3.
+  * Right click in the Levels folder and choose _Level_ to create a new level
+    * Name it `MainLevelPersistent`
+    * Save your existing level: File > Save all
+    * Double-click to open `MainLevelPersistent`
+  * Ensure the Levels tab is open - Window > Levels
+    * I situate the Levels tab under the Outliner
+  * Drag the `TowerExterior` Level from the `Levels` content folder into the Levels tab
+    * Drop it into the empty space below `PersistentLevel`
+    * It should show up with `Add Level`
+    * On drop it should appear as a sub-level under `PersistentLevel`
+    * You should now see your game's background in the viewport just as before
+
+![Levels window](./images/Persistent-levels.png)
+
+_Levels tab with TowerExterior added to our new top level_
+
+### 4.5.2 Add the SplitScreenManager
+
+_**Second** we have to add a `SplitScreenManager` to this new `MainLevelPersistent`_
+
+* In the Content Browser select the `All` at the top level
+  * In the search bar enter `SplitScreenManager`
+  * This should locate the C++ class in the plugin, check the Module name is `AdventureTools`
+  * In the Levels tab ensure the `PersistentLevel` is highlighted / selected in blue
+    * In the main level viewport at the bottom right a dropdown should display 
+      * Current Context: Level > MainLevelPersistent (Persistent)
+  * Drag the SplitScreenManager instance into the scene and drop it anywhere
+    * It should now appear in the Persistent Level
+    * Toggle the 👁️‍🗨️ icon in the Levels tab next to TowerExterior
+      * This will turn off the visibility of the TowerExterior level
+      * You should see only the `SplitScreenManager` in the Outliner
+
+![Split screen manager](./images/Splitscreen-manager.png)
+
+### 4.5.2 Configure and Manage the New Levels
+
+_**Third** Configure & manage the new Levels._
+
+* Edit > Project Settings > Maps and Modes
+  * Editor Startup Map: MainLevelPersistent
+  * Game Default Map: MainLevelPersistent
+
+If the process above goes wrong, or at a later time you find you have scene items in the wrong level,
+its important to know how to move that actor from one level to another.
+
+Note that from now on, you will open and work with the new `MainLevelPersistent`. But if in error
+you open up say `TowerExterior` directly and then run the PIE (Play in Editor) you will get bogus
+results because the game is now designed to run with streaming levels, based on `MainLevelPersistent`.
+
+Here is how to move an actor from one level to another. Make sure you have the destination level
+selected and made current (highlighted in blue), and toggle on the eye icon for all levels in the
+Levels tab. 
+
+1. In the scene Outliner select the actor you want to move by clicking on it
+2. Click on the destination level in the Levels window, and then right click on it
+3. In the right-click (context) menu select _Move Selected Actors to Level_
+
+![Move actor](./images/Move-actor-to-new-level.png)
+
+_Moving an actor from one level to another_.
+
+After the above steps click the save icon next to each level in the Levels tab/window. Then 
+save the whole game via File > Save all.
 
 # 5.0 Player Character Setup
 
@@ -411,8 +534,13 @@ to do this if you are using the tempguy.
 * Open that folder and right-click, create a blueprint based on the `AdventureCharacter` class
   * This is a C++ class in the template plugin, and it inherits from PaperZD
   * Name the blueprint class `BP_PlayerCharacter`
+  * You can also copy the one out of the Plugin Content folder
+    * Make sure **its a copy (not a move)**
 * Double-click to open & edit the `BP_PlayerCharacter` class
   * If you see "Open Full Blueprint Editor" click that to open the full editor
+
+### 5.2.1 Character Sprite setup
+
 * Open the viewport tab in the blueprint editor
   * Click on the `Sprite (Sprite 0)` item in the Components tree on the left
   * In the details panel on the right set:
@@ -425,46 +553,105 @@ to do this if you are using the tempguy.
       * This will only be available if the material is correctly set as above
 
 ![Sort priority](./images/translucent-sort-priority.png)
+
+_Translucency Sort Priority_
+
+* With the Sprite still selected set its transforms as below:
+
+![Character transforms](./images/character-transform.png)
+_Character sprite transforms_
+
+* The `X: 90` is required as per all sprites to rotate it so we can see it in the game
+* The `Y: -19.0` should be adjusted for your artwork, so that the sprite's feet are on the ground
+  * The arrow and the capsule should be at the character's ankles
+* The `Scale` values can be set if your sprite is a bit large for the scene. YMMV.
+
+### 5.2.2 Capsule Configuration
+
 _Resizing the height and width of the capsule_
 
   * Click on the "Capsule Component" (which is the root component of the character)
-    * See above screenshot
-    * Drag in the Shape > Capsule Half Height & Capsule Radius boxes to change its size
+    * Change its radius to 4, and its height to 4.
+    * It should become a small globe/circle
+      * The reason for this is the navigation agent uses this to move the character in the scene
+      * We don't want a big capsule as it will just cause the agent to get blocked
 
-![Capsule Size](./images/capsule-setup.png)
+![Capsule Size](./images/Character-capsule-setup.png)
 
-* Change the size until it neatly fits the character idle
-  * You will likely need to move the `Sprite` by a pixel or two to get it centered
-  * To do this make sure you have the grip snapping turned off in the viewport controls
+### 5.2.3 Speech Sphere Setup
 
-![Character setup](./images/character-setup.png)
-_Character in the viewport of `BP_PlayerCharacter` after capsule sizing_
+_Character speech sphere setup_
+
+* Click on the `Sphere` in the Component tree
+  * Use the red & green transform arrows to move it just above the character's head
+  * This object is used to position bark (speech) text in the game
+
+![Sphere setup](./images/Character-speech-sphere-setup.png)
+
+_Character in the viewport of `BP_PlayerCharacter` after capsule, sphere and transform setup_
+
+### 5.2.4 Character AI Setup
+
+* In the `PlayerCharacter` folder right-click and create a Blueprint from `AdventureAIController` C++ class
+  * Call it `BP_AdventureAIController`
+* Navigate to and edit the `BP_AdventureCharacter` Blueprint
+* Under the `Pawn` category ensure these settings are correct: 
+  * Auto Possess player: Disabled
+  * Auto Possess AI: Placed in World or Spawned
+  * AI Controller Class: 
+
+![Character AI setup](./images/Character-pawn-settings.png)
 
 ## 5.3 Character Controller and Modes
 
-X=Roll
-Y=Pitch
-Z=Yaw
+The way the Character is controlled for pathing around a level requires two separate pawn objects:
+
+BP_PlayerCharacter          | BP_Puck
+----------------------------| ------------------------------
+Controlled by AI            | "Controlled" by player clicks
+Visible in game             | Not visible in game
+Default spawn character     | Programmatically created
+`BP_AdventureAIController`  | `BP_AdventurePlayerController`
+
+### 5.3.1 Puck
 
 * Inside the `PlayerCharacter` folder right-click and create a blueprint sub-class of `Puck`
   * Name it `BP_Puck`
   * Double-click to open it and set the values in the `Inputs` section
+
+_You can also copy the `BP_Puck` object already created in the plugin, but will still need to set up the inputs_
 
 ![Inputs](./images/Inputs.png)
 _These inputs and the context are defined inside the plugins contents_
 
   * The puck is responsible for sending the point and click UI operations to the game
   * Its seperate from the character because that is controlled by the nav AI
-  * Under the **Pawn** section ensure the settings are as in this screenshot
+  * Under the **Pawn** section of `BP_Puck` ensure the settings are as in this screenshot
 
 ![Possession](./images/Puck-AI-settings.png)
+
+_Puck settings for AI and Possession_
 
   * `Auto Possess Player: Disabled` - that's the most important setting
   * Once set, compile and save
 
+### 5.3.2 Player Controller
+
+* Inside the `PlayerCharacter` folder right-click and create a blueprint sub-class of `AdventurePlayerController`
+  * Name it `BP_AdventurePlayerController`
+  * Double-click to open it
+* Under the `Gameplay` section set _Puck class to spawn_ to `BP_Puck`
+
+# 6.0 Gameplay Classes
+
+We are nearly at a point where we can run the game. Not long now.
+
+The next few classes are very simple, and mostly are just wiring together all the things we have
+already created.
+
+## 6.1 Game Mode
+
 * Inside the `Blueprints` folder create a `Gameplay` folder
-  * Right-click inside `Gameplay` and create a blueprint sub-class of `CommandManager`
-    * Name it `BP_CommandManager`
 
   * Right-click inside `Gameplay` and create a blueprint sub-class of `AdventureGameMode`
     * Name it `BP_AdventureGameMode`
@@ -475,6 +662,88 @@ _These inputs and the context are defined inside the plugins contents_
 * Inside `Edit > Project Settings > Maps & Modes`:
   * Set `Default GameMode: BP_AdventureGameMode`
 
+## 6.2 Command Manager
+
+* Inside the `Gameplay` folder right-click and create a blueprint sub-class of `CommandManager`
+  * Name it `BP_CommandManager`
+  * Double-click to open it
+* Set _Adventure HUD Class_ to `BP_AdventureGameHUD` (this is a UI class in the plugin)
+
+## 6.3 Game Instance
+
+* Inside the `Gameplay` folder right-click and create blueprint sub-class of `AdventureGameInstance`
+  * Set the details panel up  as follows:
+    * _Inventory Class_: `BP_ItemList`
+    * _Starting Level Name_: `TowerExterior` (or whatever you named your level in 4.5.1 above)
+    * _Starting Door Label_: `A1` (we still have to create this door)
+    * _Save Game Class_: `BP_AdventureSave`
+* Go to _Edit > Project Settings_ and then _Project > Maps and Modes_ 
+  * At the bottom set _Game Instance Class_: `BP_AdventureSave`
+
+# 7.0 First Door
+
+Here we create about the last piece required to run the game: a door for the player to start at.
+For now, follow along and use the pre-made components and the way to create your own will be
+covered later.
+
+## 7.1 Create the Door
+
+* Right click inside the `Hotspots` folder you created in step 1.2
+  * Create a blueprint subclass of _Door_ and called it `BP_StartingDoor`
+  * Notice some of the other classes in the `HotSpot` class hierarchy
+
+![Creating a door](./images/Create-door.png)
+
+  * Set the _Door Label_ to `A1`
+  * Set the _Current Level_ to `TowerExterior` (or whatever you named your level in 4.5.1 above)
+  * Leave _Level to Load_ to `None`
+
+![Door settings](./images/Door-settings.png)
+
+## 7.2 Static Mesh 
+
+* Click on the Static Mesh Component in the Component tree top left
+  * Set _Static mesh_ to `SM_StartingDoor`
+    * The materials should get set automatically
+  * The way to create your own meshes for hotspots will be covered later
+    * For now we'll just use this one from the plugin
+
+![Door mesh](./images/Door-mesh-settings.png)
+
+## 7.3 Walk to Point
+
+* Navigate in the Door blueprints viewport until the axes are Y down, X to the right
+  * You should be able to visualise the mesh as door that will be in the scene (see below)
+* Click on the _Walk to Point_ in the Component tree to highlight it in the viewport
+  * Drag it so that its near the base of the mesh door, and out a bit
+  * This is where the character will stand when they have just walked in through that door
+
+![Door walk point](./images/Door-setup.png)
+_Door walk to point is set up in front of the door_
+
+## 7.4 Set up in the Scene
+
+* Compile and save the new door
+* Go back to the `MainLevelPersistent` tab 
+  * Make sure the Levels tab is set to `TowerExterior` as current (blue)
+* Drag the door into the scene and position it appropriately
+
+![Door in scene](./images/Door-in-scene.png)
+
+* You can fine tune the position of the _Walk to Point_
+  * Either tune it inside the blue print
+  * Or select the instance in the Outliner
+    * and in the details select the Walk to Point
+    * drag it to where you need it via the handles
+
+## 7.4 Test Game Progress
+
+* Run the game
+  * The following things should work
+    * The character should animate - the idle should be happening
+    * You should be able to click in the scene and see debug information about the click
+    * You chould be able to hover the mouse over the starting door and see text in the UI
+      * Your description should show up here
 
 ---
 
