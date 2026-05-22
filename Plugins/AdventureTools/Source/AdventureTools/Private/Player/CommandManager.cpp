@@ -379,6 +379,22 @@ void ACommandManager::HandleAIMovementCompleteNotify(EPathFollowingResult::Type 
         LastPathResult = EAIMoveResult::Success;
         ShouldCompleteMovementNextTick = true;
     }
+    else if (Result == EPathFollowingResult::Invalid)
+    {
+        if (AIStatus == EAIStatus::MakingRequest)
+        {
+            AIStatus = EAIStatus::Done;
+#if WITH_EDITOR
+            const FString Message = FString::Printf(
+                TEXT("AI movement invalid %s - is agent and nav mesh correct?"), 
+                *TargetLocationForAI.ToString());
+            GEngine->AddOnScreenDebugMessage(COMMAND_MANAGER_NAV_ERR_KEY, 5.0, FColor::Cyan,
+                                             *Message, false, FVector2D(2.0, 2.0));
+            UE_LOG(LogAdventureGame, Warning, TEXT("%s"), *Message);
+#endif
+        }
+        ShouldCompleteMovementNextTick = true;
+    }
     else
     {
         if (CurrentHotSpot && (Result == EPathFollowingResult::Blocked || Result == EPathFollowingResult::OffPath))
@@ -388,7 +404,7 @@ void ACommandManager::HandleAIMovementCompleteNotify(EPathFollowingResult::Type 
             const FString Message = FString::Printf(
                 TEXT("Movement blocked to %s - %s - is walk to point on the nav mesh?"),
                 *(CurrentHotSpot->ShortDescription.ToString()), *(HotSpotLocation.ToString()));
-            GEngine->AddOnScreenDebugMessage(1, 5.0, FColor::Cyan,
+            GEngine->AddOnScreenDebugMessage(COMMAND_MANAGER_NAV_ERR_KEY, 5.0, FColor::Cyan,
                                              *Message, false, FVector2D(2.0, 2.0));
             UE_LOG(LogAdventureGame, Warning, TEXT("%s"), *Message);
 #endif
@@ -421,31 +437,33 @@ void ACommandManager::WalkToLocation(const FVector& Location)
 {
     StopAIMovement();
     if (AIStatus != EAIStatus::Idle) return;
-    TargetLocationForAI = Location;
+    
+    TargetLocationForAI = FVector(Location.X, Location.Y, 0.0f);
     
     if (bTeleportInsteadOfWalk)
     {
-        TeleportToLocation(Location);
+        TeleportToLocation(TargetLocationForAI);
         return;
     }
 
     if (AAdventureAIController* AI = GetAIController())
     {
         AIStatus = EAIStatus::MakingRequest;
-        switch (AI->MoveToLocation(Location, 1.0))
+        switch (AI->MoveToLocation(TargetLocationForAI, 2.0, 
+            true, true, true, false
+            ))
         {
         case EPathFollowingRequestResult::Type::Failed:
-            UE_LOG(LogAdventureGame, VeryVerbose, TEXT("Path following request -> failed: %f %f"), Location.X, Location.Y);
+            UE_LOG(LogAdventureGame, VeryVerbose, TEXT("Path following request -> failed: %s"), *TargetLocationForAI.ToString());
             LastPathResult = EAIMoveResult::Fail;
             break;
         case EPathFollowingRequestResult::Type::RequestSuccessful:
-            UE_LOG(LogAdventureGame, VeryVerbose, TEXT("Path following request -> success: %f %f"), Location.X, Location.Y);
+            UE_LOG(LogAdventureGame, VeryVerbose, TEXT("Path following request -> success: %s"), *TargetLocationForAI.ToString());
             LastPathResult = EAIMoveResult::Moving;
             AIStatus = EAIStatus::Moving;
             break;
         case EPathFollowingRequestResult::Type::AlreadyAtGoal:
-            UE_LOG(LogAdventureGame, VeryVerbose, TEXT("Path following request -> already there: %f %f"), Location.X,
-                   Location.Y);
+            UE_LOG(LogAdventureGame, VeryVerbose, TEXT("Path following request -> already there: %s"), *TargetLocationForAI.ToString());
             break;
         }
     }

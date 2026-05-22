@@ -55,7 +55,9 @@ void AAdventurePlayerController::BeginPlay()
 
     Puck = SetupPuck(PlayerCharacter);
     SetupAIController(PlayerCharacter);
+    
     PlayerCharacter->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+    PlayerCharacter->SetActorLocation(FVector(0.0f, 0.0f, 0.0f));
     
     Possess(Puck);
 
@@ -249,15 +251,15 @@ void AAdventurePlayerController::SetupAIController(APawn* AttachToPawn)
 #if WITH_EDITOR
     if (!AdventureAIController)
     {
-        FString ErrorMessage = FString::Printf(TEXT("AIController not found on character %s - check its blueprint"),
+        FString ErrorMessage = FString::Printf(TEXT("AIController not found on character %s - check its blueprint Pawn section"),
                                                *AttachToPawn->GetName());
-        GEngine->AddOnScreenDebugMessage(1, 10.0, FColor::Red,
+        GEngine->AddOnScreenDebugMessage(ADVENTURE_CONTROLLER_SETUP_AI_KEY, 10.0, FColor::Red,
                                          *ErrorMessage, false, FVector2D(2.0, 2.0));
-        UE_LOG(LogAdventureGame, Error, TEXT("SetupAIController error. %s"), *ErrorMessage);
+        UE_LOG(LogAdventureGame, Error, TEXT("SetupAIController missing! %s"), *ErrorMessage);
     }
 #endif
     check(AdventureAIController);
-
+    
     AdventureAIController->Possess(AttachToPawn);
 
     // DO NOT CONNECT THE COMMAND MANAGER HERE.
@@ -322,8 +324,8 @@ AHotSpot* AAdventurePlayerController::HotSpotClicked()
     {
 #if WITH_EDITOR
         FString HotSpotMessage = FString::Printf(TEXT("Got HotSpot: %s"), *HotSpot->GetName());
-        // GEngine->AddOnScreenDebugMessage(1, 20.0, FColor::White, HotSpotMessage,
-        //                                  false, FVector2D(2.0, 2.0));
+        GEngine->AddOnScreenDebugMessage(ADVENTURE_CONTROLLER_HOTSPOT_DEBUG_KEY, 20.0, FColor::White, HotSpotMessage,
+                                         false, FVector2D(2.0, 2.0));
         UE_LOG(LogAdventureGame, Display, TEXT("%s"), *HotSpotMessage);
 #endif
         return HotSpot;

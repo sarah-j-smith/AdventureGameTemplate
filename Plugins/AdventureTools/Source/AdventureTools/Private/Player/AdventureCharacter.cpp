@@ -48,8 +48,17 @@ void AAdventureCharacter::BeginPlay()
 
 void AAdventureCharacter::Tick(float DeltaTime)
 {
+	static float DelayTimer = 0.0f;
+	
 	Super::Tick(DeltaTime);
 
+	DelayTimer -= DeltaTime;
+	if (DelayTimer <= 0.0f)
+	{
+		DelayTimer = 1.0f;
+		UE_LOG(LogAdventureGame, Log, TEXT("AAdventureCharacter - position %s"), *GetActorLocation().ToString())
+	}
+	
 	// This is used just to feed in the PaperZD Set direction for the sprite facing
 	const UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
 	FVector2D Velocity = FVector2D(MovementComponent->Velocity.X, MovementComponent->Velocity.Y);
@@ -189,10 +198,10 @@ void AAdventureCharacter::TeleportToLocation(FVector NewLocation)
 		// Falling happens with increasingly negative z values.
 		UE_LOG(LogAdventureGame, Verbose, TEXT("AAdventureCharacter::TeleportToLocation - %s"), *NewLocation.ToString());
 	}
-
-	// in prod work around via forcing to MinZValue
-	const float ZValue = std::max(static_cast<float>(NewLocation.Z), MinZValue);
-	SetActorLocation(FVector(NewLocation.X, NewLocation.Y, ZValue));
+	const FVector TeleportLocation = FVector(NewLocation.X, NewLocation.Y,FMath::Clamp(NewLocation.Z, MinZValue, MaxZValue));
+	SetActorLocation(TeleportLocation);
+	UE_LOG(LogAdventureGame, Warning, TEXT("AAdventureCharacter::TeleportToLocation - %s"), *TeleportLocation.ToString());
+	UE_LOG(LogAdventureGame, Warning, TEXT("   (Possibly clamped from - %s)"), *NewLocation.ToString());	
 }
 
 void AAdventureCharacter::SetFacingDirection(EWalkDirection Direction)

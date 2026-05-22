@@ -116,7 +116,11 @@ private:
 	/// Try to prevent the player character from falling through the floor due to
 	/// misplaced geometry. Exposed mostly for debugging purposes.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Movement, meta=(AllowPrivateAccess=true))
-	float MinZValue = 5.0f;
+	float MinZValue = 0.01f;
+
+	/// Try to prevent the player character from somehow being above the nav mesh.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Movement, meta=(AllowPrivateAccess=true))
+	float MaxZValue = 1.0f;
 
 public:
 	

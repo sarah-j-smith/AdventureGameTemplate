@@ -174,89 +174,91 @@ your games content folder first, then add them from there.
   * Make sure its the **sprite**, and not the texture 
 * Drag the sprite out and drop it into the 3D viewport
 * Zero out the Location transforms so that it's X, Y and Z are as per the **Transform** screenshot
-* Set the Rotation to x: -90, y: 0.0, z: 0.0 as below
+* Set the Rotation to x: -90, y: 0.0, z: 0.-90 as below
   * All sprite assets you add to your scenes will need to be set with this transform
 
-![Axes for every sprite](images/axes-changes.png)
+![Axes for every sprite](images/transform-for-LUF.png)
 
 **_Can't see your background image? Read on..._**
 
 ## 3.2 Understand Axes - Explainer
 
-A word about Unreal Engine 2D Axes. Because this is a 2D game we _should_ be able to use the
-"Top" view which is an orthogonal view. But unfortunately due to recent changes and how the 
-development was done on earlier versions, that does not work. 
+This is what the game will look like soon, after camera and other things are added. We are in
+perpective view here. Look at the axes in the bottom corner.
+
+![Rotated view in ortho](./images/unreal-axes.png)
+_Unreal Engine viewport in v5.6 and above_
+
+To orient your Perspective view like this, select in the _Outliner_ the Background image you just dropped in to
+the scene by clicking on it; then press "F" to focus on the background. Now with your mouse cursor in the main
+viewport hold down _Alt_ and drag with the left mouse button down to orbit until you get something like this.
+
+* Since [UE 5.6 the axes changed] so we must rotate our 2D assets to x: -90, y: 0.0, z: 0.-90 
+  * Unreal is Z up, and this is explained below
+* This rotation is what we did for the background art of the tower
+
+![Unreal Z up](./images/unreal-axes-Z-up.jpeg)
+
+They will _render_ the same, after the 5.6 changes, since we can put the game camera in any 
+position and orientation. But the problem is that the **Top view**, which
+we _must_ use for our _game development_ does not work unless we rotate our assets like this.
+
+Setting it up as above means that we can _develop_ the game, and then fix the camera so we have
+it come out looking right as well.
+
+### 3.2.1 Try Top View Now
 
 1. Set the viewport camera settings to "Top"
 2. We get axes rotated so Y is left and X is down.
+3. Note the axes bottom left
 
-![Rotated view in ortho](./images/screen-is-rotated-in-top-view.png)
-_Unreal Engine viewport in v5.6 and above_
-
-* Since [UE 5.6 the axes changed] so we cannot see our game correctly
-
+![Top down view](./images/top-down-screenshot.png)
+_Unreal editor top "Top" view with background art_
 
 **Note:** Don't see the axes, bottom left? Check "Game" mode is off in the "Camera Options" menu
 
-### 3.2.1 Options to Deal with Rotated View
+**_Why use "Top view"?_**
 
-* The options are:
-  - A: Use perspective viewport camera setting and re-position 
-    * instead of using proper ortho 2D camera
-    * inconvenient, have to re-orient the perspective view often
-  - B: Use top and ortho but rotate the sprites and camera to match
-     * Every sprite would need to be: x: -90, y: 0.0, z: -90.0 
-     * means migrating this code base to use different axes
+* The "Top" view avoids perspective distortion. 
+  * To align the nav mesh and collision boxes we can see to line them up by using the top view. 
+* Some tools like the Brush mode mesh painter does not work in perspective mode
+  * And again we need to see to line up the mesh painter correctly
+* If you tried the exercise above of "F" to focus and then orbit you'll see it was a pain
+  * Top view is much easier to use.
 
-My current approach is the first, option A: use the perspective view. Until this 
-code basae can be migrated I suggest following this as well.
+Occasionally its useful to switch to perspective view, but most work will be in the top view.
 
-### 3.2.2 Use Perspective view
+**_Wait, what happened to the Z axis?_**
 
-1. Set the viewport camera settings to `Perspective`
-2. Re-orient the axes so that X is to the right and Y is down
+In top view, orthographic, the Z axis positive direction points directly at you, out of the screen
+towards the camera (as seen in the image at the top of this section). 
 
-![Use perspective view](./images/use-perspective-view-instead.png)
-_You should be able to see your background art now_
+This Z axis is also the "up" direction in the Unreal Engine world, so "Top **_Down_**" obviously
+means we are looking down on the scene from the top. Its just that because our art shows a
+world with grass and a tower, and bushes "up" can be confusing. 
 
-### 3.2.3 Tips for Orienting the Perspective Viewport
+The important thing about "up" is that we still use gravity in the 2D game because its part of
+the navigation system and moving our character.
 
-_Cannot see background / environment art properly in the viewport?_
+### 3.2.2 Grasp Handedness to Understand 2D setup
 
-* Double-check that the background image is a **PaperSpriteActor** in the scene outliner
-  * Make sure its transform is X: -90, Y: 0, Z: 0
-* Make sure you're in **Perspective view and Unlit**
+To quickly orient yourself to "Up" look at the brilliant diagram by [Freya Holmer] below:
 
-_Confused about where scene objects are rotating to?_
+![Left hand rule axes](./images/freya-holmer-handedness.png)
+_Freya Holman's handedness infographic with annotations for Unreal Engine_
 
-![Axes](./images/axes-xyz.png)
-_Viewport axes. If not visible, press "G" to disable "Game View"_
+[Freya Holmer]: https://x.com/FreyaHolmer/status/1834989650236015036/photo/1
 
-* Axes not visible, bottom left? 
-  * Ensure you're not in "Game mode", in the camera options menu
+* _Which way is Z pointing? Into or out of the screen?_
+* The Unreal axes are a **left-hand** rule. 
+  * Hold up your **_left_** hand as shown, as you sit in front of your computer monitor
+    * Index finger pointing up, 
+    * Thumb to the left, 
+    * Middle finger bent in. 
+  * Observe that your middle finger (Z axis) points toward you
+    * so that is _what happened to the Z axis_, you're looking at it end on
 
-![Right hand rule axes](./images/aircraft-flight-mechanics.png)
-
-* Which way is Z pointing? The axes are a right-hand rule. 
-  * Hold your right hand as shown below, like a handshake, but with middle finger bent in.
-  * Line up index finger paralell to your monitor screen and horizontal
-    * Rotate yourself in your chair to avoid a cramp!
-  * Rotate your arm so the middle finger points down
-  * Observe that your thumb (Z axis) points _into_ the screen
-  * So in the image above you see X and Y, but Z is into the screen (not towards the viewer)
-
-* Orient the axes, X to the right, and Y down, Z pointing away from you.
-  * To do this, select the Background image (transform as above) and **orbit around it**
-  * This [video on the Unreal site explains orbiting]
-  * Or see the gif below:
-    * Click on the background in the scene outliner
-    * Move the mouse over the view port
-    * Press "F" for focus, to get the viewport focussed on the background
-    * This may fix it outright, but if not:
-    * Press and hold Alt / ⎇ and Left-mouse-button...
-      * ...then drag the mouse in the viewport until the axes match this image
-  
-![Navigate viewport](./images/navigate-viewport.gif)
+Remember this for future work as we build up the game scene.
 
 # 4.0 Add the Camera
 
@@ -270,7 +272,7 @@ Finally to get the viewport working with the UI a `SplitScreenManager` class is 
 
 Let's get to it.
 
-## 4.1 Create the Camara Blueprint
+## 4.1 Create the Camera Blueprint
 
 * Right-click in the folder `MyAdventure/Blueprints` select "Blueprint Class"
   * Expand "All classes", search for `FollowCamera`
@@ -281,7 +283,7 @@ Let's get to it.
 
 ![Camera in outliner](./images/Camera-added-outliner.png)
 
-_In the outliner select the BP_FollowCamera you added to the scene, _
+_In the outliner select the BP_FollowCamera you added to the scene_
 
 * With the camera selected in the outliner as above
   * Select the base `BP_FollowCamera` object in the details panel
@@ -311,23 +313,31 @@ work with the the camera blueprint, in each scene. Its easier to be sure you hav
 Very important: When Unreal sets up the scene, the `FollowCamera` reads the values out of the field called
 `Confines of Camera` on the root `FollowCamera` object.
 
-![Confines of Camera](./images/camera-confines.png)
+![Confines of Camera](./images/confines-of-camera.png)
+
 _Detail of the root of the FollowCamera blueprint showing the Confines of Camera property_
 
 The code then _forces_ the actual `Camera Confines` collision box to those `Confines of Camera` dimensions. 
 So in a sense its pointless setting these values, but again I find its a lot easier to setup the scene when 
 you have this box correctly sized, to _match_ the `Confines of Camera` field.
 
-* In the 👉 Blueprint editor for the `BP_FollowCamera` 
-1. Select `Camera Confines` in the component tree, top-left
-2. Locate the `Box Extent` under the Shape heading the Details panel
-3. Set the Dimensions to 
-     * `x: 1/2 width of texture`
-     * `y: 1/2 height of texture`
+* **In the 👉 Blueprint editor for the `BP_FollowCamera`** 
+1. Select the root component `BP_FollowCamera (Self)` in the component tree, top-left
+   * Edit the `Confines of Camera` property as above 
+2. Select `Camera Confines` in the component tree, top-left
+   * Locate the `Box Extent` under the Shape heading the Details panel
+   * Set the Dimensions to 
+     * `x: 1/2 height of texture`
+     * `y: 1/2 width of texture`
      * `z: 10`
-* So for a background that is 480px x 145px, use `x: 240, y: 72.5, z: 10`
+* So for a background that is 480px wide x 145px high, use `x: 72.5, y: 240, z: 10`
 
-![Camera confines box](./images/Camera-confines-setting.png)
+![Camera confines box](./images/camera-confines-extents.png)
+
+**_Why is X the width and Y the height? Seems back-to-front?_**
+
+Again because of the rotated Unreal Engine Top Down viewport, we rotate everything so we can 
+work in the orthographic top down view.
 
 _Visualising the confines by making the box the same size as the `Confines of Camera` setting_
 
@@ -337,28 +347,13 @@ _Visualising the confines by making the box the same size as the `Confines of Ca
 
 ## 4.3 Edit Spring Arm values
   * Select the `Spring Arm Component` in the details for the blueprint
-  * Set the rotations as shown below, y: -90, z: -90
+  * Set the rotations as shown below, y: -90, z: 180
+
+![Camera transform](./images/follow-camera-boom.png)
+
   * Set the `Target Arm Length` to 200
 
-![Camera transform](./images/Camera-spring-arm-settings.png)
-
-* At this point you should be able to see your camera image previewed in the viewport
-  * check the camera preview is turned on to see the preview
-  * turn it off again to make the viewport less cluttered
-
-![Camera preview](./images/Turn-on-camera-preview.png)
-
-## 4.3 Check Camera Confines Setup
-
-**_For each room that you create_** as mentioned you'll need to set the camera box extents.
-
-Make a sticky note to do this each time you create a new room. You'll add a `BP_FollowCamera` and
-then change these `Confines of Camera` to the values for that rooms background. You can
-also set the size of the box as well, if you like.
-
-![Camera confines](./images/camera-confines.png)
-
-_At run-time these values are set forced onto the Camera Confines box._
+![Camera target arm](./images/follow-camera-boom-settings.png)
 
 ## 4.4 Camera Blueprint Configuration
 
@@ -384,6 +379,30 @@ its height. The height comes from the game area height defined by the game UI.
 
 If you type in `320 / 145` into the `Aspect ratio` field and press enter Unreal will calculate
 the value and enter it for you.
+
+## 4.5 Check Camera Preview
+
+* At this point you should be able to see your camera image previewed in the viewport
+* Save and compile the `BP_FollowCamera` blueprint
+* Close the blue print and return 
+
+![Camera preview](./images/preview-camera-in-viewport.png)
+
+* check the camera preview is turned on to see the preview
+
+![Camera preview](./images/Turn-on-camera-preview.png)
+
+## 4.6 Check Camera Confines Setup
+
+**_For each room that you create_** as mentioned you'll need to set the camera box extents.
+
+Make a sticky note to do this each time you create a new room. You'll add a `BP_FollowCamera` and
+then change these `Confines of Camera` to the values for that rooms background. You can
+also set the size of the box as well, if you like.
+
+![Camera confines](./images/camera-confines.png)
+
+_At run-time these values are set forced onto the Camera Confines box._
 
 * Click on the **Spring Arm Component**
     * Use Pawn Control Rotation - `[  ]` (unchecked)

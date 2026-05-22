@@ -75,7 +75,7 @@ void UDialogComponent::FillConversationData()
         bool IsOK = TopicConversationData.Validate(ErrorMessage);
         if (!IsOK && !ErrorMessage.IsEmpty())
         {
-            GEngine->AddOnScreenDebugMessage(1, 10.0, FColor::Red,
+            GEngine->AddOnScreenDebugMessage(DIALOGUE_FILL_KEY, 10.0, FColor::Red,
                     *ErrorMessage,false, FVector2D(2.0, 2.0));
             UE_LOG(LogDialog, Error, TEXT("Error in Conversation: check tables: %s"), *ErrorMessage);
         }
