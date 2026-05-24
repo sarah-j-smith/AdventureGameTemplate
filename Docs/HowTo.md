@@ -779,6 +779,14 @@ _Door walk to point is set up in front of the door_
     * You chould be able to hover the mouse over the starting door and see text in the UI
       * Your description should show up here
 
+# Next Steps
+
+* [Create the Nav mesh]
+* [Add Character Animation]
+
+[Create the Nav mesh]: ./CreatingNavMesh.md
+[Add Character Animation]: ./AnimationStateMachine.md
+
 ---
 
 [UE 5.6 the axes changed]: https://forums.unrealengine.com/t/the-top-view-axis-has-changed-in-version-5-6-what-was-the-reasoning-behind-this-change/2552694/7
