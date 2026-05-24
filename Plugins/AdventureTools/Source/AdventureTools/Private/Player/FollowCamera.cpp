@@ -93,10 +93,19 @@ void AFollowCamera::InitialiseCameraConfines()
 	float HalfCamWidth = CameraComponent->OrthoWidth * 0.5f;
 	float HalfCamHeight = (CameraComponent->OrthoWidth / CameraComponent->AspectRatio) * 0.5;
 	
-	ConfineMax.X = ConfinesBoxMax.X - HalfCamWidth;
-	ConfineMax.Y = ConfinesBoxMax.Y - HalfCamHeight;
-	ConfineMin.X = ConfinesBoxMin.X + HalfCamWidth;
-	ConfineMin.Y = ConfinesBoxMin.Y + HalfCamHeight;
+	if (CameraOrientation == ECameraOrientation::XAxisIsOrthoWidth)
+	{
+		ConfineMax.X = ConfinesBoxMax.X - HalfCamWidth;
+		ConfineMax.Y = ConfinesBoxMax.Y - HalfCamHeight;
+		ConfineMin.X = ConfinesBoxMin.X + HalfCamWidth;
+		ConfineMin.Y = ConfinesBoxMin.Y + HalfCamHeight;
+	} else
+	{
+		ConfineMax.X = ConfinesBoxMax.X - HalfCamHeight;
+		ConfineMax.Y = ConfinesBoxMax.Y - HalfCamWidth;
+		ConfineMin.X = ConfinesBoxMin.X + HalfCamHeight;
+		ConfineMin.Y = ConfinesBoxMin.Y + HalfCamWidth;
+	}
 
 	bConfinesInitialised = true;
 }

@@ -8,10 +8,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
+#include "Enums/CameraOrientation.h"
 
 #include "FollowCamera.generated.h"
 
 class AAdventureCharacter;
+enum class ECameraOrientation : uint8;
 
 UCLASS()
 class ADVENTURETOOLS_API AFollowCamera : public AActor
@@ -49,21 +51,33 @@ public:
 
 	/**
 	 * Camera Arm - use this to set the rotation and position of the camera,
-	 * and effects like camera lag.
+	 * and effects like camera lag. Do not set rotation and position directly
+	 * on the camera itself.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FollowCamera")
 	USpringArmComponent *SpringArmComponent;
 
 	/**
-	 * Box containing the limits for the camera. Camera viewport must be contained
-	 * within this volume.
+	 * Box to help visualize limits for the camera, these are the bounds that the camera 
+	 * viewport will be contained within. If this volumes extents are set, ensure they
+	 * match the `ConfinesOfCamera` below.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FollowCamera")
 	UBoxComponent *CameraConfines;
 
+	/**
+	 * Values to control the Camera Confines. The `CameraConfines` box will be set to these
+	 * values at run-time.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FollowCamera")
 	FVector ConfinesOfCamera;
 
+	/**
+	 * Is the camera aligned width-wise with the Y-Axis (Unreal 5.6 and later) or the X-Axis?
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FollowCamera")
+	ECameraOrientation CameraOrientation = ECameraOrientation::YAxisIsOrthoWidth;
+		
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FollowCamera")
 	float FollowSpeed = 12.0f;
 
