@@ -197,8 +197,6 @@ viewport hold down _Alt_ and drag with the left mouse button down to orbit until
   * Unreal is Z up, and this is explained below
 * This rotation is what we did for the background art of the tower
 
-![Unreal Z up](./images/unreal-axes-Z-up.jpeg)
-
 They will _render_ the same, after the 5.6 changes, since we can put the game camera in any 
 position and orientation. But the problem is that the **Top view**, which
 we _must_ use for our _game development_ does not work unless we rotate our assets like this.
@@ -234,11 +232,24 @@ In top view, orthographic, the Z axis positive direction points directly at you,
 towards the camera (as seen in the image at the top of this section). 
 
 This Z axis is also the "up" direction in the Unreal Engine world, so "Top **_Down_**" obviously
-means we are looking down on the scene from the top. Its just that because our art shows a
-world with grass and a tower, and bushes "up" can be confusing. 
+means we are looking down on the scene from the top. In this picture in **Top** view we are looking
+down onto the tip of the blue arrow.
+
+![Unreal Z up](./images/unreal-axes-Z-up.jpeg)
+
+Its just that because our art shows a world with bushes and a tower, we think of a tower as
+going "up". But in terms of Unreal the tower is stretching along the -X axis, not "up" along the Z.
+So "up" can be confusing.
 
 The important thing about "up" is that we still use gravity in the 2D game because its part of
-the navigation system and moving our character.
+the navigation system and moving our character. The character is spawned into the game at launch
+and when going in to a room, and drifts down onto the navigation mesh then stops.
+
+Here is another look at the Perspective viewport image at the top of this section to grasp this 
+better. See the blue Z arrow sticking out of the scene toward the camera. And the red +X is 
+pointing down to the "bottom" of the background artwork.
+
+![Rotated view in ortho](./images/unreal-axes.png)
 
 ### 3.2.2 Grasp Handedness to Understand 2D setup
 
@@ -249,16 +260,20 @@ _Freya Holman's handedness infographic with annotations for Unreal Engine_
 
 [Freya Holmer]: https://x.com/FreyaHolmer/status/1834989650236015036/photo/1
 
-* _Which way is Z pointing? Into or out of the screen?_
-* The Unreal axes are a **left-hand** rule. 
+**_Which way is Z pointing? Into or out of the screen?_**
+
+* The Unreal axes are a **left-hand** rule. Here's the way to answer where Z is:
   * Hold up your **_left_** hand as shown, as you sit in front of your computer monitor
-    * Index finger pointing up, 
-    * Thumb to the left, 
-    * Middle finger bent in. 
-  * Observe that your middle finger (Z axis) points toward you
+    * Now point your **_index finger Y to your left_**
+      * with your arm parallel to the monitor, 
+    * Now rotate your wrist so **_your thumb X points down_**, 
+    * With your middle finger bent in, 90 degrees to your index
+      * notice that it is **pointing out of the screen**
+  * Read off that your middle finger (Z axis) points toward you
     * so that is _what happened to the Z axis_, you're looking at it end on
 
-Remember this for future work as we build up the game scene.
+Remember this for future work as we build up the game scene. These orientations become important
+when stacking different layers of background art, furniture, trees and other items in the scene.
 
 # 4.0 Add the Camera
 

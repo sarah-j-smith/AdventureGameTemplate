@@ -22,7 +22,7 @@ void ASplitScreenManager::BeginPlay()
 	if (!Viewport) return;
 	
 	FSplitscreenData ScreenLayout;
-	auto Screen1 = FPerPlayerSplitscreenData(1, 0.725f, 0, 0);
+	auto Screen1 = FPerPlayerSplitscreenData(1.0f, 0.725f, 0, 0);
 	ScreenLayout.PlayerData.Add(Screen1);
 
 	// This should force the current split screen type to "none" so we can use that slot
