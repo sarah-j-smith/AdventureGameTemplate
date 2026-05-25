@@ -8,8 +8,23 @@ class UInventoryItem;
 
 struct ADVENTURECOMMON_API FGameUtils
 {
-    static bool HasChangedMuch(const FVector2D& Current, const FVector2D& Previous);
+    /**
+     * Return true if Current is different to Previous in either X or Y by a tiny amount.
+     * @param Current `FVector2D` Value to check to see if it differs
+     * @param Previous `FVector2D` Value to check against as a baseline
+     * @return true if `Current` is significantly different to `Previous`, false otherwise
+     */
+    static bool VectorDifference(const FVector2D& Current, const FVector2D& Previous);
 
+    /**
+     * Return true if Current is different to Previous in either X or Y by DBL_EPSILON.
+     * @param Current `FVector2D` Value to check to see if it differs
+     * @param Previous `FVector2D` Value to check against as a baseline
+     * @param Tolerance `double` Tolerance for the difference check
+     * @return true if `Current` is significantly different to `Previous`, false otherwise
+     */
+    static bool VectorDifferenceBy(const double Tolerance, const FVector2D& Current, const FVector2D& Previous);
+    
     static uint32 GetUUID();
 
     /**

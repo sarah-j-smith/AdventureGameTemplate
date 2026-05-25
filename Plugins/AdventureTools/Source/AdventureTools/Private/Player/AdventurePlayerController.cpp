@@ -273,7 +273,7 @@ bool AAdventurePlayerController::GetMouseClickPosition(float& LocationX, float& 
     float NewLocationY = 0.0f;
     if (!GetMousePosition(NewLocationX, NewLocationY)) return false;
     const FVector2D ThisMouseClick{NewLocationX, NewLocationY};
-    if (!FGameUtils::HasChangedMuch(ThisMouseClick, LastMouseClick)) return false;
+    if (!FGameUtils::VectorDifference(ThisMouseClick, LastMouseClick)) return false;
     LastMouseClick = ThisMouseClick;
     LocationX = NewLocationX;
     LocationY = NewLocationY;
@@ -288,7 +288,7 @@ bool AAdventurePlayerController::GetTouchPosition(float& LocationX, float& Locat
     GetInputTouchState(ETouchIndex::Type::Touch1, NewLocationX, NewLocationY, bIsPressed);
     if (!bIsPressed) return false;
     const FVector2D ThisMouseClick{NewLocationX, NewLocationY};
-    if (!FGameUtils::HasChangedMuch(ThisMouseClick, LastMouseClick)) return false;
+    if (!FGameUtils::VectorDifference(ThisMouseClick, LastMouseClick)) return false;
     LastMouseClick = ThisMouseClick;
     LocationX = NewLocationX;
     LocationY = NewLocationY;

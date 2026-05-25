@@ -48,28 +48,10 @@ void AAdventureCharacter::BeginPlay()
 
 void AAdventureCharacter::Tick(float DeltaTime)
 {
-	static float DelayTimer = 0.0f;
-	
-	Super::Tick(DeltaTime);
-
-	DelayTimer -= DeltaTime;
-	if (DelayTimer <= 0.0f)
-	{
-		DelayTimer = 1.0f;
-		UE_LOG(LogAdventureGame, Log, TEXT("AAdventureCharacter - position %s"), *GetActorLocation().ToString())
-	}
-	
 	// This is used just to feed in the PaperZD Set direction for the sprite facing
 	const UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
-	FVector2D Velocity = FVector2D(MovementComponent->Velocity.X, MovementComponent->Velocity.Y);
-	if (FGameUtils::HasChangedMuch(Velocity, LastVelocity))
-	{
-		LastVelocity = Velocity;
-		if (Velocity.SquaredLength() > 0)
-		{
-			LastNonZeroMovement = Velocity;
-		}
-	}
+	const FVector2D Velocity = FVector2D(MovementComponent->Velocity.X, MovementComponent->Velocity.Y);
+	SetLastNonZeroMovement(Velocity);
 }
 
 void AAdventureCharacter::Climb(EInteractTimeDirection InteractTimeDirection)
@@ -186,6 +168,38 @@ void AAdventureCharacter::OnTurnRightAnimOverrideEnd(bool completed)
 	AnimationCompleteDelegate.Broadcast(EInteractionType::TurnRight, completed);
 }
 
+void AAdventureCharacter::SetLastNonZeroMovement(FVector2D NewLastNonZeroMovement)
+{
+	if (FGameUtils::VectorDifferenceBy(2.0, NewLastNonZeroMovement, LastVelocity))
+	{
+		LastVelocity = NewLastNonZeroMovement;
+		const double VelocitySquaredMagnitude = NewLastNonZeroMovement.SquaredLength();
+		if (VelocitySquaredMagnitude > MinSpeed && LastNonZeroMovement != NewLastNonZeroMovement)
+		{
+			LastNonZeroMovement = NewLastNonZeroMovement;
+			SetAnimationDirection(LastNonZeroMovement);
+		}
+	}
+}
+
+void AAdventureCharacter::SetAnimationDirection(const FVector2D MovementValue)
+{
+	FVector2D NewDirection(0.0f, 0.0f);
+	switch (CameraOrientation)
+	{
+	case ECameraOrientation::XAxisIsOrthoWidth:
+		NewDirection = MovementValue;
+		break;
+	case ECameraOrientation::YAxisIsOrthoWidth:
+		NewDirection = FVector2D(-MovementValue.Y, MovementValue.X);
+	}
+	if (FGameUtils::VectorDifference(NewDirection, AnimationDirection))
+	{
+		AnimationDirection = NewDirection;
+		UE_LOG(LogAdventureGame, Warning, TEXT("AAdventureCharacter::SetAnimationDirection - %s"), *AnimationDirection.ToString());
+	}
+}
+
 void AAdventureCharacter::TeleportToLocation(FVector NewLocation)
 {
 	UCapsuleComponent *Capsule = GetCapsuleComponent();
@@ -204,22 +218,45 @@ void AAdventureCharacter::TeleportToLocation(FVector NewLocation)
 	UE_LOG(LogAdventureGame, Warning, TEXT("   (Possibly clamped from - %s)"), *NewLocation.ToString());	
 }
 
-void AAdventureCharacter::SetFacingDirection(EWalkDirection Direction)
+void AAdventureCharacter::SetFacingDirection(const EWalkDirection Direction)
 {
-	switch (Direction)
+	if (CameraOrientation == ECameraOrientation::XAxisIsOrthoWidth)
 	{
-	case EWalkDirection::Left:
-		LastNonZeroMovement = FVector2D(-1.0f, 0.0f);
-		break;
-	case EWalkDirection::Right:
-		LastNonZeroMovement = FVector2D(1.0f, 0.0f);
-		break;
-	case EWalkDirection::Up:
-		LastNonZeroMovement = FVector2D(0.0f, -1.0f);
-		break;
-	case EWalkDirection::Down:
-		LastNonZeroMovement = FVector2D(0.0f, 1.0f);
+		switch (Direction)
+		{
+		case EWalkDirection::Left:
+			LastNonZeroMovement = FVector2D(-1.0f, 0.0f);
+			break;
+		case EWalkDirection::Right:
+			LastNonZeroMovement = FVector2D(1.0f, 0.0f);
+			break;
+		case EWalkDirection::Up:
+			LastNonZeroMovement = FVector2D(0.0f, -1.0f);
+			break;
+		case EWalkDirection::Down:
+			LastNonZeroMovement = FVector2D(0.0f, 1.0f);
+		}
 	}
+	else
+	{
+		switch (Direction)
+		{
+		case EWalkDirection::Left:
+			LastNonZeroMovement = FVector2D(0.0f, 1.0f);
+			break;
+		case EWalkDirection::Right:
+			LastNonZeroMovement = FVector2D(0.0f, -1.0f);
+			break;
+		case EWalkDirection::Up:
+			LastNonZeroMovement = FVector2D(-1.0f, 0.0f);
+			break;
+		case EWalkDirection::Down:
+			LastNonZeroMovement = FVector2D(1.0f, 0.0f);
+		}
+	}
+	SetAnimationDirection(LastNonZeroMovement);
+	UE_LOG(LogAdventureGame, Warning, TEXT("SetFacingDirection EWalkDirection %s - vec: %s"), 
+		*UEnum::GetValueAsString(Direction), *AnimationDirection.ToString());
 }
 
 EWalkDirection AAdventureCharacter::GetFacingDirection()
@@ -249,6 +286,7 @@ void AAdventureCharacter::SetupCamera()
 	if (IsValid(Camera))
 	{
 		Camera->PlayerCharacter = this;
+		CameraOrientation = Camera->CameraOrientation;
 		APlayerCameraManager *CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
 		CameraManager->SetViewTarget(Camera);
 		Camera->SetupCamera();

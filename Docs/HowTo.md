@@ -783,9 +783,15 @@ _Door walk to point is set up in front of the door_
 
 * [Create the Nav mesh]
 * [Add Character Animation]
+* [Add Hotspots]
+* [Add Pickups]
+* [Add Doors and Rooms]
+* [Add NPCs and Conversation]
+* [Script Additional Functionality]
 
 [Create the Nav mesh]: ./CreatingNavMesh.md
 [Add Character Animation]: ./AnimationStateMachine.md
+[Add Hotspots]: ./CreatingHotSpots.md
 
 ---
 
