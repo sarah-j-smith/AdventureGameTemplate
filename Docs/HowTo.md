@@ -1,4 +1,4 @@
-# How To
+# How To Create a Game
 
 This is the process for creating a game with this plugin. The instructions are explicit
 and step-by-step but **basic knowledge of Unreal Engine is required**: how to navigate the

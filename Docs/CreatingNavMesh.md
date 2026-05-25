@@ -131,4 +131,11 @@ _The Recast nav mesh appears in the scene after the bounds volume is added_
   * You should see a navigation mesh in the scene, coloured green
 * If its not there press "P" to turn on nav mesh visualisation
 
-![Nav mesh in scene](./images/nav)
+----
+
+* Previous: [How to Create a Game]
+* Next: [Add Character Animation]
+
+[Add Character Animation]: ./AnimationStateMachine.md
+[How to Create a Game]: ./HowTo.md
+
