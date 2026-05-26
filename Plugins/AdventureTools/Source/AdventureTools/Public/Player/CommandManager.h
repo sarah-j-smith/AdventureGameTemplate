@@ -268,7 +268,7 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
     UAdventureGameHUD* AdventureGameHUD;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "HUD")
     TSubclassOf<UAdventureGameHUD> AdventureHUDClass;
 
     /// Create an AdventureGameHUD and attach it to the above property,

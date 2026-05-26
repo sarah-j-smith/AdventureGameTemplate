@@ -10,6 +10,8 @@ public class AdventureCommon : ModuleRules
             new string[]
             {
                 "Core",
+                "CoreUObject",
+                "Engine",
                 "GameplayTags"
             }
         );
@@ -17,8 +19,6 @@ public class AdventureCommon : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
-                "CoreUObject",
-                "Engine",
                 "Slate",
                 "SlateCore"
             }

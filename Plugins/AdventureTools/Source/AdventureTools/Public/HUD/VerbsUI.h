@@ -20,39 +20,39 @@ UCLASS()
 class ADVENTURETOOLS_API UVerbsUI : public UUserWidget
 {
 	GENERATED_BODY()
-public:
-
+protected:
 	virtual void NativeOnInitialized() override;
 
+public:
 	/// Handle this event to be notified when the verb changes. The argument passed is
 	/// the new current verb.
 	FOnVerbChanged OnVerbChanged;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
 	UButton *Give;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
 	UButton *Open;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
 	UButton *Close;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
 	UButton *PickUp;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
 	UButton *LookAt;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
 	UButton *TalkTo;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
 	UButton *Use;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
 	UButton *Push;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
 	UButton *Pull;
 
 	////////// Button styles ///////////

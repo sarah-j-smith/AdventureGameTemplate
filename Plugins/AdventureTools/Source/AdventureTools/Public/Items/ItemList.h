@@ -89,7 +89,7 @@ public:
     FName Identifier = "Inventory";
 
     /// Table of class references for creating instances of items.
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
     UDataTable* InventoryDataTable;
 
 #if WITH_EDITORONLY_DATA
@@ -129,7 +129,7 @@ public:
     * @param ItemToAdd EItemKind to create an InventoryItem instance of. 
     * @return InventoryItem Created and added.
     */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
     UInventoryItem* AddItemToInventory(EItemKind ItemToAdd);
 
     /**
@@ -142,7 +142,7 @@ public:
      * These must all be set to null after receiving the OnInventoryChanged signal. 
      *  @param ItemToRemove EItemKind to remove an InventoryItem instance of.
      */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
     void RemoveItemKindFromInventory(EItemKind ItemToRemove);
 
     /**
@@ -151,7 +151,7 @@ public:
      * from the `InventoryDataTable` and deletes them in the inventory UI
      * @param ItemsToRemove EItemKind set to remove an InventoryItem instances of.
      */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
     void RemoveItemKindsFromInventory(const TSet<EItemKind>& ItemsToRemove);
 
     /// Copy pointers to the current inventory into the given array out argument.

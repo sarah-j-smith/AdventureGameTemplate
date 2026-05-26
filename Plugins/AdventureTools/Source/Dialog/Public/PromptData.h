@@ -103,14 +103,14 @@ struct DIALOG_API FPromptData: public FTableRowBase
     TArray<FText> NPCResponse;
 
     /// Table of topics to switch to
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PromptText")
     UDataTable* SwitchTopic = nullptr;
 
     /// Does selecting this prompt cause the conversation to finish
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PromptText")
     bool EndsConversation = false;
 
     /// Some event that gets fired on selection
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PromptText")
     FName Event;
 };

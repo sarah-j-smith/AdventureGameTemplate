@@ -10,14 +10,13 @@ public class Dialog : ModuleRules
             new string[]
             {
                 "Core", "Engine", "AdventureCommon", 
+                "CoreUObject",
             }
         );
 
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
-                "CoreUObject",
-                "Engine",
                 "Slate",
                 "SlateCore",
                 "AdventureCommon",

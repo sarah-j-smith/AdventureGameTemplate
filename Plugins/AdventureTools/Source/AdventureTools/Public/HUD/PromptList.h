@@ -24,25 +24,25 @@ protected:
 public:
     FOnPromptClickedDelegate PromptClickedEvent;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "PromptList")
     UDialogPrompt *Prompt1;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "PromptList")
     UDialogPrompt *Prompt2;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "PromptList")
     UDialogPrompt *Prompt3;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "PromptList")
     UDialogPrompt *Prompt4;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "PromptList")
     UDialogPrompt *Prompt5;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "PromptList")
     TArray<UDialogPrompt*> PromptEntries;
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "PromptList")
     void HidePromptEntries();
 
     void SetPromptMenusEnabled(bool Enabled);
@@ -50,7 +50,7 @@ public:
     UFUNCTION()
     void DisplayPrompts(const FPromptDisplayData& PromptDisplayData);
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "PromptList")
     void SetPromptText(FText TextToBark, bool HasBeenSelected, uint8 RowIndex);
 
 private:

@@ -28,6 +28,8 @@ public class AdventureTools : ModuleRules
 			new string[]
 			{
 				"Core",
+				"CoreUObject",
+				"Engine",
 				"Paper2D",
 				"PaperZD",
 				"Dialog",
@@ -40,8 +42,6 @@ public class AdventureTools : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
-				"Engine",
 				"Slate",
 				"SlateCore", 
 				"AdventureCommon", 

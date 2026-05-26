@@ -39,13 +39,13 @@ public:
     virtual void ClearBark();
 
     /// This flag is true when the Bark Timer is running, and false otherwise.
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Barking")
     bool IsBarking = false;
 
-    UFUNCTION(BlueprintCallable, Category="Actions", BlueprintPure)
+    UFUNCTION(BlueprintCallable, Category="Barking", BlueprintPure)
     EBarkAction IsPlayerBarking() const;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Barking")
     TArray<int32> CurrentBarkTasks;
     
     FEndBark EndPlayerBark;
@@ -61,11 +61,10 @@ private:
 
     ACommandManager *GetCommandManager();
 
-protected:
+public:
     // Called when the game starts
     virtual void BeginPlay() override;
 
-public:
     // Called every frame
     virtual void TickComponent(float DeltaTime, ELevelTick TickType,
                                FActorComponentTickFunction* ThisTickFunction) override;

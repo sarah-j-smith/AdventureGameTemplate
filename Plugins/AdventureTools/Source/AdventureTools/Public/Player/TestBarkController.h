@@ -24,7 +24,7 @@ public:
 
     bool ShouldInterruptAction = false;
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Testing")
     TArray<FString> GetBarkRequests();
     
     TArray<FBarkRequest*> BarkRequests;

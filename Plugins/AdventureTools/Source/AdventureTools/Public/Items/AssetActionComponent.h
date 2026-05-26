@@ -59,7 +59,7 @@ public:
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ItemHandling")
     void OnItemGiveFailure(UItemDataAsset *DataAsset);
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     bool TimerRunning = false;
 	
     UFUNCTION()

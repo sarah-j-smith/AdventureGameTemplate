@@ -64,7 +64,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "Debug", meta = (WorldContext = "WorldContextObject"))
     static int32 PIEInstance(const UObject* WorldContextObject);
 
-    UFUNCTION(BlueprintPure)
+    UFUNCTION(BlueprintPure, Category = "Debug")
     static FString GetProjectVersion();
 
     UFUNCTION(BLueprintCallable, Category = "Player Actions", BlueprintPure)

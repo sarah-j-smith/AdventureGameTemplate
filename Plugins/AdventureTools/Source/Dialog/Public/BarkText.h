@@ -50,19 +50,19 @@ public:
 	/// BARK HANDLING
 	///
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BarkText")
 	TSubclassOf<UBarkLine> BarkLineClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "BarkText")
 	UVerticalBox *BarkContainer;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BarkText")
 	float BarkLineDisplayTime = BARK_LINE_DELAY;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BarkText")
 	int32 MaxCharactersPerLine = BARK_LINE_WIDTH;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BarkText")
 	FColor BarkTextColor = FColor::Orange;
 
 	FBarkRequestComplete BarkRequestCompleteDelegate;

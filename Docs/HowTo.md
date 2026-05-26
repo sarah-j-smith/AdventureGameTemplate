@@ -187,22 +187,36 @@ This is what the game will look like soon, after camera and other things are add
 perpective view here. Look at the axes in the bottom corner.
 
 ![Rotated view in ortho](./images/unreal-axes.png)
-_Unreal Engine viewport in v5.6 and above_
+_Unreal Engine viewport showing 3D camera looking at a 2D background_
 
-To orient your Perspective view like this, select in the _Outliner_ the Background image you just dropped in to
-the scene by clicking on it; then press "F" to focus on the background. Now with your mouse cursor in the main
-viewport hold down _Alt_ and drag with the left mouse button down to orbit until you get something like this.
+To orient your Perspective view like this, mouse over to the _Outliner_ and select the Background 
+image you just dropped in to the scene by clicking on it; then mouse back over to the 3D Viewport and
+press "F" to focus on the background. Now (with your mouse still in the main
+viewport) hold down _Alt_ and drag with the left mouse button down to orbit until you get something
+like this view. 
 
+**_You won't have a camera yet_ - but note the following things:**.
+
+* Unreal Engine's **_"Top" view orthographic camera_** uses this view, with **_Y to the left and Z down_**.
 * Since [UE 5.6 the axes changed] so we must rotate our 2D assets to x: -90, y: 0.0, z: 0.-90 
   * Unreal is Z up, and this is explained below
 * This rotation is what we did for the background art of the tower
+* It is a pain to re-orient the perspective viewport with "F" and the rest, right?
 
-They will _render_ the same, after the 5.6 changes, since we can put the game camera in any 
-position and orientation. But the problem is that the **Top view**, which
-we _must_ use for our _game development_ does not work unless we rotate our assets like this.
+We can put our game camera in any position and orientation. So the game will _render_ the same, 
+after the 5.6 changes. You'd think that would mean we would not have to do anything.
 
-Setting it up as above means that we can _develop_ the game, and then fix the camera so we have
-it come out looking right as well.
+But the problem is we are forced to use **Top view** for our 2D game. There is no real choice here.
+
+We _must_ use "Top" for our _game development_ and it does not work unless we rotate our assets like this.
+
+Setting it up as above means that we can _develop_ the game, and then we must also fix the camera so we have
+it come out _looking and playing_ right as well.
+
+Hopefully that explanation made sense and the `x: -90, y: 0.0, z: 0.-90` sprite rotation makes sense.
+If not, bear with the process and see how it plays out after working with it for a while.
+
+Anyone who has a better way of working, let me know.
 
 ### 3.2.1 Try Top View Now
 
@@ -219,7 +233,7 @@ _Unreal editor top "Top" view with background art_
 
 * The "Top" view avoids perspective distortion. 
   * To align the nav mesh and collision boxes we can see to line them up by using the top view. 
-* Some tools like the Brush mode mesh painter does not work in perspective mode
+* Some tools like the Brush mode mesh painter do not work in perspective mode
   * And again we need to see to line up the mesh painter correctly
 * If you tried the exercise above of "F" to focus and then orbit you'll see it was a pain
   * Top view is much easier to use.
@@ -228,7 +242,7 @@ Occasionally its useful to switch to perspective view, but most work will be in 
 
 **_Wait, what happened to the Z axis?_**
 
-In top view, orthographic, the Z axis positive direction points directly at you, out of the screen
+In top view, orthographic, the Z axis positive direction points _directly_ at you, out of the screen
 towards the camera (as seen in the image at the top of this section). 
 
 This Z axis is also the "up" direction in the Unreal Engine world, so "Top **_Down_**" obviously

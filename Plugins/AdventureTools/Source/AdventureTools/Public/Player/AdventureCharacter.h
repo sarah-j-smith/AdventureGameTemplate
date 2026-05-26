@@ -157,17 +157,16 @@ public:
 
 	EWalkDirection GetFacingDirection();
 	
-	/// This should match the FollowCamera
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Movement)
-	ECameraOrientation CameraOrientation = ECameraOrientation::YAxisIsOrthoWidth;
-
 	//////////////////////////////////
 	///
 	/// CAMERA
 	///
 
+	/// This should match the FollowCamera
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	ECameraOrientation CameraOrientation = ECameraOrientation::YAxisIsOrthoWidth;
+
 	/// Setup the player follow camera
-	/// @see CameraActorToSpawn
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Camera")
 	void SetupCamera();
 };

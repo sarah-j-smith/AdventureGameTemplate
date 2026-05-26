@@ -15,6 +15,6 @@ class DIALOG_API UBarkLine : public UUserWidget
 {
     GENERATED_BODY()
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Bark Line")
     UTextBlock *Text;
 };

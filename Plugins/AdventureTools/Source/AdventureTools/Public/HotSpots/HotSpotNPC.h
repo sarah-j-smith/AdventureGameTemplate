@@ -41,7 +41,7 @@ public:
     UFUNCTION()
     void OnConversationComplete();
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC")
     USphereComponent* BarkPosition;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC")

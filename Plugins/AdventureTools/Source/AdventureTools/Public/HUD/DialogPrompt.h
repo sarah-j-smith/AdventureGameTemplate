@@ -19,34 +19,36 @@ UCLASS()
 class ADVENTURETOOLS_API UDialogPrompt : public UUserWidget
 {
     GENERATED_BODY()
-public:
+    
+protected:
     virtual void NativeOnInitialized() override;
     
+public:
     /// The bullet at the start of each line
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Prompt")
     UImage *PromptBullet;
 
     /// The button to activate the prompt
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Prompt")
     UButton *PromptButton;
 
     /// The text of the button
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Prompt")
     UTextBlock *PromptText;
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Prompt")
     void SetText(const FText &TextToSet);
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Prompt")
     void HighlightText();
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Prompt")
     void UnhighlightText();
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Prompt")
     void HidePrompt();
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prompt")
     bool HasBeenUsed;
     
     UFUNCTION()
@@ -57,10 +59,10 @@ public:
 
     void FlashPrompt();
     
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prompt")
     float FlashTime = 0.6f;
     
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Prompt")
     void PromptTimerTimeout();
     
     FTimerHandle PromptTimerHandle;

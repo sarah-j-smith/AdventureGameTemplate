@@ -28,16 +28,16 @@ protected:
 public:
 	FItemSlotDelegate OnItemClick;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "ItemSlot")
 	UButton *ItemButton;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "ItemSlot")
 	UImage *ItemSlot;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot")
 	bool HasItem;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot")
 	UInventoryItem *InventoryItem;
 
 	void AddItem(UInventoryItem* InventoryItem);

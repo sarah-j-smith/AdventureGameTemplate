@@ -51,25 +51,25 @@ public:
 	void BindNotifierHandlers(UInteractionNotifier* Notifier);
 
 	/// Bindings
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Adventure HUD")
 	UInteractionHUD *InteractionUI;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Adventure HUD")
 	UVerbsUI *VerbsUI;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Adventure HUD")
 	UInventoryUI *InventoryUI;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Adventure HUD")
 	UWidgetSwitcher *UISwitcher;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Adventure HUD")
 	UPromptList *PromptList;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Adventure HUD")
 	UBarkText *Bark;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Adventure HUD")
 	UImage *BlackScreen;
 
 	UFUNCTION()
@@ -78,22 +78,22 @@ public:
 	UFUNCTION()
 	void HandleScoreChanged(int32 Score);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Adventure HUD")
 	void UpdateInteractionTextEvent();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Adventure HUD")
 	void UpdateSaveGameIndicatorEvent(ESaveGameStatus SaveGameStatus, bool Success);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Adventure HUD")
 	void UpdateInventoryTextEvent();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Adventure HUD")
 	void BeginActionEvent();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Adventure HUD")
 	void InterruptActionEvent();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Adventure HUD")
 	void OnUserInteracted();
 	
 	void ShowBlackScreen();
@@ -104,10 +104,10 @@ public:
 
 	void SetInventoryText();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Adventure HUD")
 	void ShowPromptList();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Adventure HUD")
 	void HidePromptList();
 
 	void AddBarkText(const FText &BarkText, USphereComponent *Position,

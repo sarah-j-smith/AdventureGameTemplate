@@ -234,7 +234,7 @@ public:
 	Its important at this point that the Starting Level does _not_
 	have Permanently Loaded set to true in the levels window.
 */
-	UPROPERTY(VisibleAnywhere, BlueprintAssignable)
+	UPROPERTY(VisibleAnywhere, BlueprintAssignable, Category="Gameplay")
 	FRoomTransitioned RoomTransitionedDelegate;
 	
 private:

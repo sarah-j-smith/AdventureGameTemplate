@@ -44,11 +44,11 @@ private:
     
     FTimerHandle UserInteractionBroadcastTimer;
     
-    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta=(AllowPrivateAccess))
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta=(AllowPrivateAccess), Category = "Interaction")
     bool bUserInteractionActive = false;
 
     /// When the player taps or clicks do not send another UserInteraction
     /// broadcast event until this amount of time has elapsed.
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(AllowPrivateAccess))
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(AllowPrivateAccess), Category = "Interaction")
     float UserInteractionTime = 0.6f;
 };

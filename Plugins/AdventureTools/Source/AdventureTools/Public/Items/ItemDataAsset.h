@@ -100,7 +100,7 @@ public:
 
 	/// How many seconds should the players command remain highlighted
 	/// and input locked after executing it.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ItemAction")
 	float InteractionTimeout = 5.0f;
 
 };
