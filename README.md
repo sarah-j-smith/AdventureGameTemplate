@@ -1,12 +1,41 @@
-# Adventure Game in Unreal Engine
+# 2D Point and Click Adventure Game Plugin
 
-This is a free plugin that is based on the blueprint only 
+* Current status: not much works :-(
+
+_Why dis borken?_
+
+In 2025 a port was started of a blueprint [Point and Click 2D Adventure Game tutorial] over to C++, PaperZD, and EnhancedInput. 
+[That project was archived] because:
+
+* Making a new game based on the Point and Click tutorial code was a pain
+* Style guides say [game features encapsulated in plugins] is good
+
+There is an [issues page](./Docs/Issues.md) to track what I need to fix next. I'll
+post some updates there as things get fixed.
+
+[That project was archived]: https://github.com/sarah-j-smith/AdventureGame
+[game features encapsulated in plugins]: https://medium.com/@sarah.hyperdense/ue5-project-folder-structure-and-organization-best-practices-b9e487c330a3
+
+## What is this?
+
+Its a plugin for Unreal Engine that includes functionality useful for making Point and
+Click adventure games in the style of Lucas Arts or Sierra Online. [Gabriel Knight 1] is the main
+inspiration (640 x 480) as opposed to [Day of the Tentacle] (320 x 200).
+
+* Character movement
+* Hotspots
+* Inventory
+* Dialogue
+
+This is a free plugin that is built on the blueprint based 
 [Point and Click 2D Adventure Game tutorial]. The assets included in the plugin
 come from there and are _not_ free. 
 
-You should use your own art with any game you ship.
+You should use your own art with any game you ship. I plan to add my stone chiselled GK1 style
+buttons here for free use at some point.
 
-[Point and Click 2D Adventure Game tutorial]: https://www.youtube.com/watch?v=sEy3c5JcLys&t=7s
+[Gabriel Knight 1]: https://www.reddit.com/r/dosgaming/comments/1jrfx44/gabriel_knight_sins_of_the_fathers_sierra_online/
+[Day of the Tentacle]: https://www.mobygames.com/game/719/maniac-mansion-day-of-the-tentacle/screenshots/
 
 ## How to create a game
 
@@ -71,6 +100,8 @@ Button hover.wav by Fachii -- https://freesound.org/s/338229/ -- License: Creati
 
 ## License Credit
 
+[![Made by Human](https://madebyhuman.iamjarl.com/badges/made-white.svg)](https://madebyhuman.iamjarl.com)
+
 * The [MIT NO-AI License] is from the [Non-AI Licenses Github] project
 
 The [arguments for and against non-AI licenses] are well understood. No correspondence will be entered 
@@ -80,3 +111,18 @@ here to make games with then you have no problems.
 [MIT NO-AI License]: LICENSE.md
 [Non-AI Licenses Github]: https://github.com/non-ai-licenses/non-ai-licenses
 [arguments for and against non-AI licenses]: https://news.ycombinator.com/item?id=46411275
+
+## Broken by Design
+
+None of this crap works right now.
+
+![Under construction](./Docs/images/AtAthensAtrium4970construction.gif)
+
+This project is basically me futzing around with stuff. It won't work, or if parts of it does that is
+nothing short of a miracle. Expect nothing and you won't be dissapointed.
+
+![Under construction](./Docs/images/AtAthens6321underconstruction_lemmings.gif)
+
+_GeoCities under construction gifs deployed [from here] with much irony intended_
+
+[from here]: http://www.textfiles.com/underconstruction/

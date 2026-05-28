@@ -19,6 +19,8 @@ public class AdventureCommon : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
+                "CoreUObject",
+                "Engine",
                 "Slate",
                 "SlateCore"
             }

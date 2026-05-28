@@ -33,7 +33,10 @@
 		{
 			"Name": "AdventureTools",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [ 
+				"Engine","UMG" 
+			]
 		},
 		{
 			"Name": "Dialog",
@@ -46,5 +49,8 @@
 			"LoadingPhase": "Default"
 		}
 	],
-	"EditorCustomVirtualPath": "AdventureToolsPlugin"
+	"EditorCustomVirtualPath": "AdventureToolsPlugin",
+	"SupportedTargetPlatforms": [
+		"Mac"
+	]
 }

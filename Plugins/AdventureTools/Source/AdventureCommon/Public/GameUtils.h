@@ -14,7 +14,7 @@ struct ADVENTURECOMMON_API FGameUtils
      * @param Previous `FVector2D` Value to check against as a baseline
      * @return true if `Current` is significantly different to `Previous`, false otherwise
      */
-    static bool VectorDifference(const FVector2D& Current, const FVector2D& Previous);
+    static bool VectorsDiffer(const FVector2D& Current, const FVector2D& Previous);
 
     /**
      * Return true if Current is different to Previous in either X or Y by DBL_EPSILON.
@@ -23,7 +23,17 @@ struct ADVENTURECOMMON_API FGameUtils
      * @param Tolerance `double` Tolerance for the difference check
      * @return true if `Current` is significantly different to `Previous`, false otherwise
      */
-    static bool VectorDifferenceBy(const double Tolerance, const FVector2D& Current, const FVector2D& Previous);
+    static bool VectorsDifferBy(const double Tolerance, const FVector2D& Current, const FVector2D& Previous);
+    
+    /** 
+     * Return true if the given `Player` is at the given `Location` in the X and Y co-ordinates, within
+     * the given tolerange. Note that the Z value is ignored.
+     * @param Player `APawn *` to check the position of
+     * @param Location `FVector` to compare the pawn to
+     * @param Tolerance `double` value for the "fudge factor", if omitted use a very small value
+     * @returns true if the player is at the location, and false otherwise
+     */
+    static bool PlayerIsAt(const APawn *Player, const FVector &Location, const double Tolerance = std::numeric_limits<double>::epsilon());
     
     static uint32 GetUUID();
 

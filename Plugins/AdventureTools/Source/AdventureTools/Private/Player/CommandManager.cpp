@@ -3,6 +3,7 @@
 #include "Player/CommandManager.h"
 
 #include "AdventureTools.h"
+#include "GameUtils.h"
 
 #include "HotSpots/HotSpot.h"
 #include "Items/InventoryItem.h"
@@ -408,6 +409,7 @@ void ACommandManager::HandleAIMovementCompleteNotify(EPathFollowingResult::Type 
                                              *Message, false, FVector2D(2.0, 2.0));
             UE_LOG(LogAdventureGame, Warning, TEXT("%s"), *Message);
 #endif
+            ShouldCompleteMovementNextTick = true;
         }
     }
 }
@@ -422,13 +424,11 @@ void ACommandManager::HandleMovementComplete()
     {
         UE_LOG(LogAdventureGame, VeryVerbose, TEXT("CurrentHotSpot && (LastPathResult == EAIMoveResult::Success)"));
         APlayerCharacter->SetFacingDirection(CurrentHotSpot->FacingDirection);
-        APlayerCharacter->TeleportToLocation(CurrentHotSpot->WalkToPosition);
         PerformHotSpotInteraction();
         return;
     } else if (!TargetLocationForAI.IsZero() && LastPathResult == EAIMoveResult::Success)
     {
         UE_LOG(LogAdventureGame, VeryVerbose, TEXT("TargetLocationForAI && (LastPathResult == EAIMoveResult::Success)"));
-        APlayerCharacter->TeleportToLocation(TargetLocationForAI);
     }
     InterruptCurrentAction();
 }

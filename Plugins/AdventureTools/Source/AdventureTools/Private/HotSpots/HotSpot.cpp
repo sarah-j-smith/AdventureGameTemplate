@@ -313,7 +313,8 @@ void AHotSpot::SetEnableMeshComponent(bool Enabled) const
 			UE_LOG(LogAdventureGame, Verbose, TEXT("%s %s static mesh is valid & enabled."), *HotSpotType, *HotSpotName);
 			// StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			AStaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryOnly);
-			AStaticMeshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+			AStaticMeshComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+			// AStaticMeshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 			AStaticMeshComponent->SetGenerateOverlapEvents(true);
 		}
 	}

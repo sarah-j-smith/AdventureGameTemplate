@@ -1,6 +1,6 @@
 # Creating a Nav Mesh for a Level
 
-To create a nav mesh for our 2D character to path around the level, and avoid obstacles we need to add a navigation mesh.
+To create a way for our 2D character to path around the level and avoid obstacles we add an Unreal Engine navigation mesh.
 
 The process is:
 
@@ -85,12 +85,16 @@ important to do this correctly.
 
 ![collision creation](./images/mesh_6_convex_collision.png)
 
-* On the tool dialog click "Apply" and dismiss the dialog.
-* Now on the mesh "Collision" section of the details panel choose as follows:
+* On the tool dialog click "Apply" and wait for the mesh generation to finish
+  * Then dismiss the dialog.
 
-![presets](./images/mesh_8_presets.png)
+There's more [documentation on the Unreal website on using this tool] if you run into issues.
+
+[documentation on the Unreal website on using this tool]: https://dev.epicgames.com/documentation/unreal-engine/add-a-collision-hull-to-a-static-mesh-using-the-auto-convex-collision-tool-in-unreal-engine?application_version=5.6
 
 # 4. Complex Collision
+
+Now on the mesh "Collision" section of the details panel in the editor for the static nav mesh choose as follows:
 
 * Collision complexity: Use complex collision as simple
 
@@ -103,17 +107,19 @@ the simple queries (such as did this click or tap hit an object) than the comple
 However for complex shapes, a simple convex hull (as though a bed-sheet was wrapped
 over it) would be bad because you would miss objects that could be seen behind the shape. 
 
+For our navigation mesh which has "U-shaped" areas we want to avoid this "wrapped" (convex) approach.
+
 So here we tell Unreal to use the complex collision in place of the simple one.
 
 # 5. Create the Nav Mesh In the Level 
 
-* Before adding the mesh check the [nav mesh agent settings]. 
+* Before adding the mesh check the Project Settings default [nav mesh agent settings]. 
   * This only needs to be done once, and then you can create a nav mesh for each new room
-  * Its complex, sensitive and fiddly to take time to get it right
+  * Its complex, sensitive and fiddly, so take time to get it right
 
 [nav mesh agent settings]: ./NavMeshAgentSettings.md
 
-* Back in the level editor, make sure the Mode Switcher dropdown top left is set to "Selection Mode"
+* Back in the level editor, make sure the Mode Switcher dropdown top left is set back to "Selection Mode"
 * Click into the "Place Actors" tab and filter for "Nav Mesh"
   * then drag the _Nav Mesh Bounds Volume_ into the level
 * Click on the Nav Mesh Bounds Volume in the Outliner and set its location transform to zeros
@@ -126,10 +132,48 @@ So here we tell Unreal to use the complex collision in place of the simple one.
 _The Recast nav mesh appears in the scene after the bounds volume is added_
 
 * Click on the Nav Mesh Bounds Volume in the Outliner and set its transform to zeros
-  * Change the Transform Location "Z" to -3
+* You should see a navigation mesh in the scene, coloured green
+  * If its not there press "P" to turn on nav mesh visualisation
+* Change the Nav Mesh Bounds volume Transform Location "Z" to -3
 * Click on the `SM_TowerExterior_Nav` static mesh and move it to `Z: -3` as well
-  * You should see a navigation mesh in the scene, coloured green
-* If its not there press "P" to turn on nav mesh visualisation
+  * This moves it underneath the background  
+  * In development it seems the character will fall constantly on game start without this -3 setting
+    * It's not clear why this is, but for now the -3 setting is in place to prevent this
+  * With the nav mesh underneath the background image `PaperSpriteActor`
+    * it will show as a green outline instead of being green alpha
+
+# 6. Option: Create the Nav Mesh in Linked Sections
+
+If your level (room, scene) is disjoint, that is made up of distinct areas then it may
+be best to create multiple nav meshes and link them via Nav Link Proxies
+
+* Follow steps 1 to 4 above for each separate static mesh you need for your room.
+* Check that they are correctly added to the scene and the nav mesh is being generated
+* From the _Place Actors_ tab find and drag in a _Nav Link Proxy_ object
+  * Zero out its transform
+  * Drag it near the join between the two areas
+
+![Separate nav mesh](./images/disjoint-nav-meshes.png)
+
+* Select the diamond shaped wireframe object inside the `PointLinks[0].Left` object
+  * Drag it to the right hand edge of your left-hand generated nav mesh
+    * Make sure its still on the generated mesh
+* Select the diamond shaped wireframe object inside the `PointLinks[0].Right` object
+  * Drag it to the left hand edge of your right-hand generated nav mesh
+    * Make sure its still on the generated mesh
+* Test in the game and make sure your player can walk between the two areas
+
+![Nav link proxy](./images/using-a-nav-mesh-link.png)
+
+* Some adjustments can help working with the Nav Links
+  * Its large in a small 2D scene
+    * so select it in the Outliner and set `Editor Billboard Scale` to 0.3 or so
+  * Drag in the `Snap Radius` and make it smaller
+  * Fine tune the placement of the links if needed
+* Test in the game and make sure your player can walk between the two areas
+  * The nav link can be set to only work in one direction
+    * left to right only, or right to left only
+      * This could be useful for a train station turnstile or some other one-way connect
 
 ----
 

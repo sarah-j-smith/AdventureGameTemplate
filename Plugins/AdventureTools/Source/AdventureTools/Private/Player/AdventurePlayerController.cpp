@@ -273,7 +273,7 @@ bool AAdventurePlayerController::GetMouseClickPosition(float& LocationX, float& 
     float NewLocationY = 0.0f;
     if (!GetMousePosition(NewLocationX, NewLocationY)) return false;
     const FVector2D ThisMouseClick{NewLocationX, NewLocationY};
-    if (!FGameUtils::VectorDifference(ThisMouseClick, LastMouseClick)) return false;
+    if (!FGameUtils::VectorsDiffer(ThisMouseClick, LastMouseClick)) return false;
     LastMouseClick = ThisMouseClick;
     LocationX = NewLocationX;
     LocationY = NewLocationY;
@@ -288,7 +288,7 @@ bool AAdventurePlayerController::GetTouchPosition(float& LocationX, float& Locat
     GetInputTouchState(ETouchIndex::Type::Touch1, NewLocationX, NewLocationY, bIsPressed);
     if (!bIsPressed) return false;
     const FVector2D ThisMouseClick{NewLocationX, NewLocationY};
-    if (!FGameUtils::VectorDifference(ThisMouseClick, LastMouseClick)) return false;
+    if (!FGameUtils::VectorsDiffer(ThisMouseClick, LastMouseClick)) return false;
     LastMouseClick = ThisMouseClick;
     LocationX = NewLocationX;
     LocationY = NewLocationY;
@@ -320,6 +320,10 @@ AHotSpot* AAdventurePlayerController::HotSpotClicked()
     GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
     if (!HitResult.IsValidBlockingHit()) return nullptr;
     AActor* HitActor = HitResult.GetActor();
+    if (HitActor)
+    {
+        UE_LOG(LogAdventureGame, Warning, TEXT("%s"), *HitActor->GetName());
+    }
     if (AHotSpot* HotSpot = Cast<AHotSpot>(HitActor))
     {
 #if WITH_EDITOR

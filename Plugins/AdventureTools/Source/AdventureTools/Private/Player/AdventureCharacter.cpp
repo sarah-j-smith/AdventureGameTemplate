@@ -170,7 +170,7 @@ void AAdventureCharacter::OnTurnRightAnimOverrideEnd(bool completed)
 
 void AAdventureCharacter::SetLastNonZeroMovement(FVector2D NewLastNonZeroMovement)
 {
-	if (FGameUtils::VectorDifferenceBy(2.0, NewLastNonZeroMovement, LastVelocity))
+	if (FGameUtils::VectorsDifferBy(2.0, NewLastNonZeroMovement, LastVelocity))
 	{
 		LastVelocity = NewLastNonZeroMovement;
 		const double VelocitySquaredMagnitude = NewLastNonZeroMovement.SquaredLength();
@@ -193,7 +193,7 @@ void AAdventureCharacter::SetAnimationDirection(const FVector2D MovementValue)
 	case ECameraOrientation::YAxisIsOrthoWidth:
 		NewDirection = FVector2D(-MovementValue.Y, MovementValue.X);
 	}
-	if (FGameUtils::VectorDifference(NewDirection, AnimationDirection))
+	if (FGameUtils::VectorsDiffer(NewDirection, AnimationDirection))
 	{
 		AnimationDirection = NewDirection;
 		UE_LOG(LogAdventureGame, Warning, TEXT("AAdventureCharacter::SetAnimationDirection - %s"), *AnimationDirection.ToString());

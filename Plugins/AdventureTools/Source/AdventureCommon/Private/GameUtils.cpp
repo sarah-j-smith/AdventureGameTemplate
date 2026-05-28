@@ -7,15 +7,21 @@
 
 #include "Misc/Guid.h"
 
-bool FGameUtils::VectorDifference(const FVector2D& Current, const FVector2D& Previous)
+bool FGameUtils::VectorsDiffer(const FVector2D& Current, const FVector2D& Previous)
 {
-    return VectorDifferenceBy(std::numeric_limits<double>::epsilon(), Current, Previous);
+    return VectorsDifferBy(std::numeric_limits<double>::epsilon(), Current, Previous);
 }
 
-bool FGameUtils::VectorDifferenceBy(const double Tolerance, const FVector2D& Current, const FVector2D& Previous)
+bool FGameUtils::VectorsDifferBy(const double Tolerance, const FVector2D& Current, const FVector2D& Previous)
 {
     return fabs(Previous.X - Current.X) >= Tolerance || fabs(Previous.Y - Current.Y) >= Tolerance;
 
+}
+
+bool FGameUtils::PlayerIsAt(const APawn* Player, const FVector& Location, const double Tolerance)
+{
+    const FVector PlayerLocation = Player->GetActorLocation();
+    return VectorsDifferBy(Tolerance, FVector2D(PlayerLocation.X, PlayerLocation.Y), FVector2D(Location.X, Location.Y));
 }
 
 uint32 FGameUtils::GetDisplayTimeForString(const FString &BarkText)

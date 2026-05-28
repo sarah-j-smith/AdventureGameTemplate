@@ -1,3 +1,14 @@
+# Issues
+
+After the migration to Unreal 5.6, Z-up LUF, and Plugin structure there are a lot of issues that make this
+project unusable as it stands. Its still a good resource for the bits and pieces contained in here, but as a
+drop-in solution it is not read.
+
+Things that are known, and work is planned for:
+
+- [ ] Navigation is not ending properly, blocking selection of new commands
+- [ ] Hotspot selection is not working, you cannot hover or click on them
+
 ## Nav Mesh Problems
 
 * I had a lot of problems with generating and having my nav mesh show up

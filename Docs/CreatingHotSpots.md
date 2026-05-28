@@ -121,8 +121,6 @@ important to do this correctly. For some other mesh objects that are more square
 * On the tool dialog click "Apply" and dismiss the dialog.
 * Now on the mesh "Collision" section of the details panel choose as follows:
 
-![presets](./images/mesh_8_presets.png)
-
 * Collision complexity: Use complex collision as simple
 
 There is a good explanation of what this is doing [on the Unreal website](https://dev.epicgames.com/documentation/en-us/unreal-engine/simple-versus-complex-collision-in-unreal-engine?application_version=5.5) but basically for physics bodies in an unreal scene you can have two different collision shapes: a complex set and a simple set. Its cheaper performance-wise to use
@@ -147,6 +145,28 @@ Confirm that the mesh visibility under <b>Rendering</b> in the details panel is 
 **Hidden in game**. If the green mesh is annoying, once you have it all set up in the editor
 you can also turn visibility off altogether for the mesh. Its handy to have it on in case
 the mesh and the sprite get misaligned during the editing process.
+
+* Can Ever Affect Navigation: false
+
+In general a Hotspot does not affect navigation directly. There's several places to turn this off:
+
+![Can ever affect navigation](./images/do-not-affect-navigation.png)
+
+### 6.1 Collision settings
+
+Once you've built your hotspot, clicking on the top level details panel will show this
+collision settings section:
+
+![Collision settings](./images/actor-level-vs-component-level.png)
+
+_Collision settings for a hotspot_
+
+You can see there is an _all over, **actor** level collision setting_, and then a setting for
+the **components** underneath that.
+
+Generally don't touch these settings. The Hotspot object will actually dynamically modify
+its own collision settings during the game, for example when a door is opened, or an
+object is picket up. 
 
 ## 7. Add the HotSpot in the Scene
 
