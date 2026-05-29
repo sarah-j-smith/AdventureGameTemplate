@@ -7,9 +7,10 @@ drop-in solution it is not quite ready.
 Things that are known, and work is planned for:
 
 - [ ] Navigation is not ending properly, blocking selection of new commands
-- [ ] Hotspot selection is not working, you cannot hover or click on them
+- [x] Hotspot selection is not working, you cannot hover or click on them
 - [ ] Still have issues with the player falling through the level 
 - [ ] Consider [creating custom K2 blueprint nodes] for some functions
+- [x] Switch to Common UI buttons (selectable/toggleable) for verbs
 
 [creating custom K2 blueprint nodes]: https://gamedev.net/tutorials/programming/engines-and-middleware/improving-ue4-blueprint-usability-with-custom-nodes-r5694/
 

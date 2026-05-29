@@ -1,8 +1,8 @@
 # 2D Point and Click Adventure Game Plugin
 
-* Current status: not much works :-(
+* Current status: working - still much to do
 
-_Why dis borken?_
+_Why dis?_
 
 In 2025 a port was started of a blueprint [Point and Click 2D Adventure Game tutorial] over to C++, PaperZD, and EnhancedInput. 
 [That project was archived] because:
