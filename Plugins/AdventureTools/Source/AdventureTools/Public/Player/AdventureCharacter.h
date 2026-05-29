@@ -7,6 +7,7 @@
 #include "BarkText.h"
 #include "PaperZDCharacter.h"
 #include "PaperZDAnimInstance.h"
+#include "PositionProvider.h"
 #include "Enums/CameraOrientation.h"
 #include "AdventureCharacter.generated.h"
 
@@ -20,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FCharacterAnimComplete, EInteractio
  * 
  */
 UCLASS()
-class ADVENTURETOOLS_API AAdventureCharacter : public APaperZDCharacter
+class ADVENTURETOOLS_API AAdventureCharacter : public APaperZDCharacter, public IPositionProvider
 {
 	GENERATED_BODY()
 
@@ -53,6 +54,8 @@ public:
 	/// Marker object to anchor bark text
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Barking)
 	USphereComponent* Sphere;
+	
+	virtual USphereComponent* GetPosition() const override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Barking)
 	FColor BarkColor = FColor::White;

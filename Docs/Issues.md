@@ -2,12 +2,16 @@
 
 After the migration to Unreal 5.6, Z-up LUF, and Plugin structure there are a lot of issues that make this
 project unusable as it stands. Its still a good resource for the bits and pieces contained in here, but as a
-drop-in solution it is not read.
+drop-in solution it is not quite ready.
 
 Things that are known, and work is planned for:
 
 - [ ] Navigation is not ending properly, blocking selection of new commands
 - [ ] Hotspot selection is not working, you cannot hover or click on them
+- [ ] Still have issues with the player falling through the level 
+- [ ] Consider [creating custom K2 blueprint nodes] for some functions
+
+[creating custom K2 blueprint nodes]: https://gamedev.net/tutorials/programming/engines-and-middleware/improving-ue4-blueprint-usability-with-custom-nodes-r5694/
 
 ## Nav Mesh Problems
 

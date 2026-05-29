@@ -32,6 +32,7 @@ public class AdventureTools : ModuleRules
 				"Engine",
 				"Paper2D",
 				"PaperZD",
+				"CommonUI",
 				"Dialog",
 				// ... add other public dependencies that you statically link with here ...
 			}

@@ -11,6 +11,7 @@
 
 #include "VerbsUI.generated.h"
 
+class UCommonButtonBase;
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnVerbChanged, EVerbType, CurrentVerb);
 
 /**
@@ -29,87 +30,34 @@ public:
 	FOnVerbChanged OnVerbChanged;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
-	UButton *Give;
+	UCommonButtonBase *C_Give;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
-	UButton *Open;
+	UCommonButtonBase *C_Open;
+	
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
+	// UButton *Close;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
-	UButton *Close;
+	UCommonButtonBase *C_Close;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
-	UButton *PickUp;
+	UCommonButtonBase *C_PickUp;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
-	UButton *LookAt;
+	UCommonButtonBase *C_LookAt;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
-	UButton *TalkTo;
+	UCommonButtonBase *C_TalkTo;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
-	UButton *Use;
+	UCommonButtonBase *C_Use;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
-	UButton *Push;
+	UCommonButtonBase *C_Push;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category="Button Controls")
-	UButton *Pull;
-
-	////////// Button styles ///////////
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle CloseNormalStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle CloseSelectedStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle OpenNormalStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle OpenSelectedStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle GiveNormalStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle GiveSelectedStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle PickUpNormalStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle PickUpSelectedStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle TalkToNormalStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle TalkToSelectedStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle LookAtNormalStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle LookAtSelectedStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle UseNormalStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle UseSelectedStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle PushNormalStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle PushSelectedStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle PullNormalStyle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button Controls")
-	FButtonStyle PullSelectedStyle;
+	UCommonButtonBase *C_Pull;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Button Controls")
 	EVerbType CurrentVerb;
@@ -132,12 +80,6 @@ public:
 	
 private:
 	void SetButtonActive(EVerbType VerbType);
-
-	/**
-	 * Called during initialization to pick up the normal, unactivated style of
-	 * the buttons from the values specified in the UI builder.
-	 */
-	void AssignNormalStyles();
 
 	void SetActiveVerb() const;
 };

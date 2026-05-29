@@ -24,6 +24,8 @@
 #include "Player/Puck.h"
 #include "Player/TestBarkController.h"
 
+#include  "PositionProvider.h"
+
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -633,9 +635,10 @@ void ACommandManager::SetupHUD()
     if (bDisableHUD) return;
 
     // Create the HUD and put it on the screen
-    APlayerController *PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+    AAdventurePlayerController *PlayerController = GetAdventurePlayerController();
     if (!ensureAlwaysMsgf(AdventureHUDClass, TEXT("Edit the Command Manager and ensure AdventureHUDClass is set"))) return;
     AdventureGameHUD = UAdventureGameHUD::Create(PlayerController, AdventureHUDClass);
+    AdventureGameHUD->Bark->SetPositionProvider(PlayerController->PlayerCharacter);
     
     // Probably pointed the AdventureHUDClass at the base class, not a Blueprint Widget UI design
     if (!ensureAlwaysMsgf(AdventureGameHUD->BlackScreen, TEXT("The AdventureHUDClass must be a sub-class which has the UI widgets bound"))) return;

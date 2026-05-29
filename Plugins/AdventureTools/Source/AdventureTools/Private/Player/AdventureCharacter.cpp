@@ -54,6 +54,11 @@ void AAdventureCharacter::Tick(float DeltaTime)
 	SetLastNonZeroMovement(Velocity);
 }
 
+USphereComponent* AAdventureCharacter::GetPosition() const
+{
+	return Sphere;
+}
+
 void AAdventureCharacter::Climb(EInteractTimeDirection InteractTimeDirection)
 {
 	LastInteractTimeDirection = InteractTimeDirection;
