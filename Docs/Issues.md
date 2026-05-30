@@ -7,12 +7,20 @@ drop-in solution it is not quite ready.
 Things that are known, and work is planned for:
 
 - [ ] Navigation is not ending properly, blocking selection of new commands
+- [ ] Get the unit tests working again
+- [ ] Link up the tests to Github actions
+- [ ] Get the end-to-end tests working, including `TestBarkController`
 - [x] Hotspot selection is not working, you cannot hover or click on them
 - [ ] Still have issues with the player falling through the level 
 - [ ] Consider [creating custom K2 blueprint nodes] for some functions
 - [x] Switch to Common UI buttons (selectable/toggleable) for verbs
+- [x] Package up the plugin so it can be downloaded from the Github page
 
 [creating custom K2 blueprint nodes]: https://gamedev.net/tutorials/programming/engines-and-middleware/improving-ue4-blueprint-usability-with-custom-nodes-r5694/
+
+# Troubleshooting
+
+Here's a few random troubleshooting tips, compiled during the course of this development process.
 
 ## Nav Mesh Problems
 
@@ -48,7 +56,8 @@ Things that are known, and work is planned for:
 At the end of the first episode on running the project with the player character it fell constantly. What that looks like is the game starts, the character disappears but is visible in the _Outliner_ (the list of all objects in the scene). Clicking on the character in the outliner and expanding the Transform you can see in the Z direction its rapidly and constantly changing. The character has fallen through the floor. In 
 my case the fix for this is:
 
-* change from top to side view (eg "right") 
+* double check the settings for the game background texture/sprite asset
+  * 
 * make sure the character mesh/start point is above the red line of the background image
 * make sure the character is inside the nav mesh bounds
 

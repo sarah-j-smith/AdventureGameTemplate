@@ -179,6 +179,24 @@ your games content folder first, then add them from there.
 
 ![Axes for every sprite](images/transform-for-LUF.png)
 
+* Navigation shoult _not_ use the background `PaperSpriteActor` eg `TowerBackground_Sprite`
+  * Unreal's navigation system does not understand an image - its all just coloured pixels
+  * So the whole background has to be set to not affect navigation (covered below)
+  * Set `Can Ever Affect Navigation` to _false_
+
+![Do not affect navigation](./images/Can-ever-affect-navigation.png)
+
+* Although the background `PaperSpriteActor` that fills the whole scene does not affect navigation
+  * We **_still_** want it to collide with the player character to prevent the character falling
+  * **And** we want it to _not be visible_ to our probes that handle hover and click hits during play
+* The current settings I am using for this are below:
+  * `Collision presets: Invisible Wall`
+
+![Collision preset](./images/Collision-invisible-wall.png)
+
+If you look at the dimmed section that the _Invisible wall_ setting provides, it ignores all visibility
+channel responses and still respects blocking responses for the pawn and other objects. 
+
 **_Can't see your background image? Read on..._**
 
 ## 3.2 Understand Axes - Explainer
@@ -206,9 +224,9 @@ like this view.
 We can put our game camera in any position and orientation. So the game will _render_ the same, 
 after the 5.6 changes. You'd think that would mean we would not have to do anything.
 
-But the problem is we are forced to use **Top view** for our 2D game. There is no real choice here.
+But the problem is we are forced to use **Top view** during development of our 2D game. There is no real choice here.
 
-We _must_ use "Top" for our _game development_ and it does not work unless we rotate our assets like this.
+We _must_ use "Top" for our _game development_ and _that_ does not work unless we rotate our assets like this.
 
 Setting it up as above means that we can _develop_ the game, and then we must also fix the camera so we have
 it come out _looking and playing_ right as well.

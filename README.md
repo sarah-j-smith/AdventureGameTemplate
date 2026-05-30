@@ -4,17 +4,23 @@
 
 _Why dis?_
 
-In 2025 a port was started of a blueprint [Point and Click 2D Adventure Game tutorial] over to C++, PaperZD, and EnhancedInput. 
-[That project was archived] because:
+In 2025 a C++ port was started of a blueprint [Point and Click 2D Adventure Game tutorial]. The port also moved
+to using PaperZD, Common UI and EnhancedInput. The goal was to be able to make a new game, that was not just
+the tutorial. [That project was archived] because the C++ port of the tutorial code was:
 
-* Making a new game based on the Point and Click tutorial code was a pain
-* Style guides say [game features encapsulated in plugins] is good
+* Painful to make a new game from
+* Content and features were mixed up
 
-There is an [issues page](./Docs/Issues.md) to track what I need to fix next. I'll
-post some updates there as things get fixed.
+_Plugin architecture to the rescue?_
+
+The only way to fix this and make it re-usable was to ensure [game features are encapsulated in plugins]. That way
+any new game can add the plugin and get all the features, and build the game on top. Anything useful could 
+still be upstreamed back into the plugin.
+
+There is an [issues page](./Docs/Issues.md) to track what I need to fix next. I'll post some updates there as things get fixed.
 
 [That project was archived]: https://github.com/sarah-j-smith/AdventureGame
-[game features encapsulated in plugins]: https://medium.com/@sarah.hyperdense/ue5-project-folder-structure-and-organization-best-practices-b9e487c330a3
+[game features are encapsulated in plugins]: https://medium.com/@sarah.hyperdense/ue5-project-folder-structure-and-organization-best-practices-b9e487c330a3
 
 ## What is this?
 
