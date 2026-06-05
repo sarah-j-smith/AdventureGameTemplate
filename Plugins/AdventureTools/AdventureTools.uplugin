@@ -45,12 +45,18 @@
 		{
 			"Name": "Dialog",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine","UMG"
+			]
 		},
 		{
 			"Name": "AdventureCommon",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine","UMG"
+			]
 		}
 	],
 	"EditorCustomVirtualPath": "AdventureToolsPlugin",

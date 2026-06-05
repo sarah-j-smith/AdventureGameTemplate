@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Factories/EnumFactory.h"
+
 #include "TagQuerySense.generated.h"
 
 /**

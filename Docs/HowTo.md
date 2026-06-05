@@ -5,14 +5,17 @@ and step-by-step but **basic knowledge of Unreal Engine is required**: how to na
 content windows, how to create a blueprint class based off another C++ class, how to navigate
 the editor viewport window and so on.
 
+## Install the Plugin
+
 1. First ensure you have a compatible version of Unreal Engine. As of now, the
    plugin is tested with **v5.6**
 2. Then ensure the following plugins are installed in your Unreal account under Fab Library.
   * PaperZD
-  * AdventureTools
-3. Launch Unreal Engine 
+3. Launch Unreal Engine
 
 ![Unreal Launcher](./images/Epic-Launcher.png)
+_The AdventureTools plugin is **not available via FAB right now_
+
 ## 1. Create a Game and Main Level
 
 **Throughout, where you see "MyAdventure" replace with whatever your game is called**
@@ -24,6 +27,10 @@ the editor viewport window and so on.
     - click "Create"
 
 On creation you see a weird map - ignore it as we will create a blank level
+
+* See the [Plugin installation page] to install and enable `AdventureTools`
+
+[Plugin installation page]: ./Install.md
 
 ### 1.2 Folder creation
 
