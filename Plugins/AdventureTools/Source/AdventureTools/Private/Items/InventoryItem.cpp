@@ -6,6 +6,7 @@
 
 #include "Constants.h"
 #include "AdventureTools.h"
+#include "Item.h"
 #include "VerbType.h"
 #include "Player/AdventurePlayerController.h"
 #include "Player/ItemManager.h"
@@ -14,17 +15,17 @@
 
 FText UInventoryItem::GetShortDescription() const
 {
-    return ShortDescription;
+    return ItemDetails ? ItemDetails->ShortDescription : FText::GetEmpty();
 }
 	
 FText UInventoryItem::GetLongDescription() const
 {
-    return Description;
+    return ItemDetails ? ItemDetails->Description : FText::GetEmpty();
 }
 	
-EItemKind UInventoryItem::GetItemKind() const
+FName UInventoryItem::GetItemKind() const
 {
-    return ItemKind;
+    return ItemDetails ? ItemDetails->ItemTypeDef : NAME_None;
 }
 
 //////////////////////////////////
@@ -32,65 +33,28 @@ EItemKind UInventoryItem::GetItemKind() const
 /// STATIC IMPLEMENTATIONS
 ///
 
-void UInventoryItem::OnItemUseSuccess_Implementation()
+void UInventoryItem::OnItemActionSuccess_Implementation()
 {
     UE_LOG(LogAdventureGame, Log, TEXT("OnItemUseSuccess Success - default."));
     
-    if (UItemDataAsset *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
+    if (UStoryAction *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
     {
         if (const ACommandManager *Command = GetCommandManager())
         {
-            Command->AssetActionComponent->OnItemUseSuccess(ItemDataAsset);
+            Command->AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
         }
         return;
     }
-    OnItemUseFailure();
+    OnItemActionSuccess();
 }
 
-void UInventoryItem::OnItemUseFailure_Implementation()
+void UInventoryItem::OnItemActionFailure_Implementation()
 {
     BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemUsedDefaultText"));
 }
 
-void UInventoryItem::OnItemGiveSuccess_Implementation()
+UStoryAction* UInventoryItem::ItemDataAssetForAction(const EVerbType Verb) const
 {
-    if (UItemDataAsset *ItemDataAsset = ItemDataAssetForAction(EVerbType::GiveItem))
-    {
-        if (const ACommandManager *Command = GetCommandManager())
-        {
-            Command->AssetActionComponent->OnItemGiveSuccess(ItemDataAsset);
-        }
-        return;
-    }
-    OnItemGiveFailure();
-}
-
-void UInventoryItem::OnItemGiveFailure_Implementation()
-{
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemGivenDefaultText"));
-}
-
-UItemDataAsset* UInventoryItem::ItemDataAssetForAction(const EVerbType Verb) const
-{
-    // TODO - remove this bit of code once the deprecated OnUseSuccessItem and OnGiveSuccessItem are gone
-    if (Verb == EVerbType::UseItem)
-    {
-        if (UItemDataAsset *UseItem = OnUseSuccessItem.LoadSynchronous())
-        {
-            UE_LOG(LogAdventureGame, Warning, TEXT("OnUseSuccessItem is deprecated in %s - use OnItemActivated instead"),
-                *(ShortDescription.ToString()));
-            return UseItem;
-        }
-    }
-    else if (Verb == EVerbType::GiveItem)
-    {
-        if (UItemDataAsset *UseItem = OnGiveSuccessItem.LoadSynchronous())
-        {
-            UE_LOG(LogAdventureGame, Warning, TEXT("OnGiveSuccessItem is deprecated in %s - use OnItemActivated instead"),
-                *(ShortDescription.ToString()));
-            return UseItem;
-        }
-    }
     return OnItemActivated.GetItemDataAssetForAction(Verb);
 }
 
@@ -133,13 +97,13 @@ void UInventoryItem::OnLookAt_Implementation()
 {
     IVerbInteractions::OnLookAt_Implementation();
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On look at"));
-    if (Description.IsEmpty())
+    if (ItemDetails->Description.IsEmpty())
     {
         BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "LookAtDefaultText"));
     }
     else
     {
-        BarkAndEnd(Description);
+        BarkAndEnd(ItemDetails->Description);
     }
 }
 
@@ -179,7 +143,7 @@ void UInventoryItem::OnItemUsed_Implementation()
     // verb. Check that the Source can validly use on this.
     if (UItemManager *ItemManager = GetItemManager())
     {
-        if (ItemManager->SourceItem->ItemKind == ItemKind)
+        if (ItemManager->SourceItemName == ItemDetails->ItemTypeDef)
         {
             // Item is used on itself - failure - this should not be necessary,
             // but needed in the case that during game design this item mistakenly
@@ -188,36 +152,30 @@ void UInventoryItem::OnItemUsed_Implementation()
             {
                 Command->InterruptCurrentAction();
             }
-            OnItemUseFailure();
+            OnItemActionFailure();
         }
-        else if (CanInteractWith(ItemManager->SourceItem))
+        else if (ItemManager->CanInteractWith(ItemDetails->ItemTypeDef))
         {
             // This item has interactable item
-            OnItemUseSuccess();
+            OnItemActionSuccess();
         }
-        else if (const UItemDataAsset *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
+        else if (const UStoryAction *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
         {
             // We are the target, the second item clicked
-            const EItemKind SrcKind = ItemManager->SourceItem->ItemKind;
-            const EItemKind TgtKind = ItemManager->TargetItem->ItemKind;
-            if (ItemDataAsset->SourceItem == SrcKind && ItemDataAsset->TargetItem == TgtKind)
+            if (ItemDataAsset->SourceItem == ItemManager->SourceItemName && ItemDataAsset->TargetItem == ItemManager->TargetItemName)
             {
-                OnItemUseSuccess();
+                OnItemActionSuccess();
             }
-            else if (ItemDataAsset->SourceItem == TgtKind && ItemDataAsset->TargetItem == SrcKind && ItemDataAsset->CanSwapSourceAndTarget)
+            else if (ItemDataAsset->SourceItem == ItemManager->TargetItemName && 
+                ItemDataAsset->TargetItem == ItemManager->SourceItemName && ItemDataAsset->CanSwapSourceAndTarget)
             {
                 ItemManager->SwapSourceAndTarget();
-                OnItemUseSuccess();
+                OnItemActionSuccess();
             }
         }
         else
         {
-            // Item is not the one that can be used with this
-            if (ACommandManager *Command = GetCommandManager())
-            {
-                Command->InterruptCurrentAction();
-            }
-            OnItemUseFailure();
+            OnItemActionFailure();
         }
     }
 }
@@ -225,7 +183,8 @@ void UInventoryItem::OnItemUsed_Implementation()
 void UInventoryItem::OnItemGiven_Implementation()
 {
     IVerbInteractions::OnItemGiven_Implementation();
-    // TODO Giving items not yet implemented
-    // AdventurePlayerController->GiveAnItem(ItemKind);
+    // **this** InventoryItem is the target and APC->SourceItem is the source of a Give verb. 
+    
+    // TODO Giving items to another not yet implemented - is there a use-case for this?
     BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemGivenDefaultText"));
 }

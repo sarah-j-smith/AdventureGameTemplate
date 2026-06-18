@@ -2,19 +2,20 @@
 
 #include "Items/GetInventoryItemTask.h"
 #include "Items/InventoryItem.h"
+#include "ItemDisposition.h"
 #include "AdventureTools.h"
 #include "Gameplay/AdventureGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
 UGetInventoryItemTask* UGetInventoryItemTask::DoGetInventoryItemTask(
-    const UObject* WorldContextObject, const EItemKind ItemKind, const float WaitTime)
+    const UObject* WorldContextObject, const FName ItemKind, const float WaitTime)
 {
     UGetInventoryItemTask* Task = NewObject<UGetInventoryItemTask>();
     Task->WorldContextObject = WorldContextObject;
     Task->ItemKind = ItemKind;
     Task->WaitTime = WaitTime;
 
-    UE_LOG(LogAdventureGame, VeryVerbose, TEXT("GetInventoryItemTask created for %s"), *UEnum::GetValueAsString(ItemKind));
+    UE_LOG(LogAdventureGame, VeryVerbose, TEXT("GetInventoryItemTask created for %s"), *ItemKind.ToString());
     Task->RegisterWithGameInstance(WorldContextObject);
     return Task;
 }
@@ -23,11 +24,11 @@ void UGetInventoryItemTask::Activate()
 {
     Super::Activate();
 
-    UE_LOG(LogAdventureGame, VeryVerbose, TEXT("GetInventoryItemTask::Activate - %s"), *UEnum::GetValueAsString(ItemKind));
+    UE_LOG(LogAdventureGame, VeryVerbose, TEXT("GetInventoryItemTask::Activate - %s"), *ItemKind.ToString());
 
     if (UAdventureGameInstance *GameInstance = GetAdventureGameInstance())
     {
-        if (UInventoryItem *Item = GameInstance->GetItemFromInventory(ItemKind))
+        if (UItem *Item = GameInstance->GetItemFromInventory(ItemKind))
         {
             if (CheckForSuccessCondition(GameInstance)) return;
         }
@@ -60,7 +61,7 @@ void UGetInventoryItemTask::WaitTimerTimeout()
     SetReadyToDestroy();
 }
 
-void UGetInventoryItemTask::OnPlayerInventoryChanged(EItemKind ChangedItemKind, EItemDisposition Disposition)
+void UGetInventoryItemTask::OnPlayerInventoryChanged(FName ChangedItemKind, EItemDisposition Disposition)
 {
     if (UAdventureGameInstance *GameInstance = GetAdventureGameInstance())
     {
@@ -68,8 +69,8 @@ void UGetInventoryItemTask::OnPlayerInventoryChanged(EItemKind ChangedItemKind, 
         
         // Not what we are looking for, keep waiting but log it in case somehow misconfigured
         UE_LOG(LogAdventureGame, Display, TEXT("Waiting for %s - but saw - %s - %s"),
-            *UEnum::GetValueAsString(ItemKind), *UEnum::GetValueAsString(Disposition),
-            *UEnum::GetValueAsString(ChangedItemKind));
+            *ItemKind.ToString(), *UEnum::GetValueAsString(Disposition),
+            *ChangedItemKind.ToString());
     }
 }
 
@@ -87,7 +88,7 @@ UAdventureGameInstance* UGetInventoryItemTask::GetAdventureGameInstance()
 
 bool UGetInventoryItemTask::CheckForSuccessCondition(UAdventureGameInstance* GameInstance)
 {
-    if (UInventoryItem *Item = GameInstance->GetItemFromInventory(ItemKind))
+    if (UItem *Item = GameInstance->GetItemFromInventory(ItemKind))
     {
         TaskSuccessful.Broadcast(Item);
         SetReadyToDestroy();

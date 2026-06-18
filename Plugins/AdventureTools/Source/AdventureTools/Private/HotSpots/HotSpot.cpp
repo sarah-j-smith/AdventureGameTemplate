@@ -91,12 +91,12 @@ void AHotSpot::RegisterForSaveAndLoad()
 	}
 }
 
-UItemDataAsset* AHotSpot::ItemDataAssetForAction(EVerbType Verb) const
+UStoryAction* AHotSpot::ItemDataAssetForAction(EVerbType Verb) const
 {
 	// TODO - remove this bit of code once the deprecated OnUseSuccessItem and OnGiveSuccessItem are gone
 	if (Verb == EVerbType::Use)
 	{
-		if (UItemDataAsset *UseItem = OnUseSuccessItem.LoadSynchronous())
+		if (UStoryAction *UseItem = OnUseSuccessItem.LoadSynchronous())
 		{
 			UE_LOG(LogAdventureGame, Warning, TEXT("OnUseSuccessItem is deprecated in %s - use OnItemActivated instead"),
 				*(ShortDescription.ToString()));
@@ -105,7 +105,7 @@ UItemDataAsset* AHotSpot::ItemDataAssetForAction(EVerbType Verb) const
 	}
 	else if (Verb == EVerbType::Give)
 	{
-		if (UItemDataAsset *UseItem = OnGiveSuccessItem.LoadSynchronous())
+		if (UStoryAction *UseItem = OnGiveSuccessItem.LoadSynchronous())
 		{
 			UE_LOG(LogAdventureGame, Warning, TEXT("OnGiveSuccessItem is deprecated in %s - use OnItemActivated instead"),
 				*(ShortDescription.ToString()));
@@ -140,7 +140,14 @@ void AHotSpot::OnClose_Implementation()
 {
 	IVerbInteractions::OnClose_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On close"));
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "CloseDefaultText"));
+	if (auto ItemDataAsset = ItemDataAssetForAction(EVerbType::Close))
+	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+	}
+	else
+	{
+		BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "CloseDefaultText"));
+	}
 }
 
 void AHotSpot::OnOpen_Implementation()
@@ -225,25 +232,16 @@ void AHotSpot::OnWalkTo_Implementation()
 void AHotSpot::OnItemUsed_Implementation()
 {
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Item Used"));
-	if (UItemDataAsset *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
+	if (UStoryAction *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
 	{
-		if (const UItemManager *ItemManager = GetItemManager())
+		const UItemManager *ItemManager = GetItemManager();
+		ensureAlwaysMsgf(ItemManager != nullptr, TEXT("ItemManager is nullptr."));
+		// Item was used on this hotspot, and the kind of that item matches the
+		// recipe in the ItemDataAsset. 
+		if (ItemManager->SourceItemName == ItemDataAsset->SourceItem)
 		{
-			// Item was used on this hotspot, and the kind of that item matches the
-			// recipe in the ItemDataAsset. 
-			if (ItemManager->SourceItem->ItemKind == ItemDataAsset->SourceItem)
-			{
-				if (IsValid(ItemDataAsset->UseSuccessSound))
-				{
-					UGameplayStatics::PlaySound2D(this, ItemDataAsset->UseSuccessSound);
-				}
-				AssetActionComponent->OnItemUseSuccess(ItemDataAsset);
-				return;
-			}
-		}
-		else
-		{
-			UE_LOG(LogAdventureGame, Warning, TEXT("AHotSpot::OnItemUsed_Implementation - APC was invalid!"));
+			AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+			return;
 		}
 	}
 	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemUsedDefaultText"));
@@ -252,13 +250,13 @@ void AHotSpot::OnItemUsed_Implementation()
 void AHotSpot::OnItemGiven_Implementation()
 {
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Item Given"));
-	if (UItemDataAsset *ItemDataAsset = OnGiveSuccessItem.LoadSynchronous())
+	if (UStoryAction *ItemDataAsset = OnGiveSuccessItem.LoadSynchronous())
 	{
 		if (const UItemManager *ItemManager = GetItemManager())
 		{
-			if (ItemManager->SourceItem->ItemKind == ItemDataAsset->SourceItem)
+			if (ItemManager->SourceItemName == ItemDataAsset->SourceItem)
 			{
-				AssetActionComponent->OnItemGiveSuccess(ItemDataAsset);
+				AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
 				return;
 			}
 		}

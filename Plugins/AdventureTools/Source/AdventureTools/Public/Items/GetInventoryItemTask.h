@@ -4,15 +4,14 @@
 
 #include "CoreMinimal.h"
 
-#include "Enums/ItemDisposition.h"
-#include "ItemKind.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "GetInventoryItemTask.generated.h"
 
+enum class EItemDisposition : uint8;
 class UAdventureGameInstance;
 class UInventoryItem;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetItemSuccessOutputPin, UInventoryItem *, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetItemSuccessOutputPin, UItem *, Item);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGetItemFailOutputPin);
 
@@ -33,14 +32,14 @@ public:
 
     UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"),
         Category = "Flow Control")
-    static UGetInventoryItemTask* DoGetInventoryItemTask(const UObject* WorldContextObject, EItemKind ItemKind, float WaitTime = 20.0f);
+    static UGetInventoryItemTask* DoGetInventoryItemTask(const UObject* WorldContextObject, FName ItemKind, float WaitTime = 20.0f);
 
     virtual void Activate() override;
     
     UPROPERTY()
     const UObject* WorldContextObject;
 
-    EItemKind ItemKind;
+    FName ItemKind;
 
     float WaitTime;
 
@@ -54,7 +53,7 @@ private:
     void WaitTimerTimeout();
 
     UFUNCTION()
-    void OnPlayerInventoryChanged(EItemKind ItemKind, EItemDisposition Disposition);
+    void OnPlayerInventoryChanged(FName ItemKind, EItemDisposition Disposition);
 
     UAdventureGameInstance *GetAdventureGameInstance();
     TWeakObjectPtr<UAdventureGameInstance> AdventureGameInstance;

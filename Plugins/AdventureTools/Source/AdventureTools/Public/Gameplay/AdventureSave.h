@@ -5,8 +5,6 @@
 #include "CoreMinimal.h"
 #include "DataSaveRecord.h"
 #include "GameplayTagContainer.h"
-#include "ItemKind.h"
-
 #include "GameFramework/SaveGame.h"
 
 #include "AdventureSave.generated.h"
@@ -36,7 +34,7 @@ public:
     FName StartingLevel;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Items")
-    TArray<EItemKind> Inventory;
+    TArray<FName> Inventory;
 
     /// Called after known core game values are saved into this object by
     /// a call to <code>SaveGame</code> on the Game Instance. Respond to this

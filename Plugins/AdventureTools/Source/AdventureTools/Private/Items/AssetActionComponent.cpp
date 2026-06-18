@@ -11,6 +11,7 @@
 #include "HotSpots/Door.h"
 #include "Items/InventoryItem.h"
 #include "Internationalization/StringTableRegistry.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values for this component's properties
@@ -43,18 +44,7 @@ void UAssetActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
     // ...
 }
 
-
-void UAssetActionComponent::OnItemGiveSuccess_Implementation(UItemDataAsset *DataAsset)
-{
-    if (UItemManager *ItemManager = GetItemManager())
-    {
-        ItemManager->AddToScore(DataAsset->ScoreOnSuccess);
-        ItemManager->ItemRemoveFromInventoryAsync(DataAsset->SourceItem);
-    }
-    StartTimer(DataAsset);
-}
-
-void UAssetActionComponent::OnItemUseSuccess_Implementation(UItemDataAsset *DataAsset)
+void UAssetActionComponent::OnItemActionSuccess_Implementation(UStoryAction *DataAsset)
 {
     UItemManager *ItemManager = GetItemManager();
     const ACommandManager *CommandManager = GetCommandManager();
@@ -62,23 +52,23 @@ void UAssetActionComponent::OnItemUseSuccess_Implementation(UItemDataAsset *Data
     ItemManager->AddToScore(DataAsset->ScoreOnSuccess);
     bool Success = true;
     TSet<EItemAssetType> ItemAssetTypes = AdventureGameplayTags::GetItemAssetTypes(DataAsset->SourceItemTreatmentTags);
-    ItemAssetTypes.Add(DataAsset->SourceItemAssetType);
     for (const EItemAssetType& ItemAssetType : ItemAssetTypes)
     {
         HandleSourceItem(DataAsset, ItemAssetType, Success);
     }
-
-    TSet<EItemAssetType> TargetItemAssetTypes = AdventureGameplayTags::GetItemAssetTypes(DataAsset->TargetItemTreatmentTags);
-    TargetItemAssetTypes.Add(DataAsset->TargetItemAssetType);
-    for (const EItemAssetType& ItemAssetType : TargetItemAssetTypes)
+    if (Success)
     {
-        HandleTargetItem(DataAsset, ItemAssetType, Success);
+        TSet<EItemAssetType> TargetItemAssetTypes = AdventureGameplayTags::GetItemAssetTypes(DataAsset->TargetItemTreatmentTags);
+        for (const EItemAssetType& ItemAssetType : TargetItemAssetTypes)
+        {
+            HandleTargetItem(DataAsset, ItemAssetType, Success);
+        }
     }
-    BarkAndEnd(Success ? DataAsset->UseSuccessBarkText : DataAsset->UseFailureBarkText);
+    UGameplayStatics::PlaySound2D(GetWorld(), Success ? DataAsset->ActionSuccessSound : DataAsset->ActionFailureSound);
+    BarkAndEnd(Success ? DataAsset->ActionSuccessBarkText : DataAsset->ActionFailureBarkText);
 }
 
-
-void UAssetActionComponent::HandleSourceItem(UItemDataAsset *DataAsset, const EItemAssetType ItemAssetType, bool &Success)
+void UAssetActionComponent::HandleSourceItem(UStoryAction *DataAsset, const EItemAssetType ItemAssetType, bool &Success)
 {
     UItemManager *ItemManager = GetItemManager();
     switch (ItemAssetType)
@@ -94,12 +84,12 @@ void UAssetActionComponent::HandleSourceItem(UItemDataAsset *DataAsset, const EI
         break;
     default:
         UE_LOG(LogAdventureGame, Error, TEXT("Item data asset has bad asset type: %s"),
-            *UEnum::GetValueAsString(DataAsset->SourceItemAssetType));
+            *UEnum::GetValueAsString(ItemAssetType));
         break;
     }
 }
 
-void UAssetActionComponent::HandleTargetItem(UItemDataAsset *DataAsset, const EItemAssetType ItemAssetType, bool& Success)
+void UAssetActionComponent::HandleTargetItem(UStoryAction *DataAsset, const EItemAssetType ItemAssetType, bool& Success)
 {
     UItemManager *ItemManager = GetItemManager();
     switch (ItemAssetType)
@@ -126,22 +116,21 @@ void UAssetActionComponent::HandleKeyCase(bool &Success)
                 Bark(LOCTABLE(ITEM_STRINGS_KEY, "AlreadyUnlocked"));
             }
         }
+        return;
     }
-    else if (CanUnlockDoorOrItem(ItemManager->TargetItem->DoorState))
+    if (const UItem *Target = ItemManager->GetTargetItem())
     {
-        Success = true;
-        ItemManager->TargetItem->DoorState = EDoorState::Closed;
+        if (CanUnlockDoorOrItem(Target->DoorState))
+        {
+            Success = true; 
+            ItemManager->GetTargetItem()->DoorState = EDoorState::Closed; // Closed but not locked
+        }
     }
 }
 
-void UAssetActionComponent::OnItemGiveFailure_Implementation(UItemDataAsset *DataAsset)
+void UAssetActionComponent::OnItemActionFailure_Implementation(UStoryAction *DataAsset)
 {
-    BarkAndEnd(DataAsset->GiveFailureBarkText);
-}
-
-void UAssetActionComponent::OnItemUseFailure_Implementation(UItemDataAsset *DataAsset)
-{
-    BarkAndEnd(DataAsset->UseFailureBarkText);
+    BarkAndEnd(DataAsset->ActionFailureBarkText);
 }
 
 void UAssetActionComponent::OnInteractionTimeout()
@@ -152,7 +141,7 @@ void UAssetActionComponent::OnInteractionTimeout()
     }
 }
 
-void UAssetActionComponent::StartTimer(UItemDataAsset *DataAsset)
+void UAssetActionComponent::StartTimer(UStoryAction *DataAsset)
 {
     if (TimerRunning) return;
     TimerRunning = true;

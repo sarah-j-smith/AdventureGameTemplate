@@ -14,7 +14,6 @@ class ACommandManager;
 class AAdventureCharacter;
 class AHotSpot;
 class UAdventureGameInstance;
-enum class EItemKind: uint8;
 class UInventoryItem;
 class AAdventurePlayerController;
 
@@ -53,13 +52,16 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Player Actions", meta = (WorldContext = "WorldContextObject"))
     static void ClearVerb(const UObject* WorldContextObject);
 
-    /// Add a new item to the inventory and return a reference to it if successful.
+    /// Add a new item to the inventory. To get a reference to the Item once it added the async task
+    /// @see GetInventoryItemTask can be used to wait for it to appear in the inventory.
     /// @param ItemToAdd The kind of item to add. The text descriptions for each kind can be added in the text resource.
     UFUNCTION(BlueprintCallable, Category = "Player Actions", meta = (WorldContext = "WorldContextObject"))
-    static UInventoryItem* AddToInventory(const UObject* WorldContextObject, EItemKind ItemToAdd);
+    static void AddToInventory(const UObject* WorldContextObject, FName ItemToAdd);
 
+    /// Remove an item from the inventory.
+    /// @param ItemToRemove The kind of item to remove.
     UFUNCTION(BlueprintCallable, Category = "Player Actions", meta = (WorldContext = "WorldContextObject"))
-    static void RemoveFromInventory(const UObject* WorldContextObject, EItemKind ItemToRemove);
+    static void RemoveFromInventory(const UObject* WorldContextObject, FName ItemToRemove);
 
     UFUNCTION(BlueprintPure, Category = "Debug", meta = (WorldContext = "WorldContextObject"))
     static int32 PIEInstance(const UObject* WorldContextObject);

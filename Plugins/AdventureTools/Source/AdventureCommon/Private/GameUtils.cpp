@@ -3,7 +3,6 @@
 #include "Constants.h"
 #include "DescribableItem.h"
 #include "Internationalization/StringTableRegistry.h"
-#include "ItemKind.h"
 
 #include "Misc/Guid.h"
 
@@ -103,7 +102,7 @@ FText FGameUtils::GetVerbWithItemText(const IDescribableItem* CurrentItem, const
 {
     verifyf(CurrentItem, TEXT("GetVerbWithItemString expects CurrentItem to be non-null"));
     FText ItemText = CurrentItem->GetShortDescription();
-    if (ItemText.IsEmpty()) ItemText = FItemKind::GetDescription(CurrentItem->GetItemKind());
+    if (ItemText.IsEmpty()) ItemText = FText::FromString(CurrentItem->GetItemKind().ToString());
     FFormatNamedArguments VerbArgs;
     VerbArgs.Add("Verb", VerbGetDescriptiveString(Verb));
     VerbArgs.Add("Subject", ItemText);

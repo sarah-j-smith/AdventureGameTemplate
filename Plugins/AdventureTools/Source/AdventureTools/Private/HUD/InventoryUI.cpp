@@ -3,10 +3,9 @@
 
 #include "HUD/InventoryUI.h"
 
-#include "Items/ItemList.h"
 #include "AdventureTools.h"
 #include "Gameplay/AdventureGameInstance.h"
-#include "Items/InventoryItem.h"
+#include "Item.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -40,7 +39,7 @@ void UInventoryUI::PopulateInventory(bool ScrollToLastAdded)
 {
 	UGameInstance *GameInstance = UGameplayStatics::GetGameInstance(GetWorld());
 	UAdventureGameInstance *AdventureGameInstance = Cast<UAdventureGameInstance>(GameInstance);
-	TArray<UInventoryItem*> Items;
+	TArray<UItem*> Items;
 	InventoryCount = AdventureGameInstance->GetInventoryItemCount();
 	if (InventoryCount > 0)
 	{
@@ -72,11 +71,11 @@ void UInventoryUI::PopulateInventory(bool ScrollToLastAdded)
 	InventoryUIChanged.Broadcast();
 }
 
-UItemSlot* UInventoryUI::GetFromInventory(EItemKind ItemKind) const
+UItemSlot* UInventoryUI::GetFromInventory(FName ItemKind) const
 {
 	for (UItemSlot* ItemSlot : InventorySlots)
 	{
-		if (ItemSlot && ItemSlot->InventoryItem && ItemSlot->InventoryItem->ItemKind == ItemKind)
+		if (ItemSlot && ItemSlot->InventoryItem && ItemSlot->InventoryItem->ItemTypeDef == ItemKind)
 		{
 			return ItemSlot;
 		}

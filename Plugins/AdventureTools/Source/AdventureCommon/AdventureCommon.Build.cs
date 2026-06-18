@@ -19,6 +19,7 @@ public class AdventureCommon : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
+                "Paper2D",
                 "CoreUObject",
                 "Engine",
                 "Slate",

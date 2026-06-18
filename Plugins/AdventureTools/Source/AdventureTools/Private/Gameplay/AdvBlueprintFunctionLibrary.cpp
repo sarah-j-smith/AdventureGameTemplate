@@ -100,17 +100,16 @@ int32 UAdvBlueprintFunctionLibrary::PIEInstance(const UObject* WorldContextObjec
     return -1;
 }
 
-UInventoryItem* UAdvBlueprintFunctionLibrary::AddToInventory(const UObject* WorldContextObject,
-                                                             const EItemKind ItemToAdd)
+void UAdvBlueprintFunctionLibrary::AddToInventory(const UObject* WorldContextObject,
+                                                             const FName ItemToAdd)
 {
     if (UItemManager *ItemManager = GetItemManager(WorldContextObject))
     {
-        return ItemManager->ItemAddToInventory(ItemToAdd);
+        ItemManager->ItemAddToInventory(ItemToAdd);
     }
-    return nullptr;
 }
 
-void UAdvBlueprintFunctionLibrary::RemoveFromInventory(const UObject* WorldContextObject, EItemKind ItemToRemove)
+void UAdvBlueprintFunctionLibrary::RemoveFromInventory(const UObject* WorldContextObject, FName ItemToRemove)
 {
     if (UItemManager *ItemManager = GetItemManager(WorldContextObject))
     {

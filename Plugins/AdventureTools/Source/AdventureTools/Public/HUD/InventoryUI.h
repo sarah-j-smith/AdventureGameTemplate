@@ -47,7 +47,7 @@ public:
 	void PopulateInventory(bool ScrollToLastAdded = false);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory Slots")
-	UItemSlot *GetFromInventory(EItemKind ItemKind) const;
+	UItemSlot *GetFromInventory(FName ItemKind) const;
 
 	/// Row of inventory displayed in the top row of slots.
 	/// Will be zero unless there are more than 8 items in the inventory.

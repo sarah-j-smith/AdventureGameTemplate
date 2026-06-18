@@ -17,6 +17,8 @@
 
 #include "AdventureGameInstance.generated.h"
 
+class UItem;
+class UInventory;
 class UInventoryItem;
 class AHotSpot;
 class UItemList;
@@ -24,7 +26,7 @@ class UAdventureSave;
 class ADoor;
 class UAdventureGameHUD;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerInventoryChanged, EItemKind, ItemKind, 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerInventoryChanged, FName, ItemKind, 
 	EItemDisposition, ItemDisposition);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomTransitioned, 
@@ -63,21 +65,21 @@ public:
 	FPlayerInventoryChanged PlayerInventoryChanged;
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	UInventoryItem* AddItemToInventory(EItemKind ItemKind);
+	void AddItemToInventory(FName ItemKind);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void RemoveItemFromInventory(EItemKind ItemKind);
+	void RemoveItemFromInventory(FName ItemKind);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void RemoveItemsFromInventory(const TSet<EItemKind>& ItemsToRemove);
+	void RemoveItemsFromInventory(const TSet<FName>& ItemsToRemove);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	bool IsInInventory(const EItemKind &ItemToCheck) const;
+	bool IsInInventory(const FName &ItemToCheck) const;
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	UInventoryItem* GetItemFromInventory(const EItemKind &ItemToCheck);
+	UItem* GetItemFromInventory(const FName &ItemToCheck);
 
-	void GetInventoryItems(TArray<UInventoryItem*> &Items);
+	void GetInventoryItems(TArray<UItem*> &Items);
 
 	int GetInventoryItemCount() const;
 	
@@ -85,18 +87,15 @@ private:
 	/// Do not expose this inventory object. It will get created and destroyed whenever
 	/// the player saves or loads the game.
 	UPROPERTY()
-	UItemList *Inventory;
+	UInventory *Inventory;
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
-	TSubclassOf<UItemList> InventoryClass;
-
 	/// All the tags currently set in the game
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Save Game")
 	FGameplayTagContainer GameplayTags;
 	
 	// IGameplayTagAssetInterface interface.
-	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;/**/
 	
 private:
 	FDelegateHandle OnInventoryChangedHandle;
@@ -107,7 +106,7 @@ private:
 
 	void BindInventoryChangedHandlers();
 
-	void InventoryChanged(FName InventoryIdentifier, EItemKind ItemKind, EItemDisposition ItemDisposition);
+	void InventoryChanged(FName ItemKind, EItemDisposition ItemDisposition);
 
 	//////////////////////////////////
 	///

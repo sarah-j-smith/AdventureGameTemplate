@@ -21,7 +21,7 @@ void UVerbsUI::NativeOnInitialized()
 	
 	C_Use->OnClicked().AddUObject(this, &UVerbsUI::UseTriggered);
 	C_Push->OnClicked().AddUObject(this, &UVerbsUI::PushTriggered);
-	C_Pull->OnClicked().AddUObject(this, &UVerbsUI::PushTriggered);
+	C_Pull->OnClicked().AddUObject(this, &UVerbsUI::PullTriggered);
 	
 	UE_LOG(LogAdventureGame, Warning, TEXT("Verbs UI - NativeOnInitialized"));
 }

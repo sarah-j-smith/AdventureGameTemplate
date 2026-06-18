@@ -354,28 +354,32 @@ AHotSpot* AAdventurePlayerController::HotSpotTapped(float X, float Y)
 void AAdventurePlayerController::PlayerClimb(int32 UID, EInteractTimeDirection InteractDirection)
 {
     PlayerClimbUID = UID;
-    if (PlayerCharacter->LastNonZeroMovement.X != 0)
+    switch (PlayerCharacter->GetFacingDirection())
     {
+    case EWalkDirection::Left:
+    case EWalkDirection::Right:
         PlayerCharacter->Climb();
-    }
-    else
-    {
+        break;
+    default:
         OnPlayerClimbComplete(false);
         UE_LOG(LogAdventureGame, Warning, TEXT("PlayerClimb called when player not facing left or right."))
+        break;
     }
 }
 
 void AAdventurePlayerController::PlayerInteract(int32 UID, EInteractTimeDirection InteractDirection)
 {
     PlayerInteractUID = UID;
-    if (PlayerCharacter->LastNonZeroMovement.X != 0)
+    switch (PlayerCharacter->GetFacingDirection())
     {
+    case EWalkDirection::Left:
+    case EWalkDirection::Right:
         PlayerCharacter->Interact();
-    }
-    else
-    {
+        break;
+    default:
         OnPlayerInteractComplete(false);
         UE_LOG(LogAdventureGame, Warning, TEXT("PlayerInteract called when player not facing left or right."))
+        break;
     }
 }
 
@@ -383,13 +387,14 @@ void AAdventurePlayerController::PlayerSit(int32 UID, EInteractTimeDirection Int
 {
     UE_LOG(LogAdventureGame, Warning, TEXT("AAdventurePlayerController::PlayerSit"));
     PlayerSitUID = UID;
-    if (PlayerCharacter->LastNonZeroMovement.X != 0)
+    switch (PlayerCharacter->GetFacingDirection())
     {
+    case EWalkDirection::Left:
+    case EWalkDirection::Right:
         UE_LOG(LogAdventureGame, Warning, TEXT("     >>> PlayerSit"));
         PlayerCharacter->Sit();
-    }
-    else
-    {
+        break;
+    default:
         OnPlayerSitComplete(false);
         UE_LOG(LogAdventureGame, Warning, TEXT("PlayerSit called when player not facing left or right."))
     }
@@ -398,8 +403,7 @@ void AAdventurePlayerController::PlayerSit(int32 UID, EInteractTimeDirection Int
 void AAdventurePlayerController::PlayerTurnLeft(int32 UID, EInteractTimeDirection InteractDirection)
 {
     PlayerTurnUID = UID;
-    EWalkDirection Facing = PlayerCharacter->GetFacingDirection();
-    switch (Facing)
+    switch (PlayerCharacter->GetFacingDirection())
     {
     case EWalkDirection::Up:
         UE_LOG(LogAdventureGame, VeryVerbose,

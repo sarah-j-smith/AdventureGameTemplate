@@ -3,12 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Item.h"
 #include "Enums/ChoiceState.h"
-#include "ItemKind.h"
 #include "VerbType.h"
+#include "Items/InventoryItem.h"
 #include "UObject/Object.h"
 #include "ItemManager.generated.h"
 
+class UItem;
+class UItemTypeDefs;
 class UItemSlot;
 class UInventoryItem;
 class UAdventureGameInstance;
@@ -41,26 +44,60 @@ public:
 	/// ITEMS
 	///
 
+	/// Game asset reference for the table of item types in this game. Loaded at game
+	/// launch type as required. Must be an instance of
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Items")
+	TSoftObjectPtr<UItemTypeDefs> ItemTypeDefinitions;
+	
 	/// Tell the UI to put the current verb and any current inventory item into the text display
 	/// and if the InventoryItemInteraction is true, highlight the text.
 	FUpdateItemInteractionText UpdateInventoryTextDelegate;
 
 	void UpdateInventoryText();
 	
+	UFUNCTION(BlueprintCallable, Category = "Items")
+	UItem *GetSourceItem() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "Items")
+	UItem *GetTargetItem() const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetSourceItemName")
+	FName SourceItemName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetTargetItemName")
+	FName TargetItemName;
+	
+private:
 	/// Which item will be the <b>subject</b> of the current verb eg "Open Box"
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Commands")	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Items", meta=(AllowPrivateAccess=true))	
 	UInventoryItem *SourceItem;
 
 	/// Which item will the <b>object</b> of the current verb for
 	/// example the door in "Use key on door"
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Items", meta=(AllowPrivateAccess=true))	
 	UInventoryItem *TargetItem;
+	
+	FName GetSourceItemName() const { return SourceItem->ItemDetails->ItemTypeDef; }
+	
+	FName GetTargetItemName() const { return TargetItem->ItemDetails->ItemTypeDef; }
 
+	bool GetHasSourceItem() const { return SourceItem->GetItemKind() != NAME_None; }
+	
+	bool GetHasTargetItem() const { return TargetItem->GetItemKind() != NAME_None; }
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetHasSourceItem")
+	bool HasSourceItem;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetHasTargetItem")
+	bool HasTargetItem;
+	
 	/// Item slot in the inventory either hovered or clicked.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Commands")
 	UItemSlot *CurrentItemSlot = nullptr;
 
-	bool CanInteractWith(EItemKind OtherItem) const;
+	// Helper
+	bool CanInteractWith(FName OtherItem) const;
 	
 	/// Whether the subject of the verb is locked. Locked item choices won't change
 	/// on mouse over of inventory. Default is <code>Unlocked</code>.
@@ -78,29 +115,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items")
 	EChoiceState TargetLocked = EChoiceState::Unlocked;
 	
+	/// Set the source item to be the one in the given slot, and lock it; to prevent
+	/// hover from changing it.
+	/// @param SourceItemSlot The item slot to set and lock
 	UFUNCTION(BlueprintCallable, Category = "Items")
-	void SwapSourceAndTarget();
-
+	void SetAndLockSourceItem(UItemSlot *SourceItemSlot);
+	
+	/// Set the target item to be the one in the given slot, and lock it; to prevent
+	/// hover from changing it.
+	/// @param TargetItemSlot The item slot to set and lock
 	UFUNCTION(BlueprintCallable, Category = "Items")
-	void SetAndLockSourceItem(UInventoryItem *Item)
-	{
-		SourceItem = Item;
-		SourceLocked = EChoiceState::Locked;
-	}
+	void SetAndLockTargetItem(UItemSlot *TargetItemSlot);
 	
 	UFUNCTION(BlueprintCallable, Category = "Items")
-	void SetAndLockTargetItem(UInventoryItem *Item)
-	{
-		TargetItem = Item;
-		TargetLocked = EChoiceState::Locked;
-	}
+	void SwapSourceAndTarget();
 	
 	/// Clears the <code>SourceItem</code> to null and sets it unlocked.
 	UFUNCTION(Blueprintable)
 	void ClearSourceItem()
 	{
 		SourceLocked = EChoiceState::Unlocked;
-		SourceItem = nullptr;
+		SourceItem->ItemDetails = nullptr;
 	}
 
 	/// Clears the <code>SourceItem</code> to null and sets it unlocked.
@@ -108,9 +143,9 @@ public:
 	void ClearTargetItem()
 	{
 		TargetLocked = EChoiceState::Unlocked;
-		TargetItem = nullptr;
+		TargetItem->ItemDetails = nullptr;
 	}
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Items")
 	void Reset()
 	{
@@ -124,21 +159,19 @@ public:
 	/// INTERACTION
 	///
 	
-	UInventoryItem *ItemAddToInventory(const EItemKind &ItemToAdd);
+	void ItemAddToInventory(const FName &ItemToAdd);
 
-	void ItemRemoveFromInventory(const EItemKind &ItemToRemove);
+	void ItemRemoveFromInventory(const FName &ItemToRemove);
 
-	void ItemsRemoveFromInventory(const TSet<EItemKind> &ItemsToRemove);
+	void ItemsRemoveFromInventory(const TSet<FName> &SetOfItemsToRemove);
 	
-	void ItemRemoveFromInventoryAsync(const EItemKind &ItemToRemove);
+	void ItemRemoveFromInventoryAsync(const FName &ItemToRemove);
 
-	void ItemsRemoveFromInventoryAsync(const TSet<EItemKind> &ItemsToRemove);
+	void ItemsRemoveFromInventoryAsync(const TSet<FName> &ItemsToRemove);
 
 private:
-	UAdventureGameInstance *GetAdventureGameInstance();
+	TSet<FName> ItemsToRemove;
 
-	TSet<EItemKind> ItemsToRemove;
-	
 public:
 	/// Handle a mouse click on an item button.
 	bool MaybeHandleInventoryItemClicked(UItemSlot *ItemSlot);

@@ -57,10 +57,17 @@
 			"AdditionalDependencies": [
 				"Engine","UMG"
 			]
+		},
+		{
+			"Name": "AdventureTypes",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "PreDefault",
+			"PlatformAllowList": [
+				"Win64",
+				"Linux",
+				"Mac"
+			]
 		}
 	],
-	"EditorCustomVirtualPath": "AdventureToolsPlugin",
-	"SupportedTargetPlatforms": [
-		"Mac"
-	]
+	"EditorCustomVirtualPath": "AdventureToolsPlugin"
 }

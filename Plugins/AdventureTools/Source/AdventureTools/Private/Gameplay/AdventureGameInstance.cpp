@@ -9,10 +9,9 @@
 #include "Constants.h"
 #include "HotSpots/HotSpot.h"
 #include "HotSpots/Door.h"
-#include "Items/ItemList.h"
-#include "Items/InventoryItem.h"
 #include "HUD/AdventureGameHUD.h"
 #include "Player/CommandManager.h"
+#include "Inventory.h"
 
 #include "GameFramework/SaveGame.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
@@ -73,24 +72,23 @@ void UAdventureGameInstance::OnLoadHotSpot(AHotSpot* HotSpot)
 	}
 }
 
-UInventoryItem* UAdventureGameInstance::AddItemToInventory(EItemKind ItemKind)
+void UAdventureGameInstance::AddItemToInventory(FName ItemKind)
 {
 	if (Inventory)
 	{
-		return Inventory->AddItemToInventory(ItemKind);
+		Inventory->AddItemInstanceByName(ItemKind);
 	}
-	return nullptr;
 }
 
-void UAdventureGameInstance::RemoveItemFromInventory(EItemKind ItemKind)
+void UAdventureGameInstance::RemoveItemFromInventory(FName ItemKind)
 {
 	if (Inventory)
 	{
-		Inventory->RemoveItemKindFromInventory(ItemKind);
+		Inventory->RemoveItemInstanceByName(ItemKind);
 	}
 }
 
-void UAdventureGameInstance::RemoveItemsFromInventory(const TSet<EItemKind>& ItemsToRemove)
+void UAdventureGameInstance::RemoveItemsFromInventory(const TSet<FName>& ItemsToRemove)
 {
 	if (Inventory)
 	{
@@ -99,29 +97,21 @@ void UAdventureGameInstance::RemoveItemsFromInventory(const TSet<EItemKind>& Ite
 }
 
 
-bool UAdventureGameInstance::IsInInventory(const EItemKind& ItemToCheck) const
+bool UAdventureGameInstance::IsInInventory(const FName& ItemToCheck) const
 {
 	return (Inventory && Inventory->Contains(ItemToCheck));
 }
 
-UInventoryItem* UAdventureGameInstance::GetItemFromInventory(const EItemKind& ItemToCheck)
+UItem* UAdventureGameInstance::GetItemFromInventory(const FName& ItemToCheck)
 {
-	if (Inventory && Inventory->Contains(ItemToCheck))
+	if (Inventory)
 	{
-		TArray<UInventoryItem*> Items;
-		Inventory->GetInventoryItemsArray(Items);
-		for (UInventoryItem* Item : Items)
-		{
-			if (Item->ItemKind == ItemToCheck)
-			{
-				return Item;
-			}
-		}
+		return Inventory->FindItemByName(ItemToCheck);
 	}
 	return nullptr;
 }
 
-void UAdventureGameInstance::GetInventoryItems(TArray<UInventoryItem*>& Items)
+void UAdventureGameInstance::GetInventoryItems(TArray<UItem*>& Items)
 {
 	if (Inventory)
 	{
@@ -131,7 +121,7 @@ void UAdventureGameInstance::GetInventoryItems(TArray<UInventoryItem*>& Items)
 
 int UAdventureGameInstance::GetInventoryItemCount() const
 {
-	return Inventory ? Inventory->InventorySize : 0;
+	return Inventory ? Inventory->GetInventorySize() : 0;
 }
 
 void UAdventureGameInstance::OnLoadRoom()
@@ -264,12 +254,12 @@ void UAdventureGameInstance::SaveGame()
 	CurrentSaveGame->StartingLevel = CurrentDoor->CurrentLevel;
 	CurrentSaveGame->StartingDoorLabel = CurrentDoor->DoorLabel;
 
-	TArray<UInventoryItem*> Items;
-	CurrentSaveGame->Inventory.Reset(Inventory->InventorySize);
+	TArray<UItem*> Items;
+	CurrentSaveGame->Inventory.Reset(Inventory->GetInventorySize());
 	Inventory->GetInventoryItemsArray(Items);
-	for (const UInventoryItem* Item : Items)
+	for (const UItem* Item : Items)
 	{
-		CurrentSaveGame->Inventory.Add(Item->ItemKind);
+		CurrentSaveGame->Inventory.Add(Item->ItemTypeDef);
 	}
 
 	CurrentSaveGame->AdventureTags = GameplayTags;
@@ -301,9 +291,9 @@ void UAdventureGameInstance::LoadGame()
 
 	DestroyInventory();
 	CreateInventory();
-	for (const EItemKind Item : CurrentSaveGame->Inventory)
+	for (const FName Item : CurrentSaveGame->Inventory)
 	{
-		Inventory->AddItemToInventory(Item);
+		Inventory->AddItemInstanceByName(Item);
 	}
 	BindInventoryChangedHandlers();
 
@@ -439,18 +429,9 @@ void UAdventureGameInstance::CreateInventory()
 {
 	if (!Inventory)
 	{
-		if (InventoryClass)
-		{
-			Inventory = NewObject<UItemList>(this, InventoryClass, TEXT(PLAYER_INVENTORY_NAME));
-		}
-		else
-		{
-			Inventory = NewObject<UItemList>(this, TEXT(PLAYER_INVENTORY_NAME));
-			UE_LOG(LogAdventureGame, Log,
-			       TEXT(
-				       "Created new inventory of UItemList type. Set InventoryClass property in AdventureGameInstance to customise this."
-			       ));
-		}
+		Inventory = NewObject<UInventory>(this, TEXT(PLAYER_INVENTORY_NAME));
+		Inventory->SetupHandlers();
+		UE_LOG(LogAdventureGame, Log, TEXT("Created new inventory."));
 		Inventory->Identifier = PLAYER_INVENTORY_NAME;
 	}
 }
@@ -458,6 +439,7 @@ void UAdventureGameInstance::CreateInventory()
 void UAdventureGameInstance::DestroyInventory()
 {
 	Inventory->OnInventoryChanged.Remove(OnInventoryChangedHandle);
+	Inventory->TearDownHandlers();
 	Inventory = nullptr;
 }
 
@@ -465,18 +447,14 @@ void UAdventureGameInstance::BindInventoryChangedHandlers()
 {
 	if (!Inventory->OnInventoryChanged.IsBound())
 	{
-		OnInventoryChangedHandle = Inventory->OnInventoryChanged.AddUObject(
-			this, &UAdventureGameInstance::InventoryChanged);
+		OnInventoryChangedHandle = Inventory->OnInventoryChanged.AddUObject(this, &UAdventureGameInstance::InventoryChanged);
 	}
 }
 
-void UAdventureGameInstance::InventoryChanged(FName InventoryIdentifier, EItemKind ItemKind,
+void UAdventureGameInstance::InventoryChanged(FName ItemKind,
                                               EItemDisposition ItemDisposition)
 {
-	if (InventoryIdentifier == PLAYER_INVENTORY_NAME)
-	{
-		PlayerInventoryChanged.Broadcast(ItemKind, ItemDisposition);
-	}
+	PlayerInventoryChanged.Broadcast(ItemKind, ItemDisposition);
 }
 
 void UAdventureGameInstance::LoadRoom(ADoor* FromDoor)

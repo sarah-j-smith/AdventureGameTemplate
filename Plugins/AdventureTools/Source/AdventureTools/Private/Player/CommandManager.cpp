@@ -197,8 +197,8 @@ void ACommandManager::HandleHotSpotClicked(AHotSpot* HotSpot)
     case EPlayerCommand::None:
     case EPlayerCommand::Hover:
         CurrentHotSpot = HotSpot;
-        ItemManager->SourceItem = nullptr;
-        ItemManager->TargetItem = nullptr;
+        ItemManager->ClearSourceItem();
+        ItemManager->ClearTargetItem();
         PerformInstantAction();
         break;
     case EPlayerCommand::VerbPending:
@@ -277,17 +277,17 @@ void ACommandManager::PerformInstantAction()
 {
 #if WITH_EDITOR
     FString DebugString;
-    if (ItemManager->SourceItem) DebugString = ItemManager->SourceItem->ShortDescription.ToString();
+    if (ItemManager->HasSourceItem) DebugString = ItemManager->SourceItemName.ToString();
     if (CurrentHotSpot && DebugString.IsEmpty()) DebugString = CurrentHotSpot->ShortDescription.ToString();
     UE_LOG(LogAdventureGame, Display, TEXT("PerformInstantAction %s - %s"),
            *VerbGetDescriptiveString(CurrentVerb).ToString(), *DebugString);
 #endif
 
     CurrentCommand = EPlayerCommand::InstantActive;
-    if (ItemManager->SourceItem)
+    if (ItemManager->HasSourceItem)
     {
         // Clicking on something in your own inventory
-        UInventoryItem::Execute_OnLookAt(ItemManager->SourceItem);
+        ItemManager->PerformItemAction(EVerbType::LookAt);
         ItemManager->UpdateInventoryText();
     }
     else if (CurrentHotSpot)
@@ -759,27 +759,27 @@ void ACommandManager::HandleInventoryItemClicked(UItemSlot* ItemSlot)
     {
     case EPlayerCommand::None:
     case EPlayerCommand::Hover:
-        ItemManager->SetAndLockSourceItem(ItemSlot->InventoryItem);
+        ItemManager->SetAndLockSourceItem(ItemSlot);
         PerformInstantAction();
         break;
     case EPlayerCommand::VerbPending:
-        ItemManager->SetAndLockSourceItem(ItemSlot->InventoryItem);
+        ItemManager->SetAndLockSourceItem(ItemSlot);
         CurrentCommand = EPlayerCommand::Active;
         ItemManager->PerformItemAction(CurrentVerb);
         if (!bDisableHUDUpdates) BeginAction.Broadcast();
         break;
     case EPlayerCommand::UsePending:
     case EPlayerCommand::GivePending:
-        ItemManager->SetAndLockSourceItem(ItemSlot->InventoryItem);
+        ItemManager->SetAndLockSourceItem(ItemSlot);
         CurrentVerb = CurrentCommand == EPlayerCommand::GivePending ? EVerbType::GiveItem : EVerbType::UseItem;
         CurrentCommand = EPlayerCommand::Targeting;
         ItemManager->ClearTargetItem(); // Should be clear already
         ItemManager->UpdateInventoryText();
         break;
     case EPlayerCommand::Targeting:
-        if (ItemManager->CanInteractWith(ItemSlot->InventoryItem->ItemKind))
+        if (ItemManager->CanInteractWith(ItemSlot->InventoryItem->ItemTypeDef))
         {
-            ItemManager->SetAndLockTargetItem(ItemSlot->InventoryItem);
+            ItemManager->SetAndLockTargetItem(ItemSlot);
             CurrentCommand = EPlayerCommand::Active;
             ItemManager->PerformItemInteraction(CurrentVerb);
             if (!bDisableHUDUpdates) BeginAction.Broadcast();

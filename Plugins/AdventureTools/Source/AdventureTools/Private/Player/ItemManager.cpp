@@ -4,6 +4,7 @@
 #include "Player/ItemManager.h"
 
 #include "AdventureTools.h"
+#include "Item.h"
 #include "Gameplay/AdventureGameInstance.h"
 #include "Gameplay/AdventureGameModeBase.h"
 #include "HUD/ItemSlot.h"
@@ -17,6 +18,9 @@ UItemManager::UItemManager()
     , TargetItem(nullptr)
 {
     PrimaryComponentTick.bCanEverTick = true;
+    
+    SourceItem = CreateDefaultSubobject<UInventoryItem>(FName("SourceItem"));
+    TargetItem = CreateDefaultSubobject<UInventoryItem>(FName("TargetItem"));
 }
 
 void UItemManager::AddToScore(int32 ScoreIncrement)
@@ -36,18 +40,28 @@ void UItemManager::UpdateInventoryText()
     }
 }
 
-bool UItemManager::CanInteractWith(EItemKind OtherItem) const
+UItem* UItemManager::GetSourceItem() const
+{
+    return SourceItem ? SourceItem->ItemDetails : nullptr;
+}
+
+UItem* UItemManager::GetTargetItem() const
+{
+    return TargetItem ? TargetItem->ItemDetails : nullptr;
+}
+
+bool UItemManager::CanInteractWith(FName OtherItem) const
 {
     if (SourceItem && SourceLocked == EChoiceState::Locked)
     {
-        if (SourceItem->ItemKind != OtherItem)
+        if (SourceItem->ItemDetails->ItemTypeDef != OtherItem)
         {
             return true;
         }
         else
         {
             UE_LOG(LogAdventureGame, Warning, TEXT("%s cannot target %s = same kind of item"),
-                *UEnum::GetValueAsString(OtherItem), *SourceItem->GetName());
+                *OtherItem.ToString(), *SourceItem->GetName());
         }
     }
     else
@@ -57,85 +71,61 @@ bool UItemManager::CanInteractWith(EItemKind OtherItem) const
     return false;
 }
 
+void UItemManager::SetAndLockSourceItem(UItemSlot* SourceItemSlot)
+{
+    SourceLocked = EChoiceState::Locked;
+    SourceItem->ItemDetails = SourceItemSlot->InventoryItem;
+}
+
+void UItemManager::SetAndLockTargetItem(UItemSlot* TargetItemSlot)
+{
+    TargetLocked = EChoiceState::Locked;
+    TargetItem->ItemDetails = TargetItemSlot->InventoryItem;
+}
+
 void UItemManager::SwapSourceAndTarget()
 {
-    UInventoryItem* ATargetItem = this->TargetItem;
-    this->TargetItem = this->SourceItem;
-    this->SourceItem = ATargetItem;
+    UItem* ATargetItem = this->TargetItem->ItemDetails;
+    this->TargetItem->ItemDetails = this->SourceItem->ItemDetails;
+    this->SourceItem->ItemDetails = ATargetItem;
 }
 
-UInventoryItem* UItemManager::ItemAddToInventory(const EItemKind& ItemToAdd)
+void UItemManager::ItemAddToInventory(const FName& ItemToAdd)
 {
-    if (UAdventureGameInstance *GameInstance = GetAdventureGameInstance())
+    if (UAdventureGameInstance *GameInstance = Cast<UAdventureGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
     {
-        if (!GameInstance->IsInInventory(ItemToAdd))
-        {
-            if (UInventoryItem* Item = GameInstance->AddItemToInventory(ItemToAdd))
-            {
-                return Item;
-            }
-        }
-#if WITH_EDITOR
-        else
-        {
-            /// At the present even if there's two different EItemKind::Knife objects with different
-            /// descriptions they are treated as the same item. To have two Knife objects with different
-            /// descriptions you must create a new entry in the enum table, EItemKind::Knife2
-            FString DebugString = FItemKind::GetDescription(ItemToAdd).ToString();
-            UE_LOG(LogAdventureGame, Warning, TEXT("Cannot create %s - already held in inventory"),
-                   *DebugString);
-        }
-#endif
+        GameInstance->AddItemToInventory(ItemToAdd);
     }
-    return nullptr;
 }
 
-void UItemManager::ItemRemoveFromInventory(const EItemKind& ItemToRemove)
+void UItemManager::ItemRemoveFromInventory(const FName& ItemToRemove)
 {
-    if (UAdventureGameInstance *GameInstance = GetAdventureGameInstance())
+    if (UAdventureGameInstance *GameInstance = Cast<UAdventureGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
     {
         GameInstance->RemoveItemFromInventory(ItemToRemove);
-        if (SourceItem && !GameInstance->IsInInventory(SourceItem->ItemKind)) ClearSourceItem();
-        if (TargetItem && !GameInstance->IsInInventory(TargetItem->ItemKind)) ClearTargetItem();
+        if (SourceItem && !GameInstance->IsInInventory(SourceItem->GetItemKind())) ClearSourceItem();
+        if (TargetItem && !GameInstance->IsInInventory(TargetItem->GetItemKind())) ClearTargetItem();
     }
 }
 
-void UItemManager::ItemsRemoveFromInventory(const TSet<EItemKind>& TItemsToRemove)
+void UItemManager::ItemsRemoveFromInventory(const TSet<FName>& SetOfItemsToRemove)
 {
-    if (UAdventureGameInstance *GameInstance = GetAdventureGameInstance())
+    if (UAdventureGameInstance *GameInstance = Cast<UAdventureGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
     {
-        GameInstance->RemoveItemsFromInventory(TItemsToRemove);
-        if (SourceItem && !GameInstance->IsInInventory(SourceItem->ItemKind)) ClearSourceItem();
-        if (TargetItem && !GameInstance->IsInInventory(TargetItem->ItemKind)) ClearTargetItem();
+        GameInstance->RemoveItemsFromInventory(SetOfItemsToRemove);
+        if (!GameInstance->IsInInventory(SourceItem->GetItemKind())) ClearSourceItem();
+        if (!GameInstance->IsInInventory(TargetItem->GetItemKind())) ClearTargetItem();
     }
 }
 
-void UItemManager::ItemRemoveFromInventoryAsync(const EItemKind& ItemToRemoveNextTick)
+void UItemManager::ItemRemoveFromInventoryAsync(const FName& ItemToRemoveNextTick)
 {
     ItemsToRemove.Add(ItemToRemoveNextTick);
 }
 
-void UItemManager::ItemsRemoveFromInventoryAsync(const TSet<EItemKind>& ItemsToRemoveNextTick)
+void UItemManager::ItemsRemoveFromInventoryAsync(const TSet<FName>& ItemsToRemoveNextTick)
 {
     ItemsToRemove.Append(ItemsToRemoveNextTick);
-}
-
-UAdventureGameInstance* UItemManager::GetAdventureGameInstance()
-{
-    static TWeakObjectPtr<UAdventureGameInstance> CachedAdventureGameInstance;
-    if (UAdventureGameInstance *AdventureGameInstance = CachedAdventureGameInstance.Get()) return AdventureGameInstance;
-
-    UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this);
-    UAdventureGameInstance* AdventureGameInstance = Cast<UAdventureGameInstance>(GameInstance);
-    if (!AdventureGameInstance)
-    {
-        // Could happen if loading of a save game is in progress
-        UE_LOG(LogAdventureGame, Warning, TEXT("Adventure Game Instance not available in %hs - %d"),
-            __FUNCTION__, __LINE__);
-        return nullptr;
-    }
-    CachedAdventureGameInstance = AdventureGameInstance;
-    return AdventureGameInstance;
 }
 
 bool UItemManager::MaybeHandleInventoryItemClicked(UItemSlot* ItemSlot)
@@ -161,11 +151,11 @@ void UItemManager::MouseEnterInventoryItem(UItemSlot* ItemSlot)
     {
         if (SourceLocked == EChoiceState::Unlocked)
         {
-            SourceItem = ItemSlot->InventoryItem;
+            SourceItem->ItemDetails = ItemSlot->InventoryItem;
         }
         else
         {
-            TargetItem = ItemSlot->InventoryItem;
+            TargetItem->ItemDetails = ItemSlot->InventoryItem;
         }
         CurrentItemSlot = ItemSlot;
         UpdateInventoryText();
@@ -177,11 +167,11 @@ void UItemManager::MouseLeaveInventoryItem()
     if (SourceLocked == EChoiceState::Locked && TargetLocked == EChoiceState::Locked) return;
     if (SourceLocked == EChoiceState::Unlocked)
     {
-        SourceItem = nullptr;
+        SourceItem->ItemDetails = nullptr;
     }
     else
     {
-        TargetItem = nullptr;
+        TargetItem->ItemDetails = nullptr;
     }
     CurrentItemSlot = nullptr;
     UpdateInventoryTextDelegate.Broadcast();
@@ -197,11 +187,27 @@ void UItemManager::PerformItemInteraction(EVerbType CurrentVerb)
         UInventoryItem::Execute_OnItemGiven(TargetItem);
         break;
     case EVerbType::UseItem:
+        if (SourceItem->GetItemKind() == TargetItem->GetItemKind())
+        {
+            TargetItem->OnItemActionFailure();
+        }
+        else if (SourceItem->ItemDetails->CanInteractWith(TargetItem->ItemDetails))
+        {
+            TargetItem->OnItemActionSuccess();
+        }
+        else if (const UStoryAction *ItemDataAsset = TargetItem->OnItemActivated.GetItemDataAssetForAction(EVerbType::Use))
+        {
+            
+            if (ItemDataAsset->SourceItem == SourceItem->GetItemKind())
+            {
+                //
+            }
+        }
         UInventoryItem::Execute_OnItemUsed(TargetItem);
         break;
     default:
         UE_LOG(LogAdventureGame, Warning, TEXT("Unexpected interaction verb %s for perform item interaction with %s"),
-               *VerbGetDescriptiveString(CurrentVerb).ToString(), *TargetItem->ShortDescription.ToString());
+               *VerbGetDescriptiveString(CurrentVerb).ToString(), *TargetItem->GetShortDescription().ToString());
     }
     UpdateInventoryText();
 }
@@ -209,7 +215,7 @@ void UItemManager::PerformItemInteraction(EVerbType CurrentVerb)
 void UItemManager::PerformItemAction(EVerbType CurrentVerb)
 {
 #if WITH_EDITOR
-    const FString DebugString = SourceItem->ShortDescription.ToString();
+    const FString DebugString = SourceItem->GetShortDescription().ToString();
     UE_LOG(LogAdventureGame, Warning, TEXT("PerformItemAction %s - %s"),
            *VerbGetDescriptiveString(CurrentVerb).ToString(), *DebugString);
 #endif

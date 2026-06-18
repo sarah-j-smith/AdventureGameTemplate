@@ -10,7 +10,7 @@
 
 
 enum class EItemAssetType : uint8;
-class UItemDataAsset;
+class UStoryAction;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ADVENTURETOOLS_API UAssetActionComponent : public UActorComponent, public IItemManagerProvider, public IBarkProvider
@@ -28,9 +28,8 @@ public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType,
                                FActorComponentTickFunction* ThisTickFunction) override;
     
-    
     UFUNCTION(BlueprintCallable, Category="ItemAction")
-    void StartTimer(UItemDataAsset *DataAsset);
+    void StartTimer(UStoryAction *DataAsset);
 
     UFUNCTION(BlueprintCallable, Category="ItemAction")
     void StopTimer();
@@ -39,26 +38,14 @@ public:
     /// passes initial checks. The source item of the use verb is found by querying
     /// the adventure player controller's <code>SourceItem</code> property.
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ItemHandling")
-    void OnItemUseSuccess(UItemDataAsset *DataAsset);
-
-    /// Triggered when this item is the <b>target</b> of a give verb, and it successfully
-    /// passes initial checks. The source item of the give verb is found by querying
-    /// the adventure player controller's <code>SourceItem</code> property.
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ItemHandling")
-    void OnItemGiveSuccess(UItemDataAsset *DataAsset);
+    void OnItemActionSuccess(UStoryAction *DataAsset);
 
     /// Triggered when this item is the <b>target</b> of a use verb, and it successfully
     /// passes initial checks. The source item of the use verb is found by querying
     /// the adventure player controller's <code>SourceItem</code> property.
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ItemHandling")
-    void OnItemUseFailure(UItemDataAsset *DataAsset);
-
-    /// Triggered when this item is the <b>target</b> of a give verb, and it successfully
-    /// passes initial checks. The source item of the give verb is found by querying
-    /// the adventure player controller's <code>SourceItem</code> property.
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ItemHandling")
-    void OnItemGiveFailure(UItemDataAsset *DataAsset);
-
+    void OnItemActionFailure(UStoryAction *DataAsset);
+    
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     bool TimerRunning = false;
 	
@@ -68,8 +55,8 @@ public:
     FTimerHandle ActionHighlightTimerHandle;
     
 private:
-    void HandleSourceItem(UItemDataAsset *DataAsset, EItemAssetType ItemAssetType, bool &Success);
-    void HandleTargetItem(UItemDataAsset *DataAsset, EItemAssetType ItemAssetType, bool &Success);
+    void HandleSourceItem(UStoryAction *DataAsset, EItemAssetType ItemAssetType, bool &Success);
+    void HandleTargetItem(UStoryAction *DataAsset, EItemAssetType ItemAssetType, bool &Success);
 
     void HandleKeyCase(bool &Success);
 };

@@ -74,7 +74,8 @@ void AAdventureCharacter::Interact(EInteractTimeDirection InteractTimeDirection)
 {
 	LastInteractTimeDirection = InteractTimeDirection;
 	UPaperZDAnimInstance *Anim = GetAnimInstance();
-	Anim->PlayAnimationOverride(LastNonZeroMovement.X > 0 ? InteractRightAnimationSequence : InteractLeftAnimationSequence,
+	const EWalkDirection WalkDirection = GetFacingDirection();
+	Anim->PlayAnimationOverride(WalkDirection == EWalkDirection::Right ? InteractRightAnimationSequence : InteractLeftAnimationSequence,
 		FName("DefaultSlot"),
 		InteractTimeDirection == EInteractTimeDirection::Forward ? 1.0f : -1.0f,
 		0.0f,
@@ -88,8 +89,9 @@ void AAdventureCharacter::Sit(EInteractTimeDirection InteractTimeDirection)
 
 	LastInteractTimeDirection = InteractTimeDirection;
 	UPaperZDAnimInstance *Anim = GetAnimInstance();
+	const EWalkDirection WalkDirection = GetFacingDirection();
 	Anim->PlayAnimationOverride(
-		LastNonZeroMovement.X > 0 ? SitRightAnimationSequence : SitLeftAnimationSequence,
+		WalkDirection == EWalkDirection::Right ? SitRightAnimationSequence : SitLeftAnimationSequence,
 		FName("DefaultSlot"),
 		InteractTimeDirection == EInteractTimeDirection::Forward ? 1.0f : -1.0f,
 		0.0f,
@@ -100,7 +102,6 @@ void AAdventureCharacter::TurnLeft(EInteractTimeDirection InteractTimeDirection)
 {
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("AAdventureCharacter::TurnLeft - %s"),
 		*(TimeDirectionGetDescriptiveString(InteractTimeDirection)));
-
 	LastInteractTimeDirection = InteractTimeDirection;
 	UPaperZDAnimInstance *Anim = GetAnimInstance();
 	Anim->PlayAnimationOverride(
@@ -266,19 +267,38 @@ void AAdventureCharacter::SetFacingDirection(const EWalkDirection Direction)
 
 EWalkDirection AAdventureCharacter::GetFacingDirection()
 {
-	if (LastNonZeroMovement.X > 0.0f)
+	if (CameraOrientation == ECameraOrientation::XAxisIsOrthoWidth)
 	{
-		return EWalkDirection::Right;
-	}
-	else if (LastNonZeroMovement.X < 0.0f)
+		if (LastNonZeroMovement.X > 0.0f)
+		{
+			return EWalkDirection::Right;
+		}
+		else if (LastNonZeroMovement.X < 0.0f)
+		{
+			return EWalkDirection::Left;
+		}
+		else if (LastNonZeroMovement.Y > 0.0f)
+		{
+			return EWalkDirection::Up;
+		}
+		return EWalkDirection::Down;
+	} 
+	else
 	{
-		return EWalkDirection::Left;
+		if (LastNonZeroMovement.Y < 0.0f)
+		{
+			return EWalkDirection::Right;
+		}
+		else if (LastNonZeroMovement.Y > 0.0f)
+		{
+			return EWalkDirection::Left;
+		}
+		else if (LastNonZeroMovement.X < 0.0f)
+		{
+			return EWalkDirection::Up;
+		}
+		return EWalkDirection::Down;
 	}
-	else if (LastNonZeroMovement.Y > 0.0f)
-	{
-		return EWalkDirection::Up;
-	}
-	return EWalkDirection::Down;
 }
 
 void AAdventureCharacter::SetupCamera()

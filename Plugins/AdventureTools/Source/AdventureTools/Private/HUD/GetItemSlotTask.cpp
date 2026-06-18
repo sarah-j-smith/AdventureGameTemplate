@@ -3,24 +3,24 @@
 #include "HUD/GetItemSlotTask.h"
 
 #include "AdventureTools.h"
-#include "ItemKind.h"
+
 #include "HUD/AdventureGameHUD.h"
 #include "HUD/InventoryUI.h"
 
 UGetItemSlotTask* UGetItemSlotTask::DoGetItemSlotTask(const UObject* WorldContextObject, UAdventureGameHUD* HUD,
-                                                      EItemKind ItemKind, float WaitTime)
+                                                      FName ItemKind, float WaitTime)
 {
     check(HUD);
     check(HUD->InventoryUI);
     check(WorldContextObject);
-    check(ItemKind != EItemKind::None);
+    check(!ItemKind.IsNone());
     
     UGetItemSlotTask* Task = NewObject<UGetItemSlotTask>();
     Task->ItemKind = ItemKind;
     Task->WaitTime = WaitTime;
     Task->WorldContextObject = WorldContextObject;
     Task->InventoryHUD = HUD->InventoryUI;
-    UE_LOG(LogAdventureGame, VeryVerbose, TEXT("GetInventoryItemTask created for %s"), *UEnum::GetValueAsString(ItemKind));
+    UE_LOG(LogAdventureGame, VeryVerbose, TEXT("GetInventoryItemTask created for %s"), *ItemKind.ToString());
     Task->RegisterWithGameInstance(WorldContextObject);
     return Task;
 }
@@ -29,7 +29,7 @@ void UGetItemSlotTask::Activate()
 {
     Super::Activate();
 
-    UE_LOG(LogAdventureGame, VeryVerbose, TEXT("UGetItemSlotTask::Activate - %s"), *UEnum::GetValueAsString(ItemKind));
+    UE_LOG(LogAdventureGame, VeryVerbose, TEXT("UGetItemSlotTask::Activate - %s"), *ItemKind.ToString());
 
     if (UInventoryUI *InventoryUI = InventoryHUD.Get())
     {
@@ -73,7 +73,7 @@ void UGetItemSlotTask::OnInventoryUIChanged()
         
         // Not what we are looking for, keep waiting but log it in case somehow misconfigured
         UE_LOG(LogAdventureGame, Display, TEXT("Waiting for %s - but saw a change"),
-            *UEnum::GetValueAsString(ItemKind));
+            *ItemKind.ToString());
     }
     else
     {

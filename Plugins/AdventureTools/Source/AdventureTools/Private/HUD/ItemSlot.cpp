@@ -3,11 +3,13 @@
 
 #include "HUD/ItemSlot.h"
 
+#include "Item.h"
 #include "Components/Image.h"
 #include "Player/AdventurePlayerController.h"
 #include "Items/InventoryItem.h"
 #include "Player/ItemManager.h"
 
+#include "PaperSprite.h"
 
 void UItemSlot::NativeOnInitialized()
 {
@@ -21,7 +23,7 @@ void UItemSlot::NativeOnInitialized()
 	}
 }
 
-void UItemSlot::AddItem(UInventoryItem* AnInventoryItem)
+void UItemSlot::AddItem(UItem* AnInventoryItem)
 {
 	if (AnInventoryItem != nullptr)
 	{
@@ -78,13 +80,13 @@ void UItemSlot::HandleOnUnhover()
 	}		
 }
 
-void UItemSlot::SetButtonImageFromInventoryItem(const UInventoryItem* AnInventoryItem)
+void UItemSlot::SetButtonImageFromInventoryItem(const UItem* Item)
 {
 	SavedStyle = ItemSlot->GetBrush();
 	FSlateBrush NewBrush = SavedStyle;
 	NewBrush.DrawAs = ESlateBrushDrawType::Type::Image;
 #if WITH_EDITOR
-	NewBrush.SetResourceObject(AnInventoryItem->Thumbnail->GetSourceTexture());
+	NewBrush.SetResourceObject(Item->Thumbnail->GetSourceTexture());
 #else
 	NewBrush.SetResourceObject(AnInventoryItem->Thumbnail->GetBakedTexture());
 #endif

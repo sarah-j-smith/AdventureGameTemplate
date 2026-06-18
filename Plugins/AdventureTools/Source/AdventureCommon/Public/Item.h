@@ -1,0 +1,88 @@
+// (c) 2026 Storybridge Games
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "DoorState.h"
+#include "GameplayTagContainer.h"
+#include "Internationalization/StringTableRegistry.h"
+#include "UObject/Object.h"
+#include "Item.generated.h"
+
+#define LOCTEXT_NAMESPACE "FAdventureCommonModule"
+
+class UPaperSprite;
+
+/**
+ * An item in a game. This is instantiated based on an `FItemTypeDef`, which is uniquely identified
+ * by the FName property `ItemTypeDef`.
+ */
+UCLASS()
+class ADVENTURECOMMON_API UItem : public UObject
+{
+	GENERATED_BODY()
+public:
+	/// What item is this? Currently its only supported to have a single one 
+	/// of each item in the game. If there is a "Knife", and some other thing 
+	/// that is a knife is needed in another part of the game it must be "Switchblade" 
+	/// or some other name.
+	/// 
+	/// @invariant Must be one of the names listed in ItemTypeDefs
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
+	FName ItemTypeDef;
+	
+	//////////////////////////////////
+	///
+	/// ITEM HANDLING
+	///
+
+	/// Longer description used in "Look at" to make the item more real.
+	/// eg "Blunt red knife with blood on it" - "Old tattered book covered with runes".
+	/// By default uses the `DefaultItemDescriptionText` value in the `ItemStrings` string table.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
+	FText Description = LOCTEXT("DefaultItemDescriptionText", "It doesn't look like anything");
+
+	/// Very short description to distinguish this thing from others of the same kind
+	/// eg "Blunt red knife" - "Old tattered book". By default uses the
+	/// `DefaultItemDescriptionText` value in the `ItemStrings` string table.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
+	FText ShortDescription = LOCTABLE("ItemStrings", "DefaultItemDescriptionText");
+
+	/// Various tags for the state and past actions done on this hotspot.
+	/// For example can set "History.Triggered.LookAt" to enforce that a score increment
+	/// is only given once, the first time the item is looked at.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scripting", meta = (Categories = "History"))
+	FGameplayTagContainer HistoryTags;
+	
+	/// Thumbnail image to represent this item inside the inventory.
+	/// Images used for the item while in the level or scene should
+	/// be attached to a hotspot pickup instead.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
+	TObjectPtr<UPaperSprite> Thumbnail;
+	
+	/// An item kind that can meaningfully interact with this one. Used when
+	/// items are combined in the inventory, such as _Use knife on pickle_.
+	/// This has no effect on other verbs.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
+	FName InteractableItemName;
+	
+	//////////////////////////////////
+	///
+	/// ITEM DISPOSITION
+	///
+
+	/// Is the item open or close, or locked?  For items where those concepts make
+	/// no sense this should stay in the <code>Unknown</code> state.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
+	EDoorState DoorState = EDoorState::Unknown;
+
+	/// If this Inventory Item can interact with <code>ItemToInteract</code> then
+	/// return true, otherwise return false. 
+	UFUNCTION(BlueprintCallable, Category = "Player Actions")
+	bool CanInteractWith(const UItem* ItemToInteract) const
+	{
+		return ItemToInteract->InteractableItemName == ItemTypeDef || ItemToInteract->ItemTypeDef == InteractableItemName;
+	}
+};
+
+#undef LOCTEXT_NAMESPACE

@@ -27,5 +27,5 @@ public:
 	
 	virtual FText GetLongDescription() const = 0;
 	
-	virtual EItemKind GetItemKind() const = 0;
+	virtual FName GetItemKind() const = 0;
 };

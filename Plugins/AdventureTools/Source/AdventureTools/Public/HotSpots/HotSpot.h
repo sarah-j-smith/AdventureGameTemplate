@@ -9,9 +9,9 @@
 #include "Engine/StaticMeshActor.h"
 #include "Gameplay/VerbInteractions.h"
 #include "WalkDirection.h"
+#include "ItemDataList.h"
 
-#include "Items/ItemDataAsset.h"
-#include "Items/ItemDataList.h"
+#include "StoryAction.h"
 #include "Items/ItemManagerProvider.h"
 #include "Player/BarkProvider.h"
 
@@ -50,7 +50,7 @@ public:
 
 	virtual FText GetLongDescription() const override { return Description; };
 
-	virtual EItemKind GetItemKind() const override { return EItemKind::None; }
+	virtual FName GetItemKind() const override { return NAME_None; }
 	
 	//////////////////////////////////
 	///
@@ -107,7 +107,7 @@ public:
 	/// then choose one of the <code>ItemDataAsset</code> sub-classes to create an instance.
 	/// @deprecated Use OnItemActivated instead
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
-	TSoftObjectPtr<UItemDataAsset> OnUseSuccessItem;
+	TSoftObjectPtr<UStoryAction> OnUseSuccessItem;
 
 	/// Data Asset for determining results of the player interacting via the Give verb with this hotspot.
 	/// This should be an <b>instance</b> of the <code>ItemDataAsset</code> sub-class, not the
@@ -115,7 +115,7 @@ public:
 	/// then choose one of the <code>ItemDataAsset</code> sub-classes to create an instance.
 	/// @deprecated Use OnItemActivated instead
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
-	TSoftObjectPtr<UItemDataAsset> OnGiveSuccessItem;
+	TSoftObjectPtr<UStoryAction> OnGiveSuccessItem;
 	
 	/// Data Asset for determining results of successfully activating this Hotspot. This should be
 	/// an <b>instance</b> of the <code>ItemDataAsset</code> sub-class, not the
@@ -125,7 +125,7 @@ public:
 	FItemDataList OnItemActivated;
 
 private:
-	UItemDataAsset* ItemDataAssetForAction(EVerbType Verb) const;
+	UStoryAction* ItemDataAssetForAction(EVerbType Verb) const;
 	
 	//////////////////////////////////
 	///

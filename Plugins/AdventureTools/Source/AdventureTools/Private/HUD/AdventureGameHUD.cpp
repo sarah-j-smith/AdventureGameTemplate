@@ -110,7 +110,7 @@ void UAdventureGameHUD::SetInteractionText()
     const UItemManager *ItemManager = GetItemManager();
     if (!Command || !ItemManager) return;
     auto Verb = Command->CurrentVerb;
-    const UInventoryItem* SourceItem = ItemManager->SourceItem;
+    const UItem* SourceItem = ItemManager->GetSourceItem();
     if ((Verb == EVerbType::GiveItem || Verb == EVerbType::UseItem) && SourceItem == nullptr)
     {
         UE_LOG(LogAdventureGame, Warning, TEXT("Tried to %s with no source item"),
@@ -158,8 +158,8 @@ void UAdventureGameHUD::SetInventoryText()
     if (!Command || !ItemManager) return;
     const EVerbType Verb = Command->CurrentVerb;
     FText InventoryText;
-    const UInventoryItem* SourceItem = ItemManager->SourceItem;
-    const UInventoryItem* TargetItem = ItemManager->TargetItem;
+    const UItem* SourceItem = ItemManager->GetSourceItem();
+    const UItem* TargetItem = ItemManager->GetTargetItem();
     const AHotSpot* HotSpot = Command->CurrentHotSpot;
     if (SourceItem == nullptr)
     {
@@ -232,7 +232,7 @@ void UAdventureGameHUD::ClearBarkText()
     Bark->ClearText();
 }
 
-void UAdventureGameHUD::HandleInventoryChanged(EItemKind /*ItemKind*/, EItemDisposition /*Disposition*/)
+void UAdventureGameHUD::HandleInventoryChanged(FName /*ItemKind*/, EItemDisposition /*Disposition*/)
 {
     // TO-DO: Possibly handle changes instead of destroying and re-importing.
     InventoryUI->PopulateInventory(true);

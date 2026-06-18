@@ -73,7 +73,7 @@ public:
 	UImage *BlackScreen;
 
 	UFUNCTION()
-	void HandleInventoryChanged(EItemKind ItemKind, EItemDisposition Disposition);
+	void HandleInventoryChanged(FName ItemKind, EItemDisposition Disposition);
 
 	UFUNCTION()
 	void HandleScoreChanged(int32 Score);

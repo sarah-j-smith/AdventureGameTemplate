@@ -10,7 +10,7 @@
 
 #include "ItemSlot.generated.h"
 
-class UInventoryItem;
+class UItem;
 class UImage;
 
 DECLARE_DYNAMIC_DELEGATE(FItemSlotDelegate);
@@ -38,9 +38,9 @@ public:
 	bool HasItem;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot")
-	UInventoryItem *InventoryItem;
+	UItem *InventoryItem;
 
-	void AddItem(UInventoryItem* InventoryItem);
+	void AddItem(UItem* InventoryItem);
 
 	void RemoveItem();
 
@@ -55,5 +55,5 @@ public:
 private:
 	FSlateBrush SavedStyle;
 	
-	void SetButtonImageFromInventoryItem(const UInventoryItem* InventoryItem);
+	void SetButtonImageFromInventoryItem(const UItem* InventoryItem);
 };
