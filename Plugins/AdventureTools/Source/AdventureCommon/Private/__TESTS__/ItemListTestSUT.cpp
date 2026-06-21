@@ -2,6 +2,7 @@
 
 #include "ItemListTestSUT.h"
 
+#include "AdventureGameplayTags.h"
 #include "ItemTypeDefs.h"
 #include "TestKnife.h"
 #include "TestPickle.h"
@@ -12,7 +13,7 @@ UItemListTestSut::UItemListTestSut()
     UItemTypeDefs *DataTable = CreateDefaultSubobject<UItemTypeDefs>(TEXT("InventoryDataTable"));
     {
         FItemTypeDef Def;
-        Def.UniqueName = "PickleKey";
+        Def.UniqueName = AdventureGameplayTags::Item_Kind_PickleKey;
         Def.ItemClass = UTestPickleKey::StaticClass();
         Def.bEnabled = true;
         Def.bValid = true;
@@ -21,7 +22,7 @@ UItemListTestSut::UItemListTestSut()
     }
     {
         FItemTypeDef Def;
-        Def.UniqueName = "Pickle";
+        Def.UniqueName = AdventureGameplayTags::Item_Kind_Pickle;
         Def.ItemClass = UTestPickle::StaticClass();
         Def.bEnabled = true;
         Def.bValid = true;
@@ -30,7 +31,7 @@ UItemListTestSut::UItemListTestSut()
     }
     {
         FItemTypeDef Def;
-        Def.UniqueName = "Knife";
+        Def.UniqueName = AdventureGameplayTags::Item_Kind_Knife;
         Def.ItemClass = UTestKnife::StaticClass();
         Def.bEnabled = true;
         Def.bValid = true;

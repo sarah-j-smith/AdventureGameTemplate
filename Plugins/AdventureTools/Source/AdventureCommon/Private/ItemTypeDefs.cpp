@@ -7,7 +7,7 @@ FItemTypeDef UItemTypeDefs::FindDefByName(const FName& ItemName) const
 {
 	const FItemTypeDef *Def = ItemTypeDefs.FindByPredicate([ItemName](const FItemTypeDef& ItemTypeDef)
 	{
-		return ItemTypeDef.UniqueName == ItemName;
+		return ItemTypeDef.UniqueName.GetTagLeafName() == ItemName;
 	});
 	if (Def == nullptr)
 	{

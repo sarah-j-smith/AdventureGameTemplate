@@ -111,9 +111,12 @@ void UInventory::AddItemInstanceByName(const FName ItemToAdd)
 {
 	if (Contains(ItemToAdd))
 	{
-		UE_LOG(LogAdventureCommon, Error, 
-			TEXT("AddItemToInventory called for item already in the inventory: %s"), 
-			*ItemToAdd.ToString());
+		const FString ErrorMessage = FString::Printf(TEXT("AddToInventory: item already in the inventory: %s"),*ItemToAdd.ToString());
+		UE_LOG(LogAdventureCommon, Error, TEXT("%s"), *ErrorMessage);
+#if WITH_EDITOR
+		GEngine->AddOnScreenDebugMessage(INVENTORY_MISSING_DEBUG_KEY, 10.0, FColor::Red,
+										 *ErrorMessage, false, FVector2D(2.0, 2.0));
+#endif
 		return;
 	}
 	FText OutReason;
@@ -177,7 +180,7 @@ void UInventory::AddNewItemToInventory(FName ItemName, const UItemTypeDefs *Tabl
 	}
 	if (UClass *ItemClass = ItemTypeDef.ItemClass.Get())
 	{
-		AddNewItemToInventoryWithClass(ItemClass, ItemTypeDef.UniqueName);
+		AddNewItemToInventoryWithClass(ItemClass, ItemTypeDef.UniqueName.GetTagLeafName());
 		return;
 	}
 	// Either needs to be loaded, or game designer forgot to set this
@@ -207,7 +210,7 @@ void UInventory::ItemClassLoadCompleteHandler(const FSoftObjectPath& Path, UObje
 	if (const UClass *ItemClass = ItemClassPtr.Get())
 	{
 		const FItemTypeDef ItemTypeDef = Table->FindItemByClass(ItemClass->GetName());
-		AddNewItemToInventoryWithClass(ItemClass, ItemTypeDef.UniqueName);
+		AddNewItemToInventoryWithClass(ItemClass, ItemTypeDef.UniqueName.GetTagLeafName());
 	}
 }
 

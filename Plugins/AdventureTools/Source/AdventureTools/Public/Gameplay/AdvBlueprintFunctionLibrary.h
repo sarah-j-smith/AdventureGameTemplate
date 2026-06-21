@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DoorState.h"
+#include "GameplayTagContainer.h"
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 
@@ -61,14 +62,14 @@ public:
 
     /// Add a new item to the inventory. To get a reference to the Item once it added the async task
     /// @see GetInventoryItemTask can be used to wait for it to appear in the inventory.
-    /// @param ItemToAdd The kind of item to add. The text descriptions for each kind can be added in the text resource.
+    /// @param Itemtag The kind of item to add. The text descriptions for each kind can be added in the text resource.
     UFUNCTION(BlueprintCallable, Category = "Player Actions", meta = (WorldContext = "WorldContextObject"))
-    static void AddToInventory(UObject* WorldContextObject, FName ItemToAdd);
+    static void AddToInventory(UObject* WorldContextObject, UPARAM(meta=(Categories="Item.Kind"))FGameplayTag Itemtag);
 
     /// Remove an item from the inventory.
-    /// @param ItemToRemove The kind of item to remove.
+    /// @param Itemtag The kind of item to remove.
     UFUNCTION(BlueprintCallable, Category = "Player Actions", meta = (WorldContext = "WorldContextObject"))
-    static void RemoveFromInventory(UObject* WorldContextObject, FName ItemToRemove);
+    static void RemoveFromInventory(UObject* WorldContextObject, UPARAM(meta=(Categories="Item.Kind"))FGameplayTag Itemtag);
 
     UFUNCTION(BlueprintPure, Category = "Debug", meta = (WorldContext = "WorldContextObject"))
     static int32 PIEInstance(const UObject* WorldContextObject);

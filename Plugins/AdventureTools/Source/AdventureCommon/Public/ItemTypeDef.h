@@ -15,10 +15,11 @@ struct FItemTypeDef
 {
 	GENERATED_USTRUCT_BODY()
 	
-	/// An internal unique name, which must contain no white-space, and consist only of alphanumeric 
-	/// ASCII characters. eg "Pickled_Gherkin" or "PickledGherkin"
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef)
-	FName UniqueName;
+	/// An internal unique name, which must be registered in the gameplay tags
+	/// via Edit > ProjectSettings > Manage Gameplay Tags, and added to the 
+	/// <code>Item.Kind</code> category, eg: "Item.Kind.FancyBox"
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef, meta=(Categories="Item.Kind"))
+	FGameplayTag UniqueName;
 	
 	/// A short user facing description to help game designers and also serve as a default text in error messages
 	/// for example "Pickled gherkin"

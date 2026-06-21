@@ -100,19 +100,19 @@ int32 UAdvBlueprintFunctionLibrary::PIEInstance(const UObject* WorldContextObjec
 }
 
 void UAdvBlueprintFunctionLibrary::AddToInventory(UObject* WorldContextObject,
-                                                             const FName ItemToAdd)
+                                                             FGameplayTag Itemtag)
 {
     if (UItemManager *ItemManager = GetItemManager(WorldContextObject))
     {
-        ItemManager->ItemAddToInventory(ItemToAdd);
+        ItemManager->ItemAddToInventory(Itemtag.GetTagLeafName());
     }
 }
 
-void UAdvBlueprintFunctionLibrary::RemoveFromInventory(UObject* WorldContextObject, FName ItemToRemove)
+void UAdvBlueprintFunctionLibrary::RemoveFromInventory(UObject* WorldContextObject, FGameplayTag Itemtag)
 {
     if (UItemManager *ItemManager = GetItemManager(WorldContextObject))
     {
-        ItemManager->ItemRemoveFromInventoryAsync(ItemToRemove);
+        ItemManager->ItemRemoveFromInventoryAsync(Itemtag.GetTagLeafName());
     }
 }
 

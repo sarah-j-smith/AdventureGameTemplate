@@ -32,6 +32,10 @@ namespace AdventureGameplayTags
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Tool, "Item.Treatment.Tool", "Can be used on another item to create a brand new item");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Key, "Item.Treatment.Key", "Can be used on a hotspot to lock or unlock it");
 
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Kind_Knife, "Item.Kind.Knife", "A sharp knife (Example item)");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Kind_Pickle, "Item.Kind.Pickle", "Tasty pickled cucumber (Example item)");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Kind_PickleKey, "Item.Kind.PickleKey", "Key made from a pickle (Example item)");
+    
     FGameplayTagContainer HistoryGameplayTags()
     {
         static FGameplayTagContainer Tags;

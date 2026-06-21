@@ -3,6 +3,7 @@
 
 #include "ItemTypeDefsFactory.h"
 
+#include "AdventureGameplayTags.h"
 #include "ItemTypeDefs.h"
 
 #define LOCTEXT_NAMESPACE "FAdventureTypesModule"
@@ -17,7 +18,7 @@ UObject* UItemTypeDefsFactory::FactoryCreateNew(UClass* InClass, UObject* InPare
 	UObject* Context, FFeedbackContext* Warn)
 {
 	UItemTypeDefs *Defs = NewObject<UItemTypeDefs>(InParent, InClass, InName, Flags | RF_Transactional);
-	FItemTypeDef Pickle = FItemTypeDef(FName("Pickle"), LOCTEXT("ItemTypeDefsFactoryNew_Pickle_Desc", "Pickle")); 
+	FItemTypeDef Pickle = FItemTypeDef(AdventureGameplayTags::Item_Kind_Pickle, LOCTEXT("ItemTypeDefsFactoryNew_Pickle_Desc", "Pickle")); 
 	Defs->ItemTypeDefs.Add(Pickle);
 	return Defs;
 }

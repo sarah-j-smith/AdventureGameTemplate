@@ -35,6 +35,10 @@ namespace AdventureGameplayTags
     ADVENTURECOMMON_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Treatment_Tool);
     ADVENTURECOMMON_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Treatment_Key);
 
+    ADVENTURECOMMON_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Kind_Knife);
+    ADVENTURECOMMON_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Kind_Pickle);
+    ADVENTURECOMMON_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Kind_PickleKey);
+    
     ADVENTURECOMMON_API extern void SetDoorState(EDoorState State, FGameplayTagContainer &Tags);
 
     ADVENTURECOMMON_API extern EDoorState GetDoorState(const FGameplayTagContainer &Tags);
