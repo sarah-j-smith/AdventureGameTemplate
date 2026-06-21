@@ -20,7 +20,7 @@ UInteractTask::UInteractTask(const FObjectInitializer &ObjectInitializer)
 
 UInteractTask* UInteractTask::DoInteractTask(const UObject* WorldContextObject, const EInteractionType Interaction, const EInteractTimeDirection TimeDirection)
 {
-	UInteractTask* BlueprintNode = NewObject<UInteractTask>();
+	UInteractTask* BlueprintNode = NewObject<UInteractTask>(const_cast<UObject*>(WorldContextObject));
 	BlueprintNode->SetWorldContextObject(WorldContextObject);
 	BlueprintNode->SetInteractionType(Interaction);
 	BlueprintNode->SetTimeDirection(TimeDirection);

@@ -15,7 +15,7 @@ UGetItemSlotTask* UGetItemSlotTask::DoGetItemSlotTask(const UObject* WorldContex
     check(WorldContextObject);
     check(!ItemKind.IsNone());
     
-    UGetItemSlotTask* Task = NewObject<UGetItemSlotTask>();
+    UGetItemSlotTask* Task = NewObject<UGetItemSlotTask>(HUD);
     Task->ItemKind = ItemKind;
     Task->WaitTime = WaitTime;
     Task->WorldContextObject = WorldContextObject;

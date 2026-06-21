@@ -49,8 +49,10 @@ TSharedRef<FExtender> FBlueprintReparenterModule::OnExtendContentBrowserMenu(con
 {
 	TSharedRef<FExtender> Extender = MakeShared<FExtender>();
 
-	if (SelectedAssets.Num() == 1 && SelectedAssets[0].GetClass()->IsChildOf(UBlueprint::StaticClass()))
+	if (SelectedAssets.Num() == 1)
 	{
+		UClass* SelectedAssetClass = SelectedAssets[0].GetClass();
+		if (SelectedAssetClass && SelectedAssetClass->IsChildOf(UBlueprint::StaticClass()))
 		Extender->AddMenuExtension(
 			"GetAssetActions",
 			EExtensionHook::After,

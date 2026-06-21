@@ -17,6 +17,7 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "Gameplay/ManagerProvider.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Player/AdventureCharacter.h"
@@ -25,6 +26,7 @@ void UAdventureGameInstance::Init()
 {
 	Super::Init();
 
+	ManagerProvider = NewObject<UManagerProvider>(this);
 	CreateInventory();
 	BindInventoryChangedHandlers();
 
@@ -198,16 +200,9 @@ void UAdventureGameInstance::SetupRoom()
 	UE_LOG(LogAdventureGame, Display, TEXT("Look for door %s"), *CurrentDoorLabel.ToString());
 
 	// Find the door with the label.
-	const ADoor* Door = FindDoor(CurrentDoorLabel);
-	LoadDoor(Door);
-	CurrentDoor = const_cast<ADoor*>(Door);
+	CurrentDoor = FindDoor(CurrentDoorLabel);
 
-	if (UAdventureGameHUD* HUD = GetHUD())
-	{
-		HUD->HideBlackScreen();
-	}
-
-	if (ACommandManager* Command = GetCommandManager())
+	if (ACommandManager* Command = ManagerProvider->GetCommandManager(this))
 	{
 		Command->InterruptCurrentAction();
 	}
@@ -224,12 +219,16 @@ void UAdventureGameInstance::GetOwnedGameplayTags(FGameplayTagContainer& TagCont
 
 void UAdventureGameInstance::StartNewRoom()
 {
-	if (ACommandManager* Command = GetCommandManager())
+	RoomTransitionPhase = ERoomTransitionPhase::RoomCurrent;
+	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
+	if (UAdventureGameHUD* HUD = GetHUD())
+	{
+		HUD->HideBlackScreen();
+	}
+	if (ACommandManager* Command = ManagerProvider->GetCommandManager(this))
 	{
 		Command->SetInputLocked(false);
 	}
-	RoomTransitionPhase = ERoomTransitionPhase::RoomCurrent;
-	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 }
 
 void UAdventureGameInstance::OnRoomUnloaded()
@@ -323,7 +322,7 @@ void UAdventureGameInstance::LoadRoom()
 	// streaming is supposed to work.
 	RoomTransitionPhase = ERoomTransitionPhase::LoadNewRoom;
 	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
-	if (ACommandManager* Command = GetCommandManager())
+	if (ACommandManager* Command = ManagerProvider->GetCommandManager(this))
 	{
 		Command->SetInputLocked(true);
 		Command->InterruptCurrentAction();
@@ -399,26 +398,6 @@ ADoor* UAdventureGameInstance::FindDoor(FName DoorLabel)
 	UE_LOG(LogAdventureGame, Error, TEXT("UAdventureGameInstance::FindDoor failed to find %s"),
 	       *(DoorLabel.ToString()));
 	return nullptr;
-}
-
-void UAdventureGameInstance::LoadDoor(const ADoor* Door)
-{
-	if (!Door)
-	{
-		return;
-	}
-
-	UE_LOG(LogAdventureGame, Display, TEXT("UAdventureGameInstance::LoadDoor: %s"),
-	       *(Cast<ADoor>(Door)->ShortDescription.ToString()));
-
-	if (AAdventureCharacter* AdventureCharacter = GetAdventureCharacter())
-	{
-		FVector Location = Door->WalkToPoint->GetComponentLocation();
-		Location.Z = AdventureCharacter->GetCapsuleComponent()->GetComponentLocation().Z;
-		AdventureCharacter->TeleportToLocation(Location);
-		AdventureCharacter->SetFacingDirection(Door->FacingDirection);
-		AdventureCharacter->SetupCamera();
-	}
 }
 
 void UAdventureGameInstance::LogSaveGameStatus(USaveGame* SaveGame)

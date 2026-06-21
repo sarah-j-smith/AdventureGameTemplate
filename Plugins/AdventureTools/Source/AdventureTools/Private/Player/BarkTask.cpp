@@ -5,6 +5,8 @@
 #include "AdventureTools.h"
 #include "GameUtils.h"
 
+#include "Gameplay/BarkProvider.h"
+#include "Gameplay/ManagerProvider.h"
 #include "Player/CommandManager.h"
 #include "Player/PlayerBarkManager.h"
 
@@ -18,9 +20,11 @@ UBarkTask::UBarkTask(const FObjectInitializer& ObjectInitializer)
 
 UBarkTask* UBarkTask::DoBarkTask(const UObject* WorldContextObject, const FText BarkText)
 {
-    UBarkTask* BlueprintNode = NewObject<UBarkTask>();
+    UBarkTask* BlueprintNode = NewObject<UBarkTask>(const_cast<UObject*>(WorldContextObject));
     BlueprintNode->WorldContextObject = WorldContextObject;
     BlueprintNode->BarkText = BarkText;
+    BlueprintNode->ManagerProvider = NewObject<UManagerProvider>(BlueprintNode);
+    BlueprintNode->MyUID = FGameUtils::GetUUID();
 
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("UBarkTask created"));
 
@@ -35,14 +39,12 @@ void UBarkTask::Activate()
 
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("UBarkTask Activate - %s"), *(BarkText.ToString()));
 
-    if (ACommandManager *CommandManager = GetCommandManager())
-    {
-        if (UPlayerBarkManager *BarkManager = CommandManager->GetBarkController())
-        {
-            BarkManager->PlayerBark(BarkText, MyUID);
-            BarkManager->EndPlayerBark.AddUObject(this, &UBarkTask::BarkCompleted);
-        }
-    }
+    ACommandManager *CommandManager = ManagerProvider->GetCommandManager(this);
+    check(CommandManager);
+    UPlayerBarkManager *BarkManager = CommandManager->GetBarkController();
+    check(BarkManager);
+    BarkManager->PlayerBark(BarkText, MyUID);
+    BarkManager->EndPlayerBark.AddUObject(this, &UBarkTask::BarkCompleted);
 }
 
 void UBarkTask::BarkCompleted(int32 UID, EBarkRequestFinishedReason Reason)
@@ -57,6 +59,9 @@ void UBarkTask::BarkCompleted(int32 UID, EBarkRequestFinishedReason Reason)
             TaskCompleted.Broadcast();
             break;
         case EBarkRequestFinishedReason::Interruption:
+            TaskInterrupted.Broadcast();
+            break;
+        case EBarkRequestFinishedReason::BarkAndEnd:
             TaskInterrupted.Broadcast();
             break;
         }

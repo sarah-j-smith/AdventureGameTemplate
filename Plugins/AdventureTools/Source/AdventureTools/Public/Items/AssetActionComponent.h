@@ -3,20 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemManagerProvider.h"
-#include "Player/BarkProvider.h"
+
 #include "Components/ActorComponent.h"
 #include "AssetActionComponent.generated.h"
 
 
+class UManagerProvider;
 enum class EItemAssetType : uint8;
 class UStoryAction;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class ADVENTURETOOLS_API UAssetActionComponent : public UActorComponent, public IItemManagerProvider, public IBarkProvider
+class ADVENTURETOOLS_API UAssetActionComponent : public UActorComponent
 {
     GENERATED_BODY()
 
+    UPROPERTY()
+    UManagerProvider *ManagerProvider;
+    
 public:
     // Sets default values for this component's properties
     UAssetActionComponent();

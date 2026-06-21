@@ -8,10 +8,19 @@
 #include "AdventureTools.h"
 #include "Item.h"
 #include "VerbType.h"
+#include "Gameplay/ManagerProvider.h"
+#include "Gameplay/BarkProvider.h"
 #include "Player/AdventurePlayerController.h"
 #include "Player/ItemManager.h"
 
 #include "Internationalization/StringTableRegistry.h"
+
+
+UInventoryItem::UInventoryItem()
+{
+    ManagerProvider = CreateDefaultSubobject<UManagerProvider>("ManagerProvider");
+    BarkProvider = CreateDefaultSubobject<UBarkProvider>("BarkProvider");
+}
 
 FText UInventoryItem::GetShortDescription() const
 {
@@ -39,7 +48,7 @@ void UInventoryItem::OnItemActionSuccess_Implementation()
     
     if (UStoryAction *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
     {
-        if (const ACommandManager *Command = GetCommandManager())
+        if (const ACommandManager *Command = ManagerProvider->GetCommandManager(this))
         {
             Command->AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
         }
@@ -50,7 +59,7 @@ void UInventoryItem::OnItemActionSuccess_Implementation()
 
 void UInventoryItem::OnItemActionFailure_Implementation()
 {
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemUsedDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemUsedDefaultText"), this);
 }
 
 UStoryAction* UInventoryItem::ItemDataAssetForAction(const EVerbType Verb) const
@@ -62,35 +71,35 @@ void UInventoryItem::OnClose_Implementation()
 {
     IVerbInteractions::OnClose_Implementation();
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On close"));
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "CloseDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "CloseDefaultText"), this);
 }
 
 void UInventoryItem::OnOpen_Implementation()
 {
     IVerbInteractions::OnOpen_Implementation();
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On open"));
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "OpenDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "OpenDefaultText"), this);
 }
 
 void UInventoryItem::OnGive_Implementation()
 {
     IVerbInteractions::OnGive_Implementation();
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On give inventory item defaultasdfasdfasdf"));
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "GiveDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "GiveDefaultText"), this);
 }
 
 void UInventoryItem::OnPickUp_Implementation()
 {
     IVerbInteractions::OnPickUp_Implementation();
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Pickup"));
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PickUpDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PickUpDefaultText"), this);
 }
 
 void UInventoryItem::OnTalkTo_Implementation()
 {
     IVerbInteractions::OnTalkTo_Implementation();
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On talk"));
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "TalkToDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "TalkToDefaultText"), this);
 }
 
 void UInventoryItem::OnLookAt_Implementation()
@@ -99,11 +108,11 @@ void UInventoryItem::OnLookAt_Implementation()
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On look at"));
     if (ItemDetails->Description.IsEmpty())
     {
-        BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "LookAtDefaultText"));
+        BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "LookAtDefaultText"), this);
     }
     else
     {
-        BarkAndEnd(ItemDetails->Description);
+        BarkProvider->BarkAndEnd(ItemDetails->Description, this);
     }
 }
 
@@ -111,14 +120,14 @@ void UInventoryItem::OnPull_Implementation()
 {
     IVerbInteractions::OnPull_Implementation();
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On pull"));
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PullDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PullDefaultText"), this);
 }
 
 void UInventoryItem::OnPush_Implementation()
 {
     IVerbInteractions::OnPush_Implementation();
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On push"));
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PushDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PushDefaultText"), this);
 }
 
 void UInventoryItem::OnUse_Implementation()
@@ -132,7 +141,7 @@ void UInventoryItem::OnUse_Implementation()
 void UInventoryItem::OnWalkTo_Implementation()
 {
     IVerbInteractions::OnWalkTo_Implementation();
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "WalkToDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "WalkToDefaultText"), this);
 }
 
 void UInventoryItem::OnItemUsed_Implementation()
@@ -141,14 +150,14 @@ void UInventoryItem::OnItemUsed_Implementation()
 
     // **this** InventoryItem is the target and APC->SourceItem is the source of a Use
     // verb. Check that the Source can validly use on this.
-    if (UItemManager *ItemManager = GetItemManager())
+    if (UItemManager *ItemManager = ManagerProvider->GetItemManager(this))
     {
         if (ItemManager->SourceItemName == ItemDetails->ItemTypeDef)
         {
             // Item is used on itself - failure - this should not be necessary,
             // but needed in the case that during game design this item mistakenly
             // has its interactable item set to another with the same item kind.
-            if (ACommandManager *Command = GetCommandManager())
+            if (ACommandManager *Command = ManagerProvider->GetCommandManager(this))
             {
                 Command->InterruptCurrentAction();
             }
@@ -186,5 +195,5 @@ void UInventoryItem::OnItemGiven_Implementation()
     // **this** InventoryItem is the target and APC->SourceItem is the source of a Give verb. 
     
     // TODO Giving items to another not yet implemented - is there a use-case for this?
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemGivenDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemGivenDefaultText"), this);
 }

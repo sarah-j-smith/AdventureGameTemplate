@@ -30,12 +30,16 @@ public:
     /// PLAYER BARK
     ///
 
+    /// Do a bark and immediately end the player actions
     virtual void PlayerBarkAndEnd(const FText &BarkText);
 	
+    /// Bark but potentially have more actions to follow
     virtual void PlayerBark(const FText &BarkText, int32 BarkTaskUid = BARK_UID_NONE);
 
+    /// Bark a number of lines and potentially have more actions to follow
     virtual void PlayerBarkLines(const TArray<FText> &BarkTextArray, int32 BarkTaskUid = BARK_UID_NONE);
 
+    /// Immediately end the player actions
     virtual void ClearBark();
 
     /// This flag is true when the Bark Timer is running, and false otherwise.
@@ -48,6 +52,8 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Barking")
     TArray<int32> CurrentBarkTasks;
     
+    TSet<int32> BarkTasksShouldCausePlayerInterrupt;
+    
     FEndBark EndPlayerBark;
 
     void SetAdventureGameHUD(class UAdventureGameHUD *HUD);
@@ -58,8 +64,6 @@ public:
 private:
     UPROPERTY()
     UAdventureGameHUD *AdventureHUDWidget;
-
-    ACommandManager *GetCommandManager();
 
 public:
     // Called when the game starts

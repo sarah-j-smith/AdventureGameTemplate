@@ -16,6 +16,7 @@ void UItemSlot::NativeOnInitialized()
 	ItemButton->OnClicked.AddDynamic(this, & UItemSlot::HandleOnClicked);
 	ItemButton->OnHovered.AddDynamic(this, & UItemSlot::HandleOnHover);
 	ItemButton->OnUnhovered.AddDynamic(this, & UItemSlot::HandleOnUnhover);
+	ManagerProvider = NewObject<UManagerProvider>(this);
 
 	if (!HasItem)
 	{
@@ -47,7 +48,7 @@ void UItemSlot::RemoveItem()
 
 void UItemSlot::HandleOnClicked()
 {
-	if (ACommandManager *Command = GetCommandManager())
+	if (ACommandManager *Command = ManagerProvider->GetCommandManager(this))
 	{
 		if (HasItem)
 		{
@@ -65,7 +66,7 @@ void UItemSlot::HandleOnHover()
 {
 	if (HasItem)
 	{
-		if (UItemManager *ItemManager = GetItemManager())
+		if (UItemManager *ItemManager = ManagerProvider->GetItemManager(this))
 		{
 			ItemManager->MouseEnterInventoryItem(this);
 		}		
@@ -74,7 +75,7 @@ void UItemSlot::HandleOnHover()
 
 void UItemSlot::HandleOnUnhover()
 {
-	if (UItemManager *ItemManager = GetItemManager())
+	if (UItemManager *ItemManager = ManagerProvider->GetItemManager(this))
 	{
 		ItemManager->MouseLeaveInventoryItem();
 	}		

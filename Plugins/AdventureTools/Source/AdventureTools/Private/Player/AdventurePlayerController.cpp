@@ -9,10 +9,12 @@
 
 #include "Gameplay/AdventureSave.h"
 #include "HotSpots/HotSpot.h"
+#include "HotSpots/Door.h"
 #include "GameUtils.h"
 #include "AdventureTools.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Gameplay/AdvBlueprintFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -194,7 +196,7 @@ void AAdventurePlayerController::DisplayWarningIfCommandManagerNotAdded()
     {
         LevelName = AdventureGameInstance->CurrentLevelName.ToString();
     }
-    const FString ErrorMessage = FString::Printf(TEXT("CommandManager object missing in %s"), *LevelName);
+    const FString ErrorMessage = FString::Printf(TEXT("Add a CommandManager object in %s"), *LevelName);
     GEngine->AddOnScreenDebugMessage(COMMAND_MANAGER_WARNING_KEY, 10.0, FColor::Red,
                                      *ErrorMessage, false, FVector2D(2.0, 2.0));
     UE_LOG(LogAdventureGame, Error, TEXT("SetupAIController error. %s"), *ErrorMessage);
@@ -208,11 +210,30 @@ void AAdventurePlayerController::HandleRoomTransition(const ERoomTransitionPhase
         if (RoomPhase == ERoomTransitionPhase::RoomCurrent)
         {
             SceneLoadStatus = ESceneLoadStatus::Loaded;
+            UAdventureGameInstance* AdventureGameInstance = UAdvBlueprintFunctionLibrary::GetAdventureInstance(this);
+            LoadDoor(AdventureGameInstance->CurrentDoor);
         }
     }
     if (RoomPhase == ERoomTransitionPhase::UnloadOldRoom)
     {
         ResetCommandManager();
+    }
+}
+
+void AAdventurePlayerController::LoadDoor(ADoor* Door)
+{
+    if (!Door) return;
+
+    UE_LOG(LogAdventureGame, Display, TEXT("UAdventureGameInstance::LoadDoor: %s"),
+           *(Cast<ADoor>(Door)->ShortDescription.ToString()));
+
+    if (AAdventureCharacter* Character = PlayerCharacter)
+    {
+        FVector Location = Door->WalkToPoint->GetComponentLocation();
+        Location.Z = Character->GetCapsuleComponent()->GetComponentLocation().Z;
+        Character->TeleportToLocation(Location);
+        Character->SetFacingDirection(Door->FacingDirection);
+        Character->SetupCamera();
     }
 }
 

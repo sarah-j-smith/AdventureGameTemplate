@@ -11,12 +11,11 @@
 
 #include "Engine/GameInstance.h"
 #include "Enums/RoomTransitionPhase.h"
-#include "Items/ItemManagerProvider.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/AdventureControllerProvider.h"
 
 #include "AdventureGameInstance.generated.h"
 
+class UManagerProvider;
 class UItem;
 class UInventory;
 class UInventoryItem;
@@ -33,12 +32,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomTransitioned,
 	ERoomTransitionPhase, RoomTransitionPhase);
 
 #define PLAYER_INVENTORY_NAME "PlayerInventory"
+
 /**
  * 
  */
 UCLASS()
-class ADVENTURETOOLS_API UAdventureGameInstance : public UGameInstance, public IGameplayTagAssetInterface,
-												 public IItemManagerProvider, public IAdventureControllerProvider
+class ADVENTURETOOLS_API UAdventureGameInstance : public UGameInstance, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 public:
@@ -303,7 +302,8 @@ public:
 private:
 	ADoor *FindDoor(FName DoorLabel);
 
-	void LoadDoor(const ADoor *Door);
-
 	void LogSaveGameStatus(USaveGame *SaveGame);
+	
+	UPROPERTY()
+	UManagerProvider *ManagerProvider;
 };

@@ -16,6 +16,7 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 
+#include "Gameplay/AdventureControllerProvider.h"
 #include "Player/AdventureAIController.h"
 #include "Player/AdventurePlayerController.h"
 #include "Player/AdventureCharacter.h"
@@ -47,10 +48,11 @@ ACommandManager::ACommandManager()
 
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("Construct: ACommandManager - %p"), this);
 
-    InteractionNotifier = CreateDefaultSubobject<UInteractionNotifier>(TEXT("InteractionNotifier"));
-    ItemManager = CreateDefaultSubobject<UItemManager>(TEXT("ItemManager"));
-    PlayerBarkManager = CreateDefaultSubobject<UPlayerBarkManager>(TEXT("PlayerBark"));
+    InteractionNotifier = CreateDefaultSubobject<UInteractionNotifier>("InteractionNotifier");
+    ItemManager = CreateDefaultSubobject<UItemManager>("ItemManager");
+    PlayerBarkManager = CreateDefaultSubobject<UPlayerBarkManager>("PlayerBark");
     AssetActionComponent = CreateDefaultSubobject<UAssetActionComponent>("AssetActionComponent");
+    ControllerProvider = CreateDefaultSubobject<UAdventureControllerProvider>("ControllerProvider");
 }
 
 // Called when the game starts or when spawned
@@ -120,20 +122,19 @@ void ACommandManager::HandleTouchInput()
     if (IsInputLocked()) return;
 
     float LocationX, LocationY;
-    AAdventurePlayerController* AdventurePlayerController = GetAdventurePlayerController();
-    if (!AdventurePlayerController) return;
-    if (!AdventurePlayerController->GetTouchPosition(LocationX, LocationY)) return;
+    AAdventurePlayerController* Controller = ControllerProvider->GetAdventurePlayerController(this);
+    if (!Controller->GetTouchPosition(LocationX, LocationY)) return;
 
     ShowLocationDebug(LocationX, LocationY, TEXT("Touch input"));
 
-    if (AHotSpot* HotSpot = AdventurePlayerController->HotSpotTapped(LocationX, LocationY))
+    if (AHotSpot* HotSpot = Controller->HotSpotTapped(LocationX, LocationY))
     {
         HandleHotSpotClicked(HotSpot);
     }
     else
     {
         FVector MouseWorldLocation, MouseWorldDirection;
-        AdventurePlayerController->DeprojectScreenPositionToWorld(LocationX, LocationY, MouseWorldLocation,
+        Controller->DeprojectScreenPositionToWorld(LocationX, LocationY, MouseWorldLocation,
                                                                   MouseWorldDirection);
 
         if (const AAdventureCharacter* APlayerCharacter = GetPlayerCharacter())
@@ -152,10 +153,9 @@ void ACommandManager::HandlePointAndClickInput()
     
     InteractionNotifier->NotifyUserInteraction();
 
-    AAdventurePlayerController* AdventurePlayerController = GetAdventurePlayerController();
-    if (IsInputLocked() || !AdventurePlayerController) return;
-
-    if (AHotSpot* HotSpot = AdventurePlayerController->HotSpotClicked())
+    if (IsInputLocked()) return;
+    AAdventurePlayerController* Controller = ControllerProvider->GetAdventurePlayerController(this);
+    if (AHotSpot* HotSpot = Controller->HotSpotClicked())
     {
         SetVerbAndCommandFromHotSpot(HotSpot);
         HandleHotSpotClicked(HotSpot);
@@ -163,12 +163,12 @@ void ACommandManager::HandlePointAndClickInput()
     else
     {
         float LocationX, LocationY;
-        if (!AdventurePlayerController->GetMouseClickPosition(LocationX, LocationY)) return;
+        if (!Controller->GetMouseClickPosition(LocationX, LocationY)) return;
 
         ShowLocationDebug(LocationX, LocationY, TEXT("Click input"));
 
         FVector MouseWorldLocation, MouseWorldDirection;
-        AdventurePlayerController->DeprojectScreenPositionToWorld(LocationX, LocationY, MouseWorldLocation,
+        Controller->DeprojectScreenPositionToWorld(LocationX, LocationY, MouseWorldLocation,
                                                                   MouseWorldDirection);
 
         if (const AAdventureCharacter* APlayerCharacter = GetPlayerCharacter())
@@ -635,7 +635,7 @@ void ACommandManager::SetupHUD()
     if (bDisableHUD) return;
 
     // Create the HUD and put it on the screen
-    AAdventurePlayerController *PlayerController = GetAdventurePlayerController();
+    AAdventurePlayerController *PlayerController = ControllerProvider->GetAdventurePlayerController(this);
     if (!ensureAlwaysMsgf(AdventureHUDClass, TEXT("Edit the Command Manager and ensure AdventureHUDClass is set"))) return;
     AdventureGameHUD = UAdventureGameHUD::Create(PlayerController, AdventureHUDClass);
     AdventureGameHUD->Bark->SetPositionProvider(PlayerController->PlayerCharacter);
@@ -680,7 +680,7 @@ AAdventureCharacter* ACommandManager::GetPlayerCharacter()
         UE_LOG(LogAdventureGame, Error, TEXT("PlayerCharacter is not set during testing!"));
         return nullptr;
     }
-    return GetAdventureCharacter();
+    return ControllerProvider->GetAdventureCharacter(this);
 }
 
 AAdventureAIController* ACommandManager::GetAIController()

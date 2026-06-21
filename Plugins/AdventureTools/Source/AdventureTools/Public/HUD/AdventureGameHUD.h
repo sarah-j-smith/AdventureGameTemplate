@@ -4,13 +4,12 @@
 
 #include "CoreMinimal.h"
 
-#include "Items/ItemManagerProvider.h"
-
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetSwitcher.h"
 #include "AdventureGameHUD.generated.h"
 
-enum class EItemKind : uint8;
+class UManagerProvider;
+class ACommandManager;
 class UImage;
 class UAdventureGameInstance;
 class USphereComponent;
@@ -26,7 +25,7 @@ class UBarkText;
  * 
  */
 UCLASS()
-class ADVENTURETOOLS_API UAdventureGameHUD : public UUserWidget, public IItemManagerProvider
+class ADVENTURETOOLS_API UAdventureGameHUD : public UUserWidget
 {
 	GENERATED_BODY()
 protected:
@@ -122,4 +121,7 @@ private:
 
 	UPROPERTY()
 	UWidget *DefaultWidget = nullptr;
+	
+	UPROPERTY()
+	UManagerProvider *ManagerProvider;
 };

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Items/ItemManagerProvider.h"
+#include "Gameplay/ManagerProvider.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
@@ -19,13 +19,18 @@ DECLARE_DYNAMIC_DELEGATE(FItemSlotDelegate);
  * 
  */
 UCLASS()
-class ADVENTURETOOLS_API UItemSlot : public UUserWidget, public IItemManagerProvider
+class ADVENTURETOOLS_API UItemSlot : public UUserWidget
 {
 	GENERATED_BODY()
+	
+	UPROPERTY()
+	UManagerProvider* ManagerProvider;
+	
 protected:
 	virtual void NativeOnInitialized() override;
 
 public:
+	
 	FItemSlotDelegate OnItemClick;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "ItemSlot")

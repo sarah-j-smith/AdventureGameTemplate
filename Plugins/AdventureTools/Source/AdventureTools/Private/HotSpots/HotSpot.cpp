@@ -10,6 +10,8 @@
 #include "AdventureGameplayTags.h"
 #include "Components/SphereComponent.h"
 #include "Gameplay/AdventureGameInstance.h"
+#include "Gameplay/ManagerProvider.h"
+#include "Gameplay/BarkProvider.h"
 #include "Internationalization/StringTableRegistry.h"
 #include "Items/InventoryItem.h"
 #include "Items/AssetActionComponent.h"
@@ -25,6 +27,8 @@ AHotSpot::AHotSpot()
 	WalkToPoint->SetSphereRadius(4.0f);
 	
 	AssetActionComponent = CreateDefaultSubobject<UAssetActionComponent>(TEXT("AssetActionComponent"));
+	ManagerProvider = CreateDefaultSubobject<UManagerProvider>(TEXT("ManagerProvider"));
+	BarkProvider = CreateDefaultSubobject<UBarkProvider>("BarkProvider");
 }
 
 void AHotSpot::BeginPlay()
@@ -117,7 +121,7 @@ UStoryAction* AHotSpot::ItemDataAssetForAction(EVerbType Verb) const
 
 void AHotSpot::OnBeginCursorOver(AActor *TouchedActor)
 {
-	if (ACommandManager *Command = GetCommandManager())
+	if (ACommandManager *Command = ManagerProvider->GetCommandManager(this))
 	{
 		Command->MouseEnterHotSpot(this);
 	}
@@ -125,7 +129,7 @@ void AHotSpot::OnBeginCursorOver(AActor *TouchedActor)
 
 void AHotSpot::OnEndCursorOver(AActor *TouchedActor)
 {
-	if (ACommandManager *Command = GetCommandManager())
+	if (ACommandManager *Command = ManagerProvider->GetCommandManager(this))
 	{
 		Command->MouseLeaveHotSpot();
 	}
@@ -146,7 +150,7 @@ void AHotSpot::OnClose_Implementation()
 	}
 	else
 	{
-		BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "CloseDefaultText"));
+		BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "CloseDefaultText"), this);
 	}
 }
 
@@ -154,49 +158,49 @@ void AHotSpot::OnOpen_Implementation()
 {
 	IVerbInteractions::OnOpen_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On open"));
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "OpenDefaultText"));
+	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "OpenDefaultText"), this);
 }
 
 void AHotSpot::OnGive_Implementation()
 {
 	IVerbInteractions::OnGive_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On give"));
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "GiveDefaultText"));
+	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "GiveDefaultText"), this);
 }
 
 void AHotSpot::OnPickUp_Implementation()
 {
 	IVerbInteractions::OnPickUp_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Pickup"));
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PickUpDefaultText"));
+	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PickUpDefaultText"), this);
 }
 
 void AHotSpot::OnTalkTo_Implementation()
 {
 	IVerbInteractions::OnTalkTo_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On talk to"));
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "TalkToDefaultText"));
+	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "TalkToDefaultText"), this);
 }
 
 void AHotSpot::OnLookAt_Implementation()
 {
 	IVerbInteractions::OnLookAt_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On look at"));
-	BarkAndEnd(Description.IsEmpty() ? LOCTABLE(ITEM_STRINGS_KEY, "LookAtDefaultText") : Description);
+	BarkProvider->BarkAndEnd(Description.IsEmpty() ? LOCTABLE(ITEM_STRINGS_KEY, "LookAtDefaultText") : Description, this);
 }
 
 void AHotSpot::OnPull_Implementation()
 {
 	IVerbInteractions::OnPull_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On pull"));
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PullDefaultText"));
+	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PullDefaultText"), this);
 }
 
 void AHotSpot::OnPush_Implementation()
 {
 	IVerbInteractions::OnPush_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On push"));
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PushDefaultText"));
+	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PushDefaultText"), this);
 }
 
 void AHotSpot::OnUse_Implementation()
@@ -207,24 +211,24 @@ void AHotSpot::OnUse_Implementation()
 	// terminal or a water-fountain then a custom script would need to be done.
 	IVerbInteractions::OnUse_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On use from AHotSpot default implement."));
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "UseDefaultText"));
+	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "UseDefaultText"), this);
 }
 
 void AHotSpot::OnWalkTo_Implementation()
 {
 	IVerbInteractions::OnWalkTo_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On walk to"));
-	if (const ACommandManager *Command = GetCommandManager())
+	if (const ACommandManager *Command = ManagerProvider->GetCommandManager(this))
 	{
 		if (Command->IsAlreadyAtHotspotClicked())
 		{
 			FFormatNamedArguments Args;
 			Args.Add(TEXT("Subject"), ShortDescription);
-			BarkAndEnd(FText::Format(LOCTABLE(ITEM_STRINGS_KEY, "HotSpotWalkAlreadyAt"), Args));
+			BarkProvider->BarkAndEnd(FText::Format(LOCTABLE(ITEM_STRINGS_KEY, "HotSpotWalkAlreadyAt"), Args), this);
 		}
 		else
 		{
-			BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "HotSpotWalkArrived"));;
+			BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "HotSpotWalkArrived"), this);
 		}
 	}
 }
@@ -234,7 +238,7 @@ void AHotSpot::OnItemUsed_Implementation()
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Item Used"));
 	if (UStoryAction *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
 	{
-		const UItemManager *ItemManager = GetItemManager();
+		const UItemManager *ItemManager = ManagerProvider->GetItemManager(this);
 		ensureAlwaysMsgf(ItemManager != nullptr, TEXT("ItemManager is nullptr."));
 		// Item was used on this hotspot, and the kind of that item matches the
 		// recipe in the ItemDataAsset. 
@@ -244,7 +248,7 @@ void AHotSpot::OnItemUsed_Implementation()
 			return;
 		}
 	}
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemUsedDefaultText"));
+	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemUsedDefaultText"), this);
 }
 
 void AHotSpot::OnItemGiven_Implementation()
@@ -252,7 +256,7 @@ void AHotSpot::OnItemGiven_Implementation()
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Item Given"));
 	if (UStoryAction *ItemDataAsset = OnGiveSuccessItem.LoadSynchronous())
 	{
-		if (const UItemManager *ItemManager = GetItemManager())
+		if (const UItemManager *ItemManager = ManagerProvider->GetItemManager(this))
 		{
 			if (ItemManager->SourceItemName == ItemDataAsset->SourceItem)
 			{
@@ -265,7 +269,7 @@ void AHotSpot::OnItemGiven_Implementation()
 			UE_LOG(LogAdventureGame, Warning, TEXT("AHotSpot::OnItemUsed_Implementation - APC was invalid!"));
 		}
 	}
-	BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemGivenDefaultText"));
+	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemGivenDefaultText"), this);
 }
 
 AActor *AHotSpot::SpawnAtPlayerLocation(TSubclassOf<AActor> SpawnClass, float Scale, float Lifetime) const

@@ -19,7 +19,7 @@
 
 #include "Gameplay/AdventureGameInstance.h"
 #include "Gameplay/AdventureGameMode.h"
-#include "Items/InventoryItem.h"
+#include  "Gameplay/AdventureControllerProvider.h"
 
 #include "HUD/InteractionHUD.h"
 #include "HUD/PromptList.h"
@@ -37,7 +37,7 @@ void UAdventureGameHUD::NativeOnInitialized()
     {
         IsMobileTouch = true;
     }
-
+    ManagerProvider = NewObject<UManagerProvider>(this);
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("UAdventureGameHUD::NativeOnInitialized"));
 }
 
@@ -106,8 +106,8 @@ void UAdventureGameHUD::HideBlackScreen()
 
 void UAdventureGameHUD::SetInteractionText()
 {
-    const ACommandManager *Command = GetCommandManager();
-    const UItemManager *ItemManager = GetItemManager();
+    const ACommandManager *Command = ManagerProvider->GetCommandManager(this);
+    const UItemManager *ItemManager = ManagerProvider->GetItemManager(this);
     if (!Command || !ItemManager) return;
     auto Verb = Command->CurrentVerb;
     const UItem* SourceItem = ItemManager->GetSourceItem();
@@ -153,8 +153,8 @@ void UAdventureGameHUD::SetInteractionText()
 
 void UAdventureGameHUD::SetInventoryText()
 {
-    const ACommandManager *Command = GetCommandManager();
-    const UItemManager *ItemManager = GetItemManager();
+    const ACommandManager *Command = ManagerProvider->GetCommandManager(this);
+    const UItemManager *ItemManager = ManagerProvider->GetItemManager(this);
     if (!Command || !ItemManager) return;
     const EVerbType Verb = Command->CurrentVerb;
     FText InventoryText;
@@ -298,7 +298,7 @@ void UAdventureGameHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 
     if (!IsMobileTouch)
     {
-        if (ACommandManager *Command = GetCommandManager())
+        if (ACommandManager *Command = ManagerProvider->GetCommandManager(this))
         {
             bool MouseIsOverUI = IsHovered();
             Command->UpdateMouseOverUI(MouseIsOverUI);

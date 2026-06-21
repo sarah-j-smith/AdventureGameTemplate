@@ -14,4 +14,7 @@ enum class EBarkRequestFinishedReason: uint8
 
     /// The bark was interrupted by the player click or tap
     Interruption UMETA(DisplayName = "Interruption"),
+    
+    /// The bark is a bark-and-end instruction
+    BarkAndEnd UMETA(DisplayName = "BarkAndEnd"),
 };

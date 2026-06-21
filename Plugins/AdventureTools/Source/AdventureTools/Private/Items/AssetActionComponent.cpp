@@ -6,10 +6,11 @@
 #include "AdventureGameplayTags.h"
 #include "AdventureTools.h"
 #include "Constants.h"
+#include "Gameplay/ManagerProvider.h"
 #include "Player/ItemManager.h"
 #include "Player/CommandManager.h"
 #include "HotSpots/Door.h"
-#include "Items/InventoryItem.h"
+#include "Gameplay/ManagerProvider.h"
 #include "Internationalization/StringTableRegistry.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -21,7 +22,7 @@ UAssetActionComponent::UAssetActionComponent()
     // off to improve performance if you don't need them.
     PrimaryComponentTick.bCanEverTick = true;
 
-    // ...
+    ManagerProvider = CreateDefaultSubobject<UManagerProvider>("ManagerProvider");
 }
 
 
@@ -29,8 +30,6 @@ UAssetActionComponent::UAssetActionComponent()
 void UAssetActionComponent::BeginPlay()
 {
     Super::BeginPlay();
-
-    // ...
     
 }
 
@@ -46,9 +45,10 @@ void UAssetActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UAssetActionComponent::OnItemActionSuccess_Implementation(UStoryAction *DataAsset)
 {
-    UItemManager *ItemManager = GetItemManager();
-    const ACommandManager *CommandManager = GetCommandManager();
-    if (!ItemManager || !CommandManager) return;
+    UItemManager *ItemManager = ManagerProvider->GetItemManager(this);
+    const ACommandManager *CommandManager = ManagerProvider->GetCommandManager(this);
+    ensureAlways(ItemManager);
+    ensureAlways(CommandManager);
     ItemManager->AddToScore(DataAsset->ScoreOnSuccess);
     bool Success = true;
     TSet<EItemAssetType> ItemAssetTypes = AdventureGameplayTags::GetItemAssetTypes(DataAsset->SourceItemTreatmentTags);
@@ -65,12 +65,13 @@ void UAssetActionComponent::OnItemActionSuccess_Implementation(UStoryAction *Dat
         }
     }
     UGameplayStatics::PlaySound2D(GetWorld(), Success ? DataAsset->ActionSuccessSound : DataAsset->ActionFailureSound);
-    BarkAndEnd(Success ? DataAsset->ActionSuccessBarkText : DataAsset->ActionFailureBarkText);
+    UPlayerBarkManager *PlayerBarkManager = CommandManager->GetBarkController();
+    PlayerBarkManager->PlayerBarkAndEnd(Success ? DataAsset->ActionSuccessBarkText : DataAsset->ActionFailureBarkText);
 }
 
 void UAssetActionComponent::HandleSourceItem(UStoryAction *DataAsset, const EItemAssetType ItemAssetType, bool &Success)
 {
-    UItemManager *ItemManager = GetItemManager();
+    UItemManager *ItemManager = ManagerProvider->GetItemManager(this);
     switch (ItemAssetType)
     {
     case EItemAssetType::Consumable:
@@ -91,7 +92,7 @@ void UAssetActionComponent::HandleSourceItem(UStoryAction *DataAsset, const EIte
 
 void UAssetActionComponent::HandleTargetItem(UStoryAction *DataAsset, const EItemAssetType ItemAssetType, bool& Success)
 {
-    UItemManager *ItemManager = GetItemManager();
+    UItemManager *ItemManager = ManagerProvider->GetItemManager(this);
     switch (ItemAssetType)
     {
     case EItemAssetType::Consumable:
@@ -104,8 +105,8 @@ void UAssetActionComponent::HandleTargetItem(UStoryAction *DataAsset, const EIte
 
 void UAssetActionComponent::HandleKeyCase(bool &Success)
 {
-    const ACommandManager *CommandManager = GetCommandManager();
-    UItemManager *ItemManager = GetItemManager();
+    const ACommandManager *CommandManager = ManagerProvider->GetCommandManager(this);
+    const UItemManager *ItemManager = ManagerProvider->GetItemManager(this);
     if (AHotSpot* ThisHotSpot = CommandManager->CurrentHotSpot)
     {
         if (ADoor* Door = Cast<ADoor>(ThisHotSpot))
@@ -113,7 +114,8 @@ void UAssetActionComponent::HandleKeyCase(bool &Success)
             Success = Door->UnlockDoor();
             if (!Success && Door->DoorState != EDoorState::Locked)
             {
-                Bark(LOCTABLE(ITEM_STRINGS_KEY, "AlreadyUnlocked"));
+                UPlayerBarkManager *BarkManager = CommandManager->GetBarkController();
+                BarkManager->PlayerBark(LOCTABLE(ITEM_STRINGS_KEY, "AlreadyUnlocked"));
             }
         }
         return;
@@ -130,12 +132,14 @@ void UAssetActionComponent::HandleKeyCase(bool &Success)
 
 void UAssetActionComponent::OnItemActionFailure_Implementation(UStoryAction *DataAsset)
 {
-    BarkAndEnd(DataAsset->ActionFailureBarkText);
+    const ACommandManager *CommandManager = ManagerProvider->GetCommandManager(this);
+    UPlayerBarkManager *BarkManager = CommandManager->GetBarkController();
+    BarkManager->PlayerBarkAndEnd(DataAsset->ActionFailureBarkText);
 }
 
 void UAssetActionComponent::OnInteractionTimeout()
 {
-    if (ACommandManager *CommandManager = GetCommandManager())
+    if (ACommandManager *CommandManager = ManagerProvider->GetCommandManager(this))
     {
         CommandManager->InterruptCurrentAction();
     }

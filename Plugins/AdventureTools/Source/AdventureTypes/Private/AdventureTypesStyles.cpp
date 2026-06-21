@@ -12,7 +12,7 @@ FAdventureTypesStyles& FAdventureTypesStyles::Get()
 
 void FAdventureTypesStyles::SetUp()
 {
-	/// Class Icon is 16 x 16, usually PNG, used in content browser
+	/// Class Icon is 16 x 16, usually PNG, used in content browser, actions menu
 	const FVector2D Icon16x16(16.0f, 16.0f);
 		
 	/// These are mostly used for editor button, eg: FooEditor.Flip.Small
@@ -36,6 +36,9 @@ void FAdventureTypesStyles::SetUp()
 	
 	Set("ClassThumbnail.StoryAction", new IMAGE_BRUSH_SVG("Slate/StoryAction", Icon64x64, FStyleColors::AccentOrange));
 	Set("ClassIcon.StoryAction", new IMAGE_BRUSH("Slate/StoryAction_16x", Icon16x16, FStyleColors::AccentOrange));
+	
+	Set("ClassThumbnail.Item", new IMAGE_BRUSH_SVG("Slate/Item", Icon64x64, FStyleColors::AccentOrange));
+	Set("ClassIcon.Item", new IMAGE_BRUSH("Slate/Item_16x", Icon16x16, FStyleColors::AccentOrange));
 	
 	FSlateStyleRegistry::RegisterSlateStyle(*this);
 }

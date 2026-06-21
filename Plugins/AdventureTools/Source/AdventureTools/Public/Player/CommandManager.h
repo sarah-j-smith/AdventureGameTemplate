@@ -9,11 +9,11 @@
 #include "Enums/PlayerCommand.h"
 
 #include "GameFramework/Actor.h"
-#include "Player/AdventureControllerProvider.h"
-#include "Player/BarkProvider.h"
 #include "Player/PlayerBarkManager.h"
 
 #include "CommandManager.generated.h"
+
+class UAdventureControllerProvider;
 
 namespace EPathFollowingResult
 {
@@ -44,8 +44,7 @@ class AHotSpot;
 /// such as walk to location, hotspot or use verb on item or hotspot
 /// One of these should be dropped into each level.
 UCLASS(BlueprintType, Blueprintable)
-class ADVENTURETOOLS_API ACommandManager : public AActor,
-        public IAdventureControllerProvider, public IBarkProvider
+class ADVENTURETOOLS_API ACommandManager : public AActor
 {
     GENERATED_BODY()
 
@@ -271,18 +270,11 @@ public:
     UPROPERTY(EditAnywhere, Category = "HUD")
     TSubclassOf<UAdventureGameHUD> AdventureHUDClass;
 
-    /// Create an AdventureGameHUD and attach it to the above property,
-    /// then setup handlers for it. This should never be called in regular
-    /// game play as the setup functions are done by the Player Controller.
+    /// Create an AdventureGameHUD and attach it to the <code>AdventureGameHUD</code> 
+    /// property, then setup handlers for it. 
     /// 
-    /// But in tests (where there is no player controller) it might be useful
-    /// to display the HUD to check the tests are working as expected.
-    ///
-    /// Generally showing UI during a test - they should test functionality.
-    /// Tests should be able to run headless and just report "PASS" or "FAIL".
-    /// This <code>SetupHUD()</code> will be called in the Command Manager's
-    /// <code>BeginPlay</code> if the <code>bIsTesting && !bDisableHUD</code>
-    /// boolean flags are set appropriately.
+    /// <code>SetupHUD</code> will be called in the Command Manager's
+    /// <code>BeginPlay</code> and if not found then during next event tick.
     UFUNCTION(BlueprintCallable, Category = "Testing")
     void SetupHUD();
 
@@ -298,6 +290,9 @@ private:
     /// Track barks in testing
     UPROPERTY()
     UTestBarkController* TestBarkController;
+    
+    UPROPERTY()
+    UAdventureControllerProvider* ControllerProvider;
 
 public:
     //////////////////////////////////

@@ -9,13 +9,15 @@
 
 #include "AdvBlueprintFunctionLibrary.generated.h"
 
+class UBarkProvider;
+class UManagerProvider;
 class UItemManager;
 class ACommandManager;
 class AAdventureCharacter;
 class AHotSpot;
 class UAdventureGameInstance;
-class UInventoryItem;
 class AAdventurePlayerController;
+class UAdventureControllerProvider;
 
 /**
  * 
@@ -24,6 +26,11 @@ UCLASS()
 class ADVENTURETOOLS_API UAdvBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
+    
+    static UManagerProvider *GetManagerProvider();
+    static UBarkProvider *GetBarkProvider();
+    static UAdventureControllerProvider *GetControllerProvider();
+    
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Gameplay", meta = (WorldContext = "WorldContextObject"))
@@ -33,35 +40,35 @@ public:
     /// This function is a bit slow, so don't use it in a loop.
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Controllers",
         meta = (WorldContext = "WorldContextObject"))
-    static AAdventurePlayerController* GetAdventureController(const UObject* WorldContextObject);
+    static AAdventurePlayerController* GetAdventureController(UObject* WorldContextObject);
 
     /// Get the manager used for handling player commands; verbs and item actions.
     /// This function is a bit slow, so don't use it in a loop.
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Controllers", meta = (WorldContext = "WorldContextObject"))
-    static ACommandManager* GetCommandManager(const UObject* WorldContextObject);
+    static ACommandManager* GetCommandManager(UObject* WorldContextObject);
     
     /// Get the manager used for handling items in the inventory
     /// This function is a bit slow, so don't use it in a loop.
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Controllers", meta = (WorldContext = "WorldContextObject"))
-    static UItemManager* GetItemManager(const UObject* WorldContextObject);
+    static UItemManager* GetItemManager(UObject* WorldContextObject);
 
     /// Get the player to "bark" a message, which prints on screen above their head
     UFUNCTION(BlueprintCallable, Category = "Player Actions", meta = (WorldContext = "WorldContextObject"))
-    static void PlayerBark(const UObject* WorldContextObject, FText BarkText);
+    static void PlayerBark(UObject* WorldContextObject, FText BarkText);
 
     UFUNCTION(BlueprintCallable, Category = "Player Actions", meta = (WorldContext = "WorldContextObject"))
-    static void ClearVerb(const UObject* WorldContextObject);
+    static void ClearVerb(UObject* WorldContextObject);
 
     /// Add a new item to the inventory. To get a reference to the Item once it added the async task
     /// @see GetInventoryItemTask can be used to wait for it to appear in the inventory.
     /// @param ItemToAdd The kind of item to add. The text descriptions for each kind can be added in the text resource.
     UFUNCTION(BlueprintCallable, Category = "Player Actions", meta = (WorldContext = "WorldContextObject"))
-    static void AddToInventory(const UObject* WorldContextObject, FName ItemToAdd);
+    static void AddToInventory(UObject* WorldContextObject, FName ItemToAdd);
 
     /// Remove an item from the inventory.
     /// @param ItemToRemove The kind of item to remove.
     UFUNCTION(BlueprintCallable, Category = "Player Actions", meta = (WorldContext = "WorldContextObject"))
-    static void RemoveFromInventory(const UObject* WorldContextObject, FName ItemToRemove);
+    static void RemoveFromInventory(UObject* WorldContextObject, FName ItemToRemove);
 
     UFUNCTION(BlueprintPure, Category = "Debug", meta = (WorldContext = "WorldContextObject"))
     static int32 PIEInstance(const UObject* WorldContextObject);

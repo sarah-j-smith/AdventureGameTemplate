@@ -47,10 +47,6 @@ void UPlayerBarkManager::PlayerBarkAndEnd(const FText &BarkText)
     const FBarkRequest* Request = FBarkRequest::CreatePlayerRequest(BarkText);
     AdventureHUDWidget->Bark->AddBarkRequest(Request);
     CurrentBarkTasks.Add(Request->GetUID());
-    if (ACommandManager *CommandManager = GetCommandManager())
-    {
-        CommandManager->bShouldInterruptCurrentActionOnNextTick = true;
-    }
 }
 
 void UPlayerBarkManager::PlayerBark(const FText& BarkText, int32 BarkTaskUid)
@@ -68,24 +64,6 @@ void UPlayerBarkManager::PlayerBarkLines(const TArray<FText>& BarkTextArray, int
     const FBarkRequest* Request = FBarkRequest::CreatePlayerMultilineRequest(BarkTextArray);
     CurrentBarkTasks.Add(Request->GetUID());
     AdventureHUDWidget->Bark->AddBarkRequest(Request);
-}
-
-ACommandManager* UPlayerBarkManager::GetCommandManager()
-{
-    static TWeakObjectPtr<ACommandManager> CachedCommandManager;
-    
-    if (ACommandManager *CommandManager = Cast<ACommandManager>(GetOwner()))
-    {
-        return CommandManager;
-    }
-    if (ACommandManager* CommandManager = CachedCommandManager.Get()) return CommandManager;
-    if (ACommandManager* CommandManager = Cast<ACommandManager>(UGameplayStatics::GetActorOfClass(this, ACommandManager::StaticClass())))
-    {
-        CachedCommandManager = CommandManager;
-        return CommandManager;
-    }
-    UE_LOG(LogAdventureGame, Warning, TEXT("Command manager not available in UPlayerBarkManager"));
-    return nullptr;
 }
 
 void UPlayerBarkManager::ClearBark()
@@ -132,7 +110,15 @@ void UPlayerBarkManager::OnTimeoutBark(int32 BarkTaskId)
     if (const int TaskIndex = CurrentBarkTasks.IndexOfByKey(BarkTaskId); TaskIndex != INDEX_NONE)
     {
         CurrentBarkTasks.RemoveAt(TaskIndex);
-        EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::Timeout);
+        if (BarkTasksShouldCausePlayerInterrupt.Contains(BarkTaskId))
+        {
+            EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::BarkAndEnd);
+            BarkTasksShouldCausePlayerInterrupt.Remove(BarkTaskId);
+        } 
+        else
+        {
+            EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::Timeout);
+        }
     }
     IsBarking = AdventureHUDWidget->Bark->IsBarking();
 }
@@ -142,7 +128,15 @@ void UPlayerBarkManager::OnInterruptBark(int32 BarkTaskId)
     if (const int TaskIndex = CurrentBarkTasks.IndexOfByKey(BarkTaskId); TaskIndex != INDEX_NONE)
     {
         CurrentBarkTasks.RemoveAt(TaskIndex);
-        EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::Interruption);
+        if (BarkTasksShouldCausePlayerInterrupt.Contains(BarkTaskId))
+        {
+            EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::BarkAndEnd);
+            BarkTasksShouldCausePlayerInterrupt.Remove(BarkTaskId);
+        } 
+        else
+        {
+            EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::Interruption);
+        }
     }
     IsBarking = AdventureHUDWidget->Bark->IsBarking();
 }

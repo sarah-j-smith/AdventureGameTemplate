@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Items/ItemManagerProvider.h"
 
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "BarkTask.generated.h"
 
 /// https://unrealcommunity.wiki/creating-asynchronous-blueprint-nodes-ctnmtj0q
 
+class UManagerProvider;
+class UBarkProvider;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBarkOutputPin);
 
 /**
@@ -17,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBarkOutputPin);
  * a message and wait until the bark is finished before continuing with more blueprint nodes/actions.
  */
 UCLASS()
-class ADVENTURETOOLS_API UBarkTask : public UBlueprintAsyncActionBase, public IItemManagerProvider
+class ADVENTURETOOLS_API UBarkTask : public UBlueprintAsyncActionBase
 {
     GENERATED_UCLASS_BODY()
 public:
@@ -50,7 +51,10 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Barking")
     FText BarkText;
-
+    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Barking")
+    UManagerProvider* ManagerProvider;
+    
 private:
     UFUNCTION()
     void BarkCompleted(int32 UID, EBarkRequestFinishedReason Reason);

@@ -10,7 +10,7 @@
 UGetInventoryItemTask* UGetInventoryItemTask::DoGetInventoryItemTask(
     const UObject* WorldContextObject, const FName ItemKind, const float WaitTime)
 {
-    UGetInventoryItemTask* Task = NewObject<UGetInventoryItemTask>();
+    UGetInventoryItemTask* Task = NewObject<UGetInventoryItemTask>(const_cast<UObject*>(WorldContextObject));
     Task->WorldContextObject = WorldContextObject;
     Task->ItemKind = ItemKind;
     Task->WaitTime = WaitTime;

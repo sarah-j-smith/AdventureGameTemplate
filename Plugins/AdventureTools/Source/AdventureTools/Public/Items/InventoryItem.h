@@ -6,25 +6,33 @@
 #include "DescribableItem.h"
 #include "StoryAction.h"
 #include "ItemDataList.h"
-#include "ItemManagerProvider.h"
 #include "Gameplay/VerbInteractions.h"
-#include "Player/BarkProvider.h"
 #include "InventoryItem.generated.h"
 
+class UBarkProvider;
+class UManagerProvider;
 class UItem;
+
 /**
- * The `Item` in our inventory.
+ * The `Item` in our inventory, that can be scripted with blueprints.
  */
 UCLASS(BlueprintType, Blueprintable, EditInlineNew)
 class ADVENTURETOOLS_API UInventoryItem : public UObject, 
-    public IVerbInteractions, public IItemManagerProvider,
-    public IBarkProvider, public IDescribableItem
+    public IVerbInteractions, public IDescribableItem
 {
     GENERATED_BODY()
     
     UStoryAction* ItemDataAssetForAction(EVerbType Verb) const;
+    
+    UPROPERTY()
+    UManagerProvider* ManagerProvider;
+    
+    UPROPERTY()
+    UBarkProvider* BarkProvider;
 
 public:
+    UInventoryItem();
+    
     virtual FText GetShortDescription() const override;
 
     virtual FText GetLongDescription() const override;

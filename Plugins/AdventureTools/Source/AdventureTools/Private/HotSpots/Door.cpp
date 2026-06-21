@@ -5,6 +5,7 @@
 
 #include "Constants.h"
 #include "Gameplay/AdventureGameInstance.h"
+#include "Gameplay/BarkProvider.h"
 #include "VerbType.h"
 
 #include "AdventureGameplayTags.h"
@@ -93,7 +94,7 @@ void ADoor::OnUse_Implementation()
     switch (DoorState)
     {
     case EDoorState::Unknown:
-        BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "NotOpenable"));
+        BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "NotOpenable"), this);
         return;
     case EDoorState::Closed:
         Execute_OnOpen(this);
@@ -109,10 +110,10 @@ void ADoor::OnUse_Implementation()
         }
         return;
     case EDoorState::Locked:
-        BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "Locked"));
+        BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "Locked"), this);
         return;
     }
-    BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "UseDefaultText"));
+    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "UseDefaultText"), this);
 }
 
 void ADoor::OnOpen_Implementation()
@@ -120,16 +121,16 @@ void ADoor::OnOpen_Implementation()
     switch (DoorState)
     {
     case EDoorState::Unknown:
-        BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "NotOpenable"));
+        BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "NotOpenable"), this);
         break;
     case EDoorState::Closed:
         OpenDoor();
         break;
     case EDoorState::Opened:
-        BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "AlreadyOpened"));
+        BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "AlreadyOpened"), this);
         break;
     case EDoorState::Locked:
-        BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "Locked"));
+        BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "Locked"), this);
         break;
     }
 }

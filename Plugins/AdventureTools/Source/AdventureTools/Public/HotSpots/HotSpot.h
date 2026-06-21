@@ -12,11 +12,11 @@
 #include "ItemDataList.h"
 
 #include "StoryAction.h"
-#include "Items/ItemManagerProvider.h"
-#include "Player/BarkProvider.h"
 
 #include "HotSpot.generated.h"
 
+class UBarkProvider;
+class UManagerProvider;
 enum class EVerbType : uint8;
 class USphereComponent;
 class UAssetActionComponent;
@@ -28,8 +28,7 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FHotSpotDataLoad, AHotSpot *, HotSpot);
  * 
  */
 UCLASS()
-class ADVENTURETOOLS_API AHotSpot : public AStaticMeshActor, public IVerbInteractions,
-		public IItemManagerProvider, public IBarkProvider, public IDescribableItem
+class ADVENTURETOOLS_API AHotSpot : public AStaticMeshActor, public IVerbInteractions, public IDescribableItem
 {
 	GENERATED_BODY()
 	
@@ -231,4 +230,10 @@ protected:
 	
 	bool HotSpotHidden = false;
 	bool Pickup = false;
+	
+	UPROPERTY()
+	UManagerProvider *ManagerProvider;
+	
+	UPROPERTY()
+	UBarkProvider *BarkProvider;
 };

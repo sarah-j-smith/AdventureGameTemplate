@@ -6,6 +6,7 @@
 #include "DialogComponent.h"
 #include "PaperFlipbookComponent.h"
 #include "Player/AdventurePlayerController.h"
+#include "Gameplay/ManagerProvider.h"
 #include "HUD/AdventureGameHUD.h"
 #include "HUD/PromptList.h"
 
@@ -64,7 +65,7 @@ void AHotSpotNPC::Tick(float DeltaTime)
 void AHotSpotNPC::OnConverseWith_Implementation()
 {
     IDialogInteractable::OnConverseWith_Implementation();
-    if (ACommandManager *Command = GetCommandManager())
+    if (ACommandManager *Command = ManagerProvider->GetCommandManager(this))
     {
         Command->CommenceConversation();
     }
@@ -109,7 +110,7 @@ void AHotSpotNPC::StopConversation()
     UE_LOG(LogTemp, Warning, TEXT("StopConversation - IsConversing: %s"), IsConversing ? TEXT("Yes") : TEXT("No"));
     if (!IsConversing) return;
     UE_LOG(LogTemp, Warning, TEXT("Stopping Conversation"));
-    if (ACommandManager *Command = GetCommandManager())
+    if (ACommandManager *Command = ManagerProvider->GetCommandManager(this))
     {
         Command->EndConversation();
     }

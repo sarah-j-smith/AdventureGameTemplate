@@ -12,14 +12,6 @@
 #include "AdventurePlayerController.generated.h"
 
 class AAdventureCharacter;
-
-namespace EPathFollowingResult
-{
-	enum Type : int;
-}
-
-class UItemSlot;
-class UAdventureGameHUD;
 class AHotSpot;
 class APuck;
 
@@ -122,6 +114,8 @@ private:
 	UFUNCTION()
 	void HandleRoomTransition(const ERoomTransitionPhase RoomPhase);
 	
+	void LoadDoor(ADoor* Door);
+	
 public:
 	//////////////////////////////////
 	///
@@ -131,11 +125,7 @@ public:
 	/// Player input, commands and state management are all delegated to this instance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Commands")
 	ACommandManager *Command = nullptr;
-
-	/// <code>CommandManager</code> sub-class to spawn, if one is not found in the scene
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Commands")
-	TSubclassOf<ACommandManager> CommandManagerToSpawn = ACommandManager::StaticClass();
-
+	
 	void SetupCommandManager(ACommandManager *NewCommandManager);
 	
 	/// Has the player currently issued a command?
