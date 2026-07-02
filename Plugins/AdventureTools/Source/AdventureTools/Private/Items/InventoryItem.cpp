@@ -45,31 +45,58 @@ FName UInventoryItem::GetItemKind() const
 void UInventoryItem::OnItemActionSuccess_Implementation()
 {
     UE_LOG(LogAdventureGame, Log, TEXT("OnItemUseSuccess Success - default."));
-    
-    if (UStoryAction *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
+    bHandled = false;
+    const ACommandManager *Command = ManagerProvider->GetCommandManager(this);
+    if (UStoryAction *ItemDataAsset = ItemDataAssetForAction(Command->CurrentVerb))
     {
-        if (const ACommandManager *Command = ManagerProvider->GetCommandManager(this))
+        ItemDataAsset->bHandled = false;
+        Command->AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+        if (ItemDataAsset->bHandled)
         {
-            Command->AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+            bHandled = true;
+            ItemDataAsset->bHandled = false;
+            return;
         }
-        return;
     }
     OnItemActionSuccess();
 }
 
 void UInventoryItem::OnItemActionFailure_Implementation()
 {
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemUsedDefaultText"), this);
+    UE_LOG(LogAdventureGame, Log, TEXT("OnItemUseSuccess Success - default."));
+    bHandled = false;
+    const ACommandManager *Command = ManagerProvider->GetCommandManager(this);
+    if (UStoryAction *ItemDataAsset = ItemDataAssetForAction(Command->CurrentVerb))
+    {
+        ItemDataAsset->bHandled = false;
+        Command->AssetActionComponent->OnItemActionFailure(ItemDataAsset);
+        if (ItemDataAsset->bHandled)
+        {
+            bHandled = true;
+            ItemDataAsset->bHandled = false;
+            return;
+        }
+    }
+    OnItemActionFailure();
 }
 
 UStoryAction* UInventoryItem::ItemDataAssetForAction(const EVerbType Verb) const
 {
-    return OnItemActivated.GetItemDataAssetForAction(Verb);
+    return ItemDetails->Activations.GetItemDataAssetForAction(Verb);
 }
 
 void UInventoryItem::OnClose_Implementation()
 {
     IVerbInteractions::OnClose_Implementation();
+    if (CanCloseDoorOrItem(ItemDetails->DoorState))
+    {
+        OnItemActionSuccess();
+    }
+    else
+    {
+        OnItemActionFailure();
+    }
+    if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On close"));
     BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "CloseDefaultText"), this);
 }
@@ -77,6 +104,15 @@ void UInventoryItem::OnClose_Implementation()
 void UInventoryItem::OnOpen_Implementation()
 {
     IVerbInteractions::OnOpen_Implementation();
+    if (CanOpenDoorOrItem(ItemDetails->DoorState))
+    {
+        OnItemActionSuccess();
+    }
+    else
+    {
+        OnItemActionFailure();
+    }
+    if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On open"));
     BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "OpenDefaultText"), this);
 }
@@ -91,6 +127,8 @@ void UInventoryItem::OnGive_Implementation()
 void UInventoryItem::OnPickUp_Implementation()
 {
     IVerbInteractions::OnPickUp_Implementation();
+    OnItemActionSuccess();
+    if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Pickup"));
     BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PickUpDefaultText"), this);
 }
@@ -98,6 +136,8 @@ void UInventoryItem::OnPickUp_Implementation()
 void UInventoryItem::OnTalkTo_Implementation()
 {
     IVerbInteractions::OnTalkTo_Implementation();
+    OnItemActionSuccess();
+    if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On talk"));
     BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "TalkToDefaultText"), this);
 }
@@ -105,6 +145,8 @@ void UInventoryItem::OnTalkTo_Implementation()
 void UInventoryItem::OnLookAt_Implementation()
 {
     IVerbInteractions::OnLookAt_Implementation();
+    OnItemActionSuccess();
+    if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On look at"));
     if (ItemDetails->Description.IsEmpty())
     {
@@ -119,6 +161,8 @@ void UInventoryItem::OnLookAt_Implementation()
 void UInventoryItem::OnPull_Implementation()
 {
     IVerbInteractions::OnPull_Implementation();
+    OnItemActionSuccess();
+    if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On pull"));
     BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PullDefaultText"), this);
 }
@@ -126,6 +170,8 @@ void UInventoryItem::OnPull_Implementation()
 void UInventoryItem::OnPush_Implementation()
 {
     IVerbInteractions::OnPush_Implementation();
+    OnItemActionSuccess();
+    if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On push"));
     BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PushDefaultText"), this);
 }
@@ -195,5 +241,6 @@ void UInventoryItem::OnItemGiven_Implementation()
     // **this** InventoryItem is the target and APC->SourceItem is the source of a Give verb. 
     
     // TODO Giving items to another not yet implemented - is there a use-case for this?
+    // Usually we give an item to an NPC (a hot-spot) and giving it to another item is weird.
     BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemGivenDefaultText"), this);
 }

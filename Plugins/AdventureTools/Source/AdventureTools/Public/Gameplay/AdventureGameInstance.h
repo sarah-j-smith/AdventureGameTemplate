@@ -11,6 +11,7 @@
 
 #include "Engine/GameInstance.h"
 #include "Enums/RoomTransitionPhase.h"
+#include "Items/InventoryItem.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "AdventureGameInstance.generated.h"
@@ -59,6 +60,35 @@ public:
 	/// INVENTORY
 	///
 
+	/// Custom inventory item behaviours
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Save Game")
+	TSoftObjectPtr<UDataTable> DataTable;
+	
+	DECLARE_DELEGATE_TwoParams(FCustomInventoryItemLoaded, FName /* ItemKind */, UInventoryItem * /* CustomInventoryItem */);
+	
+	FCustomInventoryItemLoaded CustomInventoryItemLoadedDelegate;
+
+	/// Try to load a custom <code>UInventoryItem</code> for the item with the given name.
+	void GetCustomInventoryItem(FName ItemKind);
+
+private:
+	FLoadSoftObjectPathAsyncDelegate LoadTableDelegate;
+	FLoadSoftObjectPathAsyncDelegate LoadClassDelegate;
+	
+	UFUNCTION()
+	void InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object);
+
+	UFUNCTION()
+	void InventoryClassLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object);
+
+	void GetCustomInventoryItemWithTable(FName ItemKind, UDataTable* DataTablePtr);
+	
+	void GetCustomInventoryItemWithClass(FName ItemKind, const UClass* InventoryItemClass);
+	
+	TArray<FName> TableOperationsQueue;
+	TMap<FString, FName> ClassOperationsQueue;
+	
+public:
 	/// Bind to this event to be notified of changes to the players inventory.
 	UPROPERTY(BlueprintAssignable, Category="Inventory")
 	FPlayerInventoryChanged PlayerInventoryChanged;
@@ -82,19 +112,19 @@ public:
 
 	int GetInventoryItemCount() const;
 	
-private:
-	/// Do not expose this inventory object. It will get created and destroyed whenever
-	/// the player saves or loads the game.
-	UPROPERTY()
+	/// Do not save a reference to this inventory object. It will get created and destroyed whenever
+	/// the player saves or loads the game. To keep a reference safely, handle the 
+	/// <code>PlayerInventoryChanged</code> event, and when the _ItemDisposition_ is 
+	/// <code>Reloaded</code> get the new instance from here.
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Inventory")
 	UInventory *Inventory;
-
-public:
+	
 	/// All the tags currently set in the game
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Save Game")
 	FGameplayTagContainer GameplayTags;
 	
 	// IGameplayTagAssetInterface interface.
-	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;/**/
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 	
 private:
 	FDelegateHandle OnInventoryChangedHandle;

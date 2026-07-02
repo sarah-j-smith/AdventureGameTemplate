@@ -15,7 +15,8 @@ namespace AdventureGameplayTags
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(HotSpot_Hidden, "HotSpot.Hidden", "The entire HotSpot actor is hidden");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(HotSpot_SpriteHidden, "HotSpot.SpriteHidden", "The PickUp sprite is hidden");
 
-    UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_Succeeded_ItemData, "History.Succeeded.ItemData", "The item data success case was triggered");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_ItemData_Succeeded, "History.ItemData.Succeeded", "The item data success case was triggered");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_ItemData_Failed, "History.ItemData.Succeeded", "The item data success case was triggered");
     
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_Triggered_Give, "History.Triggered.Give", "The item or hotspot had the give verb used on it");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_Triggered_Open, "History.Triggered.Open", "The item or hotspot had the open verb used on it");
@@ -26,7 +27,9 @@ namespace AdventureGameplayTags
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_Triggered_Use, "History.Triggered.Use", "The item or hotspot had the use verb used on it");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_Triggered_Push, "History.Triggered.Push", "The item or hotspot had the push verb used on it");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_Triggered_Pull, "History.Triggered.Pull", "The item or hotspot had the pull verb used on it");
-    
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Fail, "Item.Treatment.Fail", "This story item will always fail");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Succeed, "Item.Treatment.Succeed", "This story item will always succeed");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Article, "Item.Treatment.Article", "Object that can be held, examined and given");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Consumable, "Item.Treatment.Consumable", "After being successfully used it is destroyed");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Tool, "Item.Treatment.Tool", "Can be used on another item to create a brand new item");

@@ -18,6 +18,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Gameplay/ManagerProvider.h"
+#include "Items/ItemData.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Player/AdventureCharacter.h"
@@ -38,6 +39,9 @@ void UAdventureGameInstance::Init()
 			LoadGame();
 		}
 	}
+	
+	LoadTableDelegate.BindUObject(this, &UAdventureGameInstance::InventoryTableLoadCompleteHandler);
+	LoadClassDelegate.BindUObject(this, &UAdventureGameInstance::InventoryClassLoadCompleteHandler);
 }
 
 void UAdventureGameInstance::OnSaveHotSpot(AHotSpot* HotSpot)
@@ -124,6 +128,61 @@ void UAdventureGameInstance::GetInventoryItems(TArray<UItem*>& Items)
 int UAdventureGameInstance::GetInventoryItemCount() const
 {
 	return Inventory ? Inventory->GetInventorySize() : 0;
+}
+
+void UAdventureGameInstance::GetCustomInventoryItem(FName ItemName)
+{
+	if (UDataTable *Table = DataTable.Get())
+	{
+		GetCustomInventoryItemWithTable(ItemName, Table);
+		return;
+	}
+	TableOperationsQueue.Push(ItemName);
+	int32 _ = DataTable.LoadAsync(LoadTableDelegate);
+}
+
+void UAdventureGameInstance::InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object)
+{
+	const TSoftObjectPtr<UDataTable> DataTablePtr(Path);
+	ensureAlwaysMsgf(DataTablePtr.IsValid(), TEXT("InventoryTableLoadCompleteHandler: DataTable is not valid"));
+	while (!TableOperationsQueue.IsEmpty())
+	{
+		const FName ItemName = TableOperationsQueue.Pop();
+		GetCustomInventoryItemWithTable(ItemName, DataTablePtr.Get());
+	}
+}
+
+void UAdventureGameInstance::InventoryClassLoadCompleteHandler(const FSoftObjectPath& Path, UObject* /* Object */)
+{
+	const TSoftClassPtr<UInventoryItem> InventoryItemClassPtr(Path);
+	const UClass* InventoryItemClass = InventoryItemClassPtr.Get();
+	ensureAlwaysMsgf(InventoryItemClass, TEXT("InventoryClassLoadCompleteHandler: InventoryItemClass is not valid"));
+	const FName ItemName = ClassOperationsQueue.FindAndRemoveChecked(Path.ToString());
+	GetCustomInventoryItemWithClass(ItemName, InventoryItemClass);
+}
+
+void UAdventureGameInstance::GetCustomInventoryItemWithTable(FName ItemName, UDataTable* DataTablePtr)
+{
+	ensureAlwaysMsgf(DataTablePtr, TEXT("GetCustomInventoryItemWithTable: Error, expected table to be loaded"));
+	const FItemData *ItemRow  = DataTable->FindRow<FItemData>(ItemName, "GetCustomInventoryItemWithTable");
+	if (ItemRow == nullptr)
+	{
+		CustomInventoryItemLoadedDelegate.Execute(ItemName, nullptr);
+	}
+	if (const UClass *InventoryItemClass = ItemRow->ItemClass.Get())
+	{
+		GetCustomInventoryItemWithClass(ItemName, InventoryItemClass);
+		return;
+	}
+	const FSoftObjectPath ItemClassPath = ItemRow->ItemClass.ToSoftObjectPath();
+	ClassOperationsQueue.Add(ItemClassPath.ToString(), ItemName);
+	int32 _ = ItemRow->ItemClass.LoadAsync(LoadClassDelegate);
+}
+
+void UAdventureGameInstance::GetCustomInventoryItemWithClass(FName ItemName, const UClass* InventoryItemClass)
+{
+	UInventoryItem *InventoryItem = NewObject<UInventoryItem>(this, InventoryItemClass, ItemName);
+	CustomInventoryItemLoadedDelegate.Execute(ItemName, InventoryItem);
 }
 
 void UAdventureGameInstance::OnLoadRoom()
@@ -295,6 +354,7 @@ void UAdventureGameInstance::LoadGame()
 		Inventory->AddItemInstanceByName(Item);
 	}
 	BindInventoryChangedHandlers();
+	PlayerInventoryChanged.Broadcast(NAME_None, EItemDisposition::Reloaded);
 
 	GameplayTags = CurrentSaveGame->AdventureTags;
 

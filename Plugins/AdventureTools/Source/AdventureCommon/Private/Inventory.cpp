@@ -4,20 +4,19 @@
 #include "Inventory.h"
 #include "Item.h"
 #include "AdventureCommon.h"
-#include "Constants.h"
 #include "ItemTypeDefs.h"
 #include "Kismet/GameplayStatics.h"
 
 void UInventory::SetupHandlers()
 {
 	InventoryTableLoadCompleteDelegate.BindUObject(this, &UInventory::InventoryTableLoadCompleteHandler);
-	ItemClassLoadCompleteDelegate.BindUObject(this, &UInventory::ItemClassLoadCompleteHandler);
+	ItemDetailsLoadCompleteDelegate.BindUObject(this, &UInventory::ItemDetailLoadCompleteHandler);
 }
 
 void UInventory::TearDownHandlers()
 {
 	if (InventoryTableLoadCompleteDelegate.IsBound()) InventoryTableLoadCompleteDelegate.Unbind();
-	if (ItemClassLoadCompleteDelegate.IsBound()) ItemClassLoadCompleteDelegate.Unbind();
+	if (ItemDetailsLoadCompleteDelegate.IsBound()) ItemDetailsLoadCompleteDelegate.Unbind();
 }
 
 void UInventory::AddItemToInventory(UItem* InventoryItem)
@@ -107,32 +106,17 @@ UItem* UInventory::FindItemByName(FName ItemName) const
 	return nullptr;
 }
 
-void UInventory::AddItemInstanceByName(const FName ItemToAdd)
+void UInventory::AddItemInstanceByName(FName ItemToAdd)
 {
-	if (Contains(ItemToAdd))
-	{
-		const FString ErrorMessage = FString::Printf(TEXT("AddToInventory: item already in the inventory: %s"),*ItemToAdd.ToString());
-		UE_LOG(LogAdventureCommon, Error, TEXT("%s"), *ErrorMessage);
-#if WITH_EDITOR
-		GEngine->AddOnScreenDebugMessage(INVENTORY_MISSING_DEBUG_KEY, 10.0, FColor::Red,
-										 *ErrorMessage, false, FVector2D(2.0, 2.0));
-#endif
-		return;
-	}
 	FText OutReason;
-	if (!ItemToAdd.IsValidObjectName(OutReason))
+	if (Contains(ItemToAdd) || !ItemToAdd.IsValidObjectName(OutReason))
 	{
-		const FString ErrorMessage = FString::Printf(TEXT("Item name was invalid: %s"), *OutReason.ToString());
-		UE_LOG(LogAdventureCommon, Error, TEXT("%s"), *ErrorMessage);
-#if WITH_EDITOR
-		GEngine->AddOnScreenDebugMessage(INVENTORY_MISSING_DEBUG_KEY, 10.0, FColor::Red,
-										 *ErrorMessage, false, FVector2D(2.0, 2.0));
-#endif
+		UE_LOG(LogAdventureCommon, Error, TEXT("Item name was invalid: %s"), OutReason.IsEmpty() ? TEXT("already added") : *OutReason.ToString());
 		return;
 	}
 	if (const UItemTypeDefs *Table = InventoryDataTable.Get())
 	{
-		AddNewItemToInventory(ItemToAdd, Table);
+		AddNewItemToInventoryWithTable(ItemToAdd, Table);
 		return;
 	}
 	TableOperationsQueue.Push(ItemToAdd);
@@ -144,81 +128,54 @@ void UInventory::AddItemInstanceByName(const FName ItemToAdd)
 
 void UInventory::InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object)
 {
-	FString LevelName = "Unknown level";
-	if (const UItemTypeDefs *Items = Cast<UItemTypeDefs>(Object))
+	UItemTypeDefs* Table = InventoryDataTable.Get();
+	ensureAlwaysMsgf(Table, TEXT("InventoryTableLoadCompleteHandler: Table not valid"));
+	while (!TableOperationsQueue.IsEmpty())
 	{
-		// OK, we have a valid table now, lets finish the work
-		while (!TableOperationsQueue.IsEmpty())
-		{
-			const FName Request = TableOperationsQueue.Pop();
-			AddNewItemToInventory(Request, Items);
-		}
-		return;
+		const FName ItemName = TableOperationsQueue.Pop();
+		AddNewItemToInventoryWithTable(ItemName, Table);
 	}
-	const FString ErrorMessage = FString::Printf(TEXT("InventoryDataTable property missing in Inventory"));
-#if WITH_EDITOR
-	GEngine->AddOnScreenDebugMessage(INVENTORY_MISSING_DEBUG_KEY, 10.0, FColor::Red,
-									 *ErrorMessage, false, FVector2D(2.0, 2.0));
-#endif
-	UE_LOG(LogAdventureCommon, Error, TEXT("SetupAIController error. %s"), *ErrorMessage);
 }
 
-void UInventory::AddNewItemToInventory(FName ItemName, const UItemTypeDefs *Table)
+void UInventory::AddNewItemToInventoryWithTable(FName ItemName, const UItemTypeDefs *Table)
 {
 	const FItemTypeDef ItemTypeDef = Table->FindDefByName(ItemName);
-	if (!ItemTypeDef.bValid)
+	if (!ItemTypeDef.Item.IsValid())
 	{
-		const FString ErrorMessage = FString::Printf(TEXT("InventoryDataTable property missing in Inventory"));
-#if WITH_EDITOR
-		GEngine->AddOnScreenDebugMessage(INVENTORY_MISSING_DEBUG_KEY, 10.0, FColor::Red,
-										 *ErrorMessage, false, FVector2D(2.0, 2.0));
-#endif
-		UE_LOG(LogAdventureCommon, Warning,
-			TEXT("ItemTypeDef could not be loaded for name \"%s\". Check the InventoryDataTable set in ItemList."),
-			*ItemName.ToString());
+		UE_LOG(LogAdventureCommon, Error, TEXT("Item name was invalid: %s"), *ItemName.ToString());
+		OnInventoryChanged.Broadcast(ItemName, EItemDisposition::Error);
 		return;
 	}
-	if (UClass *ItemClass = ItemTypeDef.ItemClass.Get())
+	if (UItem *ItemDetails = ItemTypeDef.Item.Get())
 	{
-		AddNewItemToInventoryWithClass(ItemClass, ItemTypeDef.UniqueName.GetTagLeafName());
+		AddNewItemToInventoryWithDetails(ItemDetails, ItemTypeDef.UniqueName.GetTagLeafName());
 		return;
 	}
-	// Either needs to be loaded, or game designer forgot to set this
-	if (ItemTypeDef.ItemClass.IsPending())
+	if (ItemTypeDef.Item.IsPending())
 	{
 		// It's been set, just needs loading
-		ItemOperationsQueue.Push(ItemName);
-		int32 _ = ItemTypeDef.ItemClass.LoadAsync(ItemClassLoadCompleteDelegate);
+		int32 _ = ItemTypeDef.Item.LoadAsync(ItemDetailsLoadCompleteDelegate);
 		return;
 	}
-	// Forgot to set!
-	const FString ErrorMessage = FString::Printf(
-		TEXT("ItemClass missing in Inventory ItemTypeDef for: %s"),
-		*ItemName.ToString());
-#if WITH_EDITOR
-	GEngine->AddOnScreenDebugMessage(INVENTORY_MISSING_DEBUG_KEY, 10.0, FColor::Red,
-									 *ErrorMessage, false, FVector2D(2.0, 2.0));
-#endif
-	UE_LOG(LogAdventureCommon, Warning,TEXT("%s"), *ErrorMessage);
+	OnInventoryChanged.Broadcast(ItemName, EItemDisposition::Error);
+	UE_LOG(LogAdventureCommon, Warning,TEXT("ItemClass missing in ItemTypeDef for: %s"), *ItemName.ToString());
 }
 
-void UInventory::ItemClassLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object)
+void UInventory::ItemDetailLoadCompleteHandler(const FSoftObjectPath& Path, UObject* /* Object */)
 {
 	const UItemTypeDefs *Table = InventoryDataTable.Get();
-	ensureAlwaysMsgf(Table, TEXT("Must not be calling the item class load handler if the table is not loaded!"));
-	TSoftClassPtr<UItem> ItemClassPtr(Path);
-	if (const UClass *ItemClass = ItemClassPtr.Get())
-	{
-		const FItemTypeDef ItemTypeDef = Table->FindItemByClass(ItemClass->GetName());
-		AddNewItemToInventoryWithClass(ItemClass, ItemTypeDef.UniqueName.GetTagLeafName());
-	}
+	ensureAlwaysMsgf(Table, TEXT("ItemDetailLoadCompleteHandler: Error, expected table to be loaded!"));
+	TSoftObjectPtr<UItem> ItemDetailPtr(Path);
+	UItem *ItemDetails = ItemDetailPtr.Get();
+	ensureAlwaysMsgf(ItemDetails, TEXT("Details expected once loaded %s"), *Path.GetAssetPathString());
+	const FItemTypeDef ItemTypeDef = Table->FindDefByName(ItemDetails->ItemTypeDef);
+	ensureAlwaysMsgf(ItemTypeDef.bValid, TEXT("ItemDetailLoadCompleteHandler: type def must exist in table!"));
+	AddNewItemToInventoryWithDetails(ItemDetails, ItemTypeDef.UniqueName.GetTagLeafName());
 }
 
-void UInventory::AddNewItemToInventoryWithClass(const UClass *ItemClass, FName ItemName)
+void UInventory::AddNewItemToInventoryWithDetails(UItem *ItemDetails, FName ItemName)
 {
-	UItem* InventoryItem = NewObject<UItem>(this, ItemClass, ItemName);
-	RegisterWithGameInstance(InventoryItem);
-	AddItemToInventory(InventoryItem);
+	AddItemToInventory(ItemDetails);
 	OnInventoryChanged.Broadcast(ItemName, EItemDisposition::Added);
 }
 

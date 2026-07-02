@@ -6,6 +6,7 @@
 #include "ItemDisposition.h"
 #include "UObject/Object.h"
 #include "ItemTypeDef.h"
+
 #include "Inventory.generated.h"
 
 class UItemTypeDefs;
@@ -40,7 +41,7 @@ protected:
 	 * tail pointer as an optimisation. There are no back-pointers.
 	 *
 	 * One issue is that the TList::ElementType is a plain pointer
-	 * to UInventoryItem which is not recognised by the UE GC. To
+	 * to UItem which is not recognised by the UE GC. To
 	 * make sure the item is retained, register it via
 	 * UGameInstance::RegisterReferencedObject
 	 */
@@ -100,29 +101,29 @@ public:
 
 private:
 	FLoadSoftObjectPathAsyncDelegate InventoryTableLoadCompleteDelegate;
-	FLoadSoftObjectPathAsyncDelegate ItemClassLoadCompleteDelegate;
+	FLoadSoftObjectPathAsyncDelegate ItemDetailsLoadCompleteDelegate;
 	
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	UFUNCTION()
 	void InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object);
 	
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void ItemClassLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object);
+	UFUNCTION()
+	void ItemDetailLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object);
 	
 	bool Loading = false;
 	
+	/// Queue of all operations waiting for a valid table
 	TArray<FName> TableOperationsQueue;
-	TArray<FName> ItemOperationsQueue;
 	
-	void AddNewItemToInventory(FName ItemName, const UItemTypeDefs *Table);
+	void AddNewItemToInventoryWithTable(FName ItemName, const UItemTypeDefs *Table);
 	
-	void AddNewItemToInventoryWithClass(const UClass *ItemClass, FName ItemName);
+	void AddNewItemToInventoryWithDetails(UItem *ItemDetails, FName ItemName);
 	
 public:
 	//////////////////////////////////
     ///
     /// ITEM REPORTING
     ///
-
+	
 	/// Test if the item identified by the given unique Item if in this inventory.
 	/// @param ItemName Unique name to search for
 	/// @returns true if the item is present and false otherwise
@@ -154,7 +155,8 @@ public:
     * instance. The instance will be a subclass of UItem, with the actual class 
     * read from the entry in the <b>InventoryDataTable</b>. 
     *
-    * Throws a fatal error if the item is already in the inventory.
+    * Throws a fatal error if the item is already in the inventory. Note that
+    * async loading of the 
     * 
     * @param ItemToAdd FName to create an InventoryItem instance of. 
     */
@@ -170,7 +172,7 @@ public:
 
     /**
      * Removes the given items from the current players inventory of held
-     * items. Destroys the `UInventoryItem` instances of the class
+     * items. Destroys the `UItem` instances of the class
      * from the `InventoryDataTable` and deletes them in the inventory UI
      * @param ItemsToRemove EItemKind set to remove an InventoryItem instances of.
      */

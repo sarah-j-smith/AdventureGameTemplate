@@ -5,22 +5,44 @@
 
 #include "AdventureTools.h"
 #include "Item.h"
+#include "ItemDisposition.h"
+#include "ItemTypeDefs.h"
 #include "Gameplay/AdventureGameInstance.h"
 #include "Gameplay/AdventureGameModeBase.h"
 #include "HUD/ItemSlot.h"
 #include "Items/InventoryItem.h"
+#include "Inventory.h"
 
 #include "Kismet/GameplayStatics.h"
-#include "Player/AdventurePlayerController.h"
 
 UItemManager::UItemManager()
-    : SourceItem(nullptr)
-    , TargetItem(nullptr)
 {
     PrimaryComponentTick.bCanEverTick = true;
     
-    SourceItem = CreateDefaultSubobject<UInventoryItem>(FName("SourceItem"));
-    TargetItem = CreateDefaultSubobject<UInventoryItem>(FName("TargetItem"));
+}
+
+void UItemManager::OnComponentCreated()
+{
+    Super::OnComponentCreated();
+    
+    UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this);
+    UAdventureGameInstance *AdventureGameInstance = Cast<UAdventureGameInstance>(GameInstance);        
+    AdventureGameInstance->PlayerInventoryChanged.AddDynamic(this, &UItemManager::OnInventoryChanged);
+    AdventureGameInstance->CustomInventoryItemLoadedDelegate.BindUObject(this, &UItemManager::CreateCustomInventoryItemHandler);
+    Inventory = AdventureGameInstance->Inventory;
+        
+    SourceItem = NewObject<UInventoryItem>(this, FName("Default SourceItem"));
+    TargetItem = NewObject<UInventoryItem>(this, FName("Default TargetItem"));
+}
+
+void UItemManager::OnInventoryChanged(FName ItemKind, EItemDisposition ItemDisposition)
+{
+    if (ItemDisposition == EItemDisposition::Reloaded)
+    {
+        UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this);
+        const UAdventureGameInstance *AdventureGameInstance = Cast<UAdventureGameInstance>(GameInstance);        
+        Inventory = AdventureGameInstance->Inventory;
+    }
 }
 
 void UItemManager::AddToScore(int32 ScoreIncrement)
@@ -50,6 +72,53 @@ UItem* UItemManager::GetTargetItem() const
     return TargetItem ? TargetItem->ItemDetails : nullptr;
 }
 
+void UItemManager::CheckForCustomInventoryItem(FName ItemDef)
+{
+    UAdventureGameInstance *AdventureGameInstance = Cast<UAdventureGameInstance>(UGameplayStatics::GetGameInstance(this));
+    AdventureGameInstance->GetCustomInventoryItem(ItemDef);
+}
+
+void UItemManager::CreateCustomInventoryItemHandler(FName ItemDef, UInventoryItem *InventoryItem)
+{
+    if (InventoryItem == nullptr)
+    {
+        CreateDefaultInventoryItem(ItemDef);
+        return;
+    }
+    if (Source->ItemTypeDef == ItemDef)
+    {
+        if (SourceItem) SourceItem->ItemDetails = nullptr;
+        SourceItem = InventoryItem;
+        InventoryItem->ItemDetails = Source;
+        UE_LOG(LogAdventureGame, Log, TEXT("Loaded custom source inventory class for %s"), *ItemDef.ToString());
+    }
+    else if (Target->ItemTypeDef == ItemDef)
+    {
+        if (TargetItem) TargetItem->ItemDetails = nullptr;
+        TargetItem = InventoryItem;
+        InventoryItem->ItemDetails = Target;
+        UE_LOG(LogAdventureGame, Log, TEXT("Loaded custom target inventory class for %s"), *ItemDef.ToString());
+    }
+}
+
+void UItemManager::CreateDefaultInventoryItem(FName ItemDef)
+{
+    if (Source->ItemTypeDef == ItemDef)
+    {
+        if (SourceItem ) SourceItem->ItemDetails = nullptr;
+        SourceItem = NewObject<UInventoryItem>(this);
+        SourceItem->ItemDetails = Source;
+        UE_LOG(LogAdventureGame, Log, TEXT("Loaded custom source inventory class for %s"), *ItemDef.ToString());
+    }
+    else if (Target->ItemTypeDef == ItemDef)
+    {
+        if (TargetItem) TargetItem->ItemDetails = nullptr;
+        TargetItem = NewObject<UInventoryItem>(this);;
+        TargetItem->ItemDetails = Target;
+        UE_LOG(LogAdventureGame, Log, TEXT("Loaded custom target inventory class for %s"), *ItemDef.ToString());
+    }
+}
+
 bool UItemManager::CanInteractWith(FName OtherItem) const
 {
     if (SourceItem && SourceLocked == EChoiceState::Locked)
@@ -73,8 +142,10 @@ bool UItemManager::CanInteractWith(FName OtherItem) const
 
 void UItemManager::SetAndLockSourceItem(UItemSlot* SourceItemSlot)
 {
+    ensureAlwaysMsgf(SourceItemSlot != nullptr, TEXT("Expected source item not to be null"));
     SourceLocked = EChoiceState::Locked;
-    SourceItem->ItemDetails = SourceItemSlot->InventoryItem;
+    Source = SourceItemSlot->InventoryItem;
+    CheckForCustomInventoryItem(SourceItemSlot->InventoryItem->ItemTypeDef);
 }
 
 void UItemManager::SetAndLockTargetItem(UItemSlot* TargetItemSlot)
@@ -195,9 +266,8 @@ void UItemManager::PerformItemInteraction(EVerbType CurrentVerb)
         {
             TargetItem->OnItemActionSuccess();
         }
-        else if (const UStoryAction *ItemDataAsset = TargetItem->OnItemActivated.GetItemDataAssetForAction(EVerbType::Use))
+        else if (const UStoryAction *ItemDataAsset = TargetItem->ItemDetails->Activations.GetItemDataAssetForAction(EVerbType::Use))
         {
-            
             if (ItemDataAsset->SourceItem == SourceItem->GetItemKind())
             {
                 //
@@ -220,6 +290,7 @@ void UItemManager::PerformItemAction(EVerbType CurrentVerb)
            *VerbGetDescriptiveString(CurrentVerb).ToString(), *DebugString);
 #endif
 
+    
     check(SourceItem);
     switch (CurrentVerb)
     {

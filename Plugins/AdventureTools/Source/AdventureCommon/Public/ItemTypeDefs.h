@@ -24,5 +24,4 @@ public:
 	TArray<FItemTypeDef> ItemTypeDefs;
 	
 	FItemTypeDef FindDefByName(const FName& ItemName) const;
-	FItemTypeDef FindItemByClass(const FString& ClassName) const;
 };

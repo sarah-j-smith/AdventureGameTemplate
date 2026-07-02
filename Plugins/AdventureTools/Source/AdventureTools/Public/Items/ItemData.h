@@ -9,6 +9,6 @@ struct ADVENTURETOOLS_API FItemData: public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemData)
-	TSubclassOf<UObject> ItemClass = UInventoryItem::StaticClass();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	TSoftClassPtr<UInventoryItem> ItemClass;
 };

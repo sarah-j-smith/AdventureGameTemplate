@@ -20,6 +20,9 @@ class ADVENTURECOMMON_API UStoryAction : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:
+	/// Set to true to indicate no more processing should be done on this story
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ItemAction")
+	bool bHandled = false;
 	
 	/// Score related to activating this item
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Score")

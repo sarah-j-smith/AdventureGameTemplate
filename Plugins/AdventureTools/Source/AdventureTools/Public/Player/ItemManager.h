@@ -10,6 +10,7 @@
 #include "UObject/Object.h"
 #include "ItemManager.generated.h"
 
+class UInventory;
 class UItem;
 class UItemTypeDefs;
 class UItemSlot;
@@ -31,6 +32,11 @@ class UItemManager : public UActorComponent
 public:
 	UItemManager();
 	
+	virtual void OnComponentCreated() override;
+	
+	UFUNCTION()
+	void OnInventoryChanged(FName ItemKind, EItemDisposition ItemDisposition);
+	
 	//////////////////////////////////
 	///
 	/// SCORE
@@ -43,7 +49,7 @@ public:
 	///
 	/// ITEMS
 	///
-
+	
 	/// Game asset reference for the table of item types in this game. Loaded at game
 	/// launch type as required. Must be an instance of
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Items")
@@ -68,22 +74,35 @@ public:
 	FName TargetItemName;
 	
 private:
-	/// Which item will be the <b>subject</b> of the current verb eg "Open Box"
+	void CheckForCustomInventoryItem(FName ItemDef);
+	void CreateCustomInventoryItemHandler(FName ItemDef, UInventoryItem *InventoryItem);
+	void CreateDefaultInventoryItem(FName ItemDef);
+	
+	/// Which item behaviours will be the <b>subject</b> of the current verb eg "Open Box"
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Items", meta=(AllowPrivateAccess=true))	
 	UInventoryItem *SourceItem;
 
-	/// Which item will the <b>object</b> of the current verb for
-	/// example the door in "Use key on door"
+	/// Which item behaviours will the <b>object</b> of the current verb for
+	/// example the door in "Use key on door". 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Items", meta=(AllowPrivateAccess=true))	
 	UInventoryItem *TargetItem;
 	
-	FName GetSourceItemName() const { return SourceItem->ItemDetails->ItemTypeDef; }
+	/// Which item behaviours will be the <b>subject</b> of the current verb eg "Open Box"
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Items", meta=(AllowPrivateAccess=true))	
+	UItem *Source;
 	
-	FName GetTargetItemName() const { return TargetItem->ItemDetails->ItemTypeDef; }
+	/// Which item behaviours will the <b>object</b> of the current verb for
+	/// example the door in "Use key on door". 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Items", meta=(AllowPrivateAccess=true))	
+	UItem *Target;
+	
+	FName GetSourceItemName() const { return Source ? Source->ItemTypeDef : NAME_None; }
+	
+	FName GetTargetItemName() const { return Target ? Target->ItemTypeDef : NAME_None; }
 
-	bool GetHasSourceItem() const { return SourceItem->GetItemKind() != NAME_None; }
+	bool GetHasSourceItem() const { return !!Source; }
 	
-	bool GetHasTargetItem() const { return TargetItem->GetItemKind() != NAME_None; }
+	bool GetHasTargetItem() const { return !!Target; }
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetHasSourceItem")
@@ -171,6 +190,9 @@ public:
 
 private:
 	TSet<FName> ItemsToRemove;
+	
+	UPROPERTY()
+	UInventory *Inventory;
 
 public:
 	/// Handle a mouse click on an item button.

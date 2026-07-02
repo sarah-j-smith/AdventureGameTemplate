@@ -67,6 +67,7 @@ void UAssetActionComponent::OnItemActionSuccess_Implementation(UStoryAction *Dat
     UGameplayStatics::PlaySound2D(GetWorld(), Success ? DataAsset->ActionSuccessSound : DataAsset->ActionFailureSound);
     UPlayerBarkManager *PlayerBarkManager = CommandManager->GetBarkController();
     PlayerBarkManager->PlayerBarkAndEnd(Success ? DataAsset->ActionSuccessBarkText : DataAsset->ActionFailureBarkText);
+    DataAsset->bHandled = true;
 }
 
 void UAssetActionComponent::HandleSourceItem(UStoryAction *DataAsset, const EItemAssetType ItemAssetType, bool &Success)
@@ -135,6 +136,8 @@ void UAssetActionComponent::OnItemActionFailure_Implementation(UStoryAction *Dat
     const ACommandManager *CommandManager = ManagerProvider->GetCommandManager(this);
     UPlayerBarkManager *BarkManager = CommandManager->GetBarkController();
     BarkManager->PlayerBarkAndEnd(DataAsset->ActionFailureBarkText);
+    UGameplayStatics::PlaySound2D(GetWorld(), DataAsset->ActionFailureSound);
+    DataAsset->bHandled = true;
 }
 
 void UAssetActionComponent::OnInteractionTimeout()

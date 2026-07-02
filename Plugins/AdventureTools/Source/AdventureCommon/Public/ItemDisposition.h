@@ -20,4 +20,11 @@ enum class EItemDisposition: uint8
 
     /// The item was removed from the inventory
     Removed     = 2    UMETA(DisplayName = "Removed"),
+    
+    /// The inventory was reloaded, eg during a game save or load
+    Reloaded    = 3    UMETA(DisplayName = "Reloaded"),
+    
+    /// An error ocurred with the given item - it couldn't be loaded
+    /// see the logs for specific details
+    Error       = 4    UMETA(DisplayName = "Error"),
 };

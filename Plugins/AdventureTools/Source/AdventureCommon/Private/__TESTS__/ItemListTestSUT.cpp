@@ -14,7 +14,6 @@ UItemListTestSut::UItemListTestSut()
     {
         FItemTypeDef Def;
         Def.UniqueName = AdventureGameplayTags::Item_Kind_PickleKey;
-        Def.ItemClass = UTestPickleKey::StaticClass();
         Def.bEnabled = true;
         Def.bValid = true;
         Def.TypeDescription = FText::FromString(TEXT("A key that is made from pickle"));
@@ -23,7 +22,6 @@ UItemListTestSut::UItemListTestSut()
     {
         FItemTypeDef Def;
         Def.UniqueName = AdventureGameplayTags::Item_Kind_Pickle;
-        Def.ItemClass = UTestPickle::StaticClass();
         Def.bEnabled = true;
         Def.bValid = true;
         Def.TypeDescription = FText::FromString(TEXT("A tasty little sour treat"));
@@ -32,7 +30,6 @@ UItemListTestSut::UItemListTestSut()
     {
         FItemTypeDef Def;
         Def.UniqueName = AdventureGameplayTags::Item_Kind_Knife;
-        Def.ItemClass = UTestKnife::StaticClass();
         Def.bEnabled = true;
         Def.bValid = true;
         Def.TypeDescription = FText::FromString(TEXT("Sharp and cutting"));

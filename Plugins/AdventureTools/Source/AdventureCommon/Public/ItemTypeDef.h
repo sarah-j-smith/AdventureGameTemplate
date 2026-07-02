@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Item.h"
-#include "ItemDataList.h"
 
 #include "ItemTypeDef.generated.h"
 
@@ -26,9 +25,9 @@ struct FItemTypeDef
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef)
 	FText TypeDescription;
 		
-	/// Must be set to a valid sub-class of UItem for the given in-game item
+	/// Must be set to a valid Item 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef)
-	TSoftClassPtr<UItem> ItemClass = UItem::StaticClass();
+	TSoftObjectPtr<UItem> Item;
 	
 	/// Set this to false to disable this item, and prevent it from being used
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef)
@@ -37,8 +36,4 @@ struct FItemTypeDef
 	/// Set to true when the Item Type is initialized with valid data
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef)
 	bool bValid = false;
-	
-	/// List of story actions that can happen to this item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef)
-	FItemDataList StoryActions;
 };

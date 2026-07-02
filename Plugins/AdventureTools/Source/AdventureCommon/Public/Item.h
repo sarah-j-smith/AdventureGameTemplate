@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "DoorState.h"
 #include "GameplayTagContainer.h"
+#include "ItemDataList.h"
 #include "Internationalization/StringTableRegistry.h"
 #include "UObject/Object.h"
 #include "Item.generated.h"
@@ -83,6 +84,13 @@ public:
 	{
 		return ItemToInteract->InteractableItemName == ItemTypeDef || ItemToInteract->ItemTypeDef == InteractableItemName;
 	}
+    
+	/// Data Assets for determining results of activating this item. This should be
+	/// a list of <b>instances</b> of the <code>ItemDataAsset</code> sub-class, not the
+	/// class itself. Right-click in the content drawer, and choose <i>Miscellaneous - Data Asset</i>
+	/// then choose one of the <code>ItemDataAsset</code> sub-classes to create an instance.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
+	FItemDataList Activations;
 };
 
 #undef LOCTEXT_NAMESPACE

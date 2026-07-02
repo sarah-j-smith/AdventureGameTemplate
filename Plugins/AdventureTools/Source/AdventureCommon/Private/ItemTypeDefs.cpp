@@ -16,17 +16,3 @@ FItemTypeDef UItemTypeDefs::FindDefByName(const FName& ItemName) const
 	}
 	return FItemTypeDef(*Def);
 }
-
-FItemTypeDef UItemTypeDefs::FindItemByClass(const FString& ClassName) const
-{
-	const FItemTypeDef *Def = ItemTypeDefs.FindByPredicate([ClassName](const FItemTypeDef& ItemTypeDef) {
-		const UClass *ItemClassResolved = ItemTypeDef.ItemClass.Get();
-		return ItemClassResolved && ItemClassResolved->GetName() == ClassName;
-	});
-	if (Def == nullptr)
-	{
-		// Return an invalid ItemTypeDef with bValid === false
-		return FItemTypeDef();
-	}
-	return FItemTypeDef(*Def);
-}
