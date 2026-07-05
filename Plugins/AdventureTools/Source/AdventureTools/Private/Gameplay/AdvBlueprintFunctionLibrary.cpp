@@ -37,7 +37,6 @@ UAdventureControllerProvider* UAdvBlueprintFunctionLibrary::GetControllerProvide
     return ControllerProvider;
 }
 
-
 void UAdvBlueprintFunctionLibrary::AddToScore(const UObject* WorldContextObject, int32 ScoreIncrement)
 {
     if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject,

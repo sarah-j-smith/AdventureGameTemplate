@@ -16,10 +16,27 @@
 #include "Internationalization/StringTableRegistry.h"
 
 
+FGameplayTagContainer& UInventoryItem::GetTagContainer()
+{
+    return HistoryTags;
+}
+
 UInventoryItem::UInventoryItem()
 {
     ManagerProvider = CreateDefaultSubobject<UManagerProvider>("ManagerProvider");
     BarkProvider = CreateDefaultSubobject<UBarkProvider>("BarkProvider");
+}
+
+void UInventoryItem::PlayerBarkAndEnd(FText Text)
+{
+    BarkProvider->BarkAndEnd(Text, this);
+}
+
+void UInventoryItem::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+{
+    TagContainer.AppendTags(HistoryTags);
+    TagContainer.AppendTags(StateTags);
+    TagContainer.AppendTags(ItemTags);
 }
 
 FText UInventoryItem::GetShortDescription() const
@@ -34,7 +51,7 @@ FText UInventoryItem::GetLongDescription() const
 	
 FName UInventoryItem::GetItemKind() const
 {
-    return ItemDetails ? ItemDetails->ItemTypeDef : NAME_None;
+    return ItemDetails ? ItemDetails->ItemTypeDef.GetTagLeafName() : NAME_None;
 }
 
 //////////////////////////////////
@@ -194,11 +211,11 @@ void UInventoryItem::OnItemUsed_Implementation()
 {
     IVerbInteractions::OnItemUsed_Implementation();
 
-    // **this** InventoryItem is the target and APC->SourceItem is the source of a Use
+    // **this** InventoryItem is the target and ItemManager->SourceItem is the source of a Use
     // verb. Check that the Source can validly use on this.
     if (UItemManager *ItemManager = ManagerProvider->GetItemManager(this))
     {
-        if (ItemManager->SourceItemName == ItemDetails->ItemTypeDef)
+        if (ItemManager->CanInteractWith(ItemDetails->ItemTypeDef))
         {
             // Item is used on itself - failure - this should not be necessary,
             // but needed in the case that during game design this item mistakenly
@@ -209,7 +226,7 @@ void UInventoryItem::OnItemUsed_Implementation()
             }
             OnItemActionFailure();
         }
-        else if (ItemManager->CanInteractWith(ItemDetails->ItemTypeDef))
+        else if (const UItem *Src = ItemManager->GetSourceItem(); Src->InteractableItemName == ItemDetails->ItemTypeDef)
         {
             // This item has interactable item
             OnItemActionSuccess();
@@ -217,12 +234,12 @@ void UInventoryItem::OnItemUsed_Implementation()
         else if (const UStoryAction *ItemDataAsset = ItemDataAssetForAction(EVerbType::UseItem))
         {
             // We are the target, the second item clicked
-            if (ItemDataAsset->SourceItem == ItemManager->SourceItemName && ItemDataAsset->TargetItem == ItemManager->TargetItemName)
+            if (ItemDataAsset->SourceItem == ItemManager->SourceItemTag && ItemDataAsset->TargetItem == ItemManager->TargetItemTag)
             {
                 OnItemActionSuccess();
             }
-            else if (ItemDataAsset->SourceItem == ItemManager->TargetItemName && 
-                ItemDataAsset->TargetItem == ItemManager->SourceItemName && ItemDataAsset->CanSwapSourceAndTarget)
+            else if (ItemDataAsset->SourceItem == ItemManager->TargetItemTag && 
+                ItemDataAsset->TargetItem == ItemManager->SourceItemTag && ItemDataAsset->CanSwapSourceAndTarget)
             {
                 ItemManager->SwapSourceAndTarget();
                 OnItemActionSuccess();

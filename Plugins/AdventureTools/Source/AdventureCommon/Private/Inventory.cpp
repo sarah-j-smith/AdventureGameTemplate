@@ -92,7 +92,7 @@ bool UInventory::Contains(const FName ItemName) const
 {
 	for (const FListOfItems *Iterator = Inventory; Iterator; Iterator = Iterator->Next)
 	{
-		if (Iterator->Element->ItemTypeDef == ItemName) return true;
+		if (Iterator->Element->ItemTypeDef.GetTagLeafName() == ItemName) return true;
 	}
 	return false;
 }
@@ -101,17 +101,21 @@ UItem* UInventory::FindItemByName(FName ItemName) const
 {
 	for (const FListOfItems *Iterator = Inventory; Iterator; Iterator = Iterator->Next)
 	{
-		if (Iterator->Element->ItemTypeDef == ItemName) return Iterator->Element;
+		if (Iterator->Element->ItemTypeDef.GetTagLeafName() == ItemName) return Iterator->Element;
 	}
 	return nullptr;
 }
 
-void UInventory::AddItemInstanceByName(FName ItemToAdd)
+void UInventory::AddItemInstanceByName(const FName ItemToAdd)
 {
-	FText OutReason;
-	if (Contains(ItemToAdd) || !ItemToAdd.IsValidObjectName(OutReason))
+	if (Contains(ItemToAdd))
 	{
-		UE_LOG(LogAdventureCommon, Error, TEXT("Item name was invalid: %s"), OutReason.IsEmpty() ? TEXT("already added") : *OutReason.ToString());
+		UE_LOG(LogAdventureCommon, Error, TEXT("already added"), *ItemToAdd.ToString());
+		return;
+	}
+	if (FText OutReason; !ItemToAdd.IsValidObjectName(OutReason))
+	{
+		UE_LOG(LogAdventureCommon, Error, TEXT("Item name was invalid: %s"), *OutReason.ToString());
 		return;
 	}
 	if (const UItemTypeDefs *Table = InventoryDataTable.Get())
@@ -140,7 +144,7 @@ void UInventory::InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, 
 void UInventory::AddNewItemToInventoryWithTable(FName ItemName, const UItemTypeDefs *Table)
 {
 	const FItemTypeDef ItemTypeDef = Table->FindDefByName(ItemName);
-	if (!ItemTypeDef.Item.IsValid())
+	if (!ItemTypeDef.bValid)
 	{
 		UE_LOG(LogAdventureCommon, Error, TEXT("Item name was invalid: %s"), *ItemName.ToString());
 		OnInventoryChanged.Broadcast(ItemName, EItemDisposition::Error);
@@ -168,7 +172,7 @@ void UInventory::ItemDetailLoadCompleteHandler(const FSoftObjectPath& Path, UObj
 	TSoftObjectPtr<UItem> ItemDetailPtr(Path);
 	UItem *ItemDetails = ItemDetailPtr.Get();
 	ensureAlwaysMsgf(ItemDetails, TEXT("Details expected once loaded %s"), *Path.GetAssetPathString());
-	const FItemTypeDef ItemTypeDef = Table->FindDefByName(ItemDetails->ItemTypeDef);
+	const FItemTypeDef ItemTypeDef = Table->FindDefByName(ItemDetails->ItemTypeDef.GetTagLeafName());
 	ensureAlwaysMsgf(ItemTypeDef.bValid, TEXT("ItemDetailLoadCompleteHandler: type def must exist in table!"));
 	AddNewItemToInventoryWithDetails(ItemDetails, ItemTypeDef.UniqueName.GetTagLeafName());
 }
@@ -184,7 +188,7 @@ void UInventory::RemoveItemInstanceByName(const FName ItemToRemove)
 	if (IsEmpty()) return;
 	for (FListOfItems *Iterator = Inventory; Iterator; Iterator = Iterator->Next)
 	{
-		if (ItemToRemove == Iterator->Element->ItemTypeDef)
+		if (ItemToRemove == Iterator->Element->ItemTypeDef.GetTagLeafName())
 		{
 			OnInventoryChanged.Broadcast(ItemToRemove, EItemDisposition::Removed);
 			UnregisterFromGameInstance(Iterator->Element);

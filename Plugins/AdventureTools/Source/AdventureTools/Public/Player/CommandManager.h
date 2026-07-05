@@ -140,7 +140,7 @@ public:
     void CommenceConversation();
 
     void EndConversation();
-
+    
     //////////////////////////////////
     ///
     /// INTERRUPT COMMANDS

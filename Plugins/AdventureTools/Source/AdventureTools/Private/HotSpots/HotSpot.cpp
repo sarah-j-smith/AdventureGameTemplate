@@ -66,10 +66,10 @@ void AHotSpot::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 FGameplayTagContainer AHotSpot::GetTags() const
 {
-	FGameplayTagContainer FTags;
-	FTags.AppendTags(HistoryTags);
-	if (HotSpotHidden) FTags.AddTag(AdventureGameplayTags::HotSpot_Hidden);
-	return FTags;
+	FGameplayTagContainer Tags;
+	GetOwnedGameplayTags(Tags);
+	if (HotSpotHidden) Tags.AddTag(AdventureGameplayTags::HotSpot_Hidden);
+	return Tags;
 }
 
 void AHotSpot::SetTags(const FGameplayTagContainer& ATags)
@@ -93,6 +93,18 @@ void AHotSpot::RegisterForSaveAndLoad()
 		UAdventureGameInstance *GameInstance = Cast<UAdventureGameInstance>(GetWorld()->GetGameInstance());
 		GameInstance->RegisterHotSpotForSaveAndLoad(this);
 	}
+}
+
+FGameplayTagContainer& AHotSpot::GetTagContainer()
+{
+	return HistoryTags;
+}
+
+void AHotSpot::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+{
+	TagContainer.AppendTags(HistoryTags);
+	TagContainer.AppendTags(StateTags);
+	TagContainer.AppendTags(HotSpotTags);
 }
 
 UStoryAction* AHotSpot::ItemDataAssetForAction(EVerbType Verb) const
@@ -242,7 +254,7 @@ void AHotSpot::OnItemUsed_Implementation()
 		ensureAlwaysMsgf(ItemManager != nullptr, TEXT("ItemManager is nullptr."));
 		// Item was used on this hotspot, and the kind of that item matches the
 		// recipe in the ItemDataAsset. 
-		if (ItemManager->SourceItemName == ItemDataAsset->SourceItem)
+		if (ItemManager->SourceItemTag == ItemDataAsset->SourceItem)
 		{
 			AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
 			return;
@@ -258,7 +270,7 @@ void AHotSpot::OnItemGiven_Implementation()
 	{
 		if (const UItemManager *ItemManager = ManagerProvider->GetItemManager(this))
 		{
-			if (ItemManager->SourceItemName == ItemDataAsset->SourceItem)
+			if (ItemManager->SourceItemTag == ItemDataAsset->SourceItem)
 			{
 				AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
 				return;

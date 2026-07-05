@@ -20,8 +20,8 @@ struct FItemTypeDef
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef, meta=(Categories="Item.Kind"))
 	FGameplayTag UniqueName;
 	
-	/// A short user facing description to help game designers and also serve as a default text in error messages
-	/// for example "Pickled gherkin"
+	/// A short optional user facing description to help game designers
+	/// for example "Pickled gherkin from Tower". Does not appear in the game.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef)
 	FText TypeDescription;
 		
@@ -33,7 +33,7 @@ struct FItemTypeDef
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef)
 	bool bEnabled = true;
 
-	/// Set to true when the Item Type is initialized with valid data
+	/// Set to true when the Item Type is initialized with valid data, that is a valid <code>Item</code> is added.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemTypeDef)
 	bool bValid = false;
 };

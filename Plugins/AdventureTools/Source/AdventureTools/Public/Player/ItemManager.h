@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AdventureGameplayTags.h"
 #include "Item.h"
 #include "Enums/ChoiceState.h"
 #include "VerbType.h"
@@ -15,9 +16,10 @@ class UItem;
 class UItemTypeDefs;
 class UItemSlot;
 class UInventoryItem;
-class UAdventureGameInstance;
 
 DECLARE_MULTICAST_DELEGATE(FUpdateItemInteractionText);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FActionDispatchDelegate, UStoryAction *, Action, UInventoryItem *, Item);
 
 /**
  * Class to marshall all interactions and state of items in the game, including
@@ -59,6 +61,9 @@ public:
 	/// and if the InventoryItemInteraction is true, highlight the text.
 	FUpdateItemInteractionText UpdateInventoryTextDelegate;
 
+	/// Event for an action that should be handled.
+	FActionDispatchDelegate ActionDispatch;
+	
 	void UpdateInventoryText();
 	
 	UFUNCTION(BlueprintCallable, Category = "Items")
@@ -72,6 +77,12 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetTargetItemName")
 	FName TargetItemName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetSourceItemTag")
+	FGameplayTag SourceItemTag;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetTargetItemTag")
+	FGameplayTag TargetItemTag;
 	
 private:
 	void CheckForCustomInventoryItem(FName ItemDef);
@@ -96,13 +107,19 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Items", meta=(AllowPrivateAccess=true))	
 	UItem *Target;
 	
-	FName GetSourceItemName() const { return Source ? Source->ItemTypeDef : NAME_None; }
+	FName GetSourceItemName() const { return Source ? Source->ItemTypeDef.GetTagLeafName() : NAME_None; }
 	
-	FName GetTargetItemName() const { return Target ? Target->ItemTypeDef : NAME_None; }
+	FName GetTargetItemName() const { return Target ? Target->ItemTypeDef.GetTagLeafName() : NAME_None; }
+
+	FGameplayTag GetSourceItemTag() const { return Source ? Source->ItemTypeDef : AdventureGameplayTags::Item; }
+	
+	FGameplayTag GetTargetItemTag() const { return Target ? Target->ItemTypeDef : AdventureGameplayTags::Item; }
 
 	bool GetHasSourceItem() const { return !!Source; }
 	
 	bool GetHasTargetItem() const { return !!Target; }
+	
+	TArray<EVerbType> ItemActionQueue;
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetHasSourceItem")
@@ -115,8 +132,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Commands")
 	UItemSlot *CurrentItemSlot = nullptr;
 
-	// Helper
-	bool CanInteractWith(FName OtherItem) const;
+	/// Return true if the current source item can possibly ever interact with the
+	/// <code>OtherItem</code>. Does <b>not</b> check the <code>InteractableItemName</code>
+	/// field or any Story Action to see if an interaction exists.
+	UFUNCTION(BlueprintCallable, Category = "Items")
+	bool CanInteractWith(UPARAM(meta = (Categories="Item.Kind")) FGameplayTag OtherItem) const;
 	
 	/// Whether the subject of the verb is locked. Locked item choices won't change
 	/// on mouse over of inventory. Default is <code>Unlocked</code>.
@@ -154,7 +174,7 @@ public:
 	void ClearSourceItem()
 	{
 		SourceLocked = EChoiceState::Unlocked;
-		SourceItem->ItemDetails = nullptr;
+		if (SourceItem) SourceItem->ItemDetails = nullptr;
 	}
 
 	/// Clears the <code>SourceItem</code> to null and sets it unlocked.
@@ -162,7 +182,7 @@ public:
 	void ClearTargetItem()
 	{
 		TargetLocked = EChoiceState::Unlocked;
-		TargetItem->ItemDetails = nullptr;
+		if (TargetItem) TargetItem->ItemDetails = nullptr;
 	}
 	
 	UFUNCTION(BlueprintCallable, Category = "Items")

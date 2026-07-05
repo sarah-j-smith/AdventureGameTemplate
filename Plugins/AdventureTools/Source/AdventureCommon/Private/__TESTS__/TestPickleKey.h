@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item.h"
+#include "AdventureGameplayTags.h"
 #include "TestPickleKey.generated.h"
 
 /**
@@ -16,6 +17,7 @@ class ADVENTURECOMMON_API UTestPickleKey : public UItem
 	
 	UTestPickleKey()
 	{
-		ItemTypeDef = "Pickle";
+		ItemTypeDef = AdventureGameplayTags::Item_Kind_PickleKey;
+		ShortDescription = FText::FromString(TEXT("pickle key"));
 	}
 };

@@ -62,4 +62,5 @@ private:
     void HandleTargetItem(UStoryAction *DataAsset, EItemAssetType ItemAssetType, bool &Success);
 
     void HandleKeyCase(bool &Success);
+    void HandlePickupCase(bool &Success, UStoryAction *DataAsset);
 };

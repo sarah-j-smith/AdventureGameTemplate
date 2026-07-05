@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "DescribableItem.h"
+#include "GameplayTagAssetInterface.h"
 #include "GameplayTagContainer.h"
+#include "HistoryTagInterface.h"
 
 #include "Engine/StaticMeshActor.h"
 #include "Gameplay/VerbInteractions.h"
@@ -28,7 +30,8 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FHotSpotDataLoad, AHotSpot *, HotSpot);
  * 
  */
 UCLASS()
-class ADVENTURETOOLS_API AHotSpot : public AStaticMeshActor, public IVerbInteractions, public IDescribableItem
+class ADVENTURETOOLS_API AHotSpot : public AStaticMeshActor, public IVerbInteractions, public IDescribableItem,
+	public IHistoryTagInterface, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 	
@@ -56,28 +59,51 @@ public:
 	/// SAVE AND LOAD
 	///
 
+	/// Delegate event that fires to signal that the hotspot is ready to have its data
+	/// looded.
 	FHotSpotDataLoad DataLoad;
 	FHotSpotDataSave DataSave;
-
+	
+	/// Return the tags used to get and save the state of the game, for example getting if the hotspot is hidden
 	virtual FGameplayTagContainer GetTags() const;
-	virtual void SetTags(const FGameplayTagContainer& Tags);
+	
+	/// Set the tags used to load and restore the state of the game, for example setting if the hotspot is hidden
+	/// @param ATags Tags to set onto this hotspot.
+	virtual void SetTags(const FGameplayTagContainer& ATags);
+	
+	/// Various tags for the past actions done on this hotspot.
+	/// For example can set "History.Triggered.LookAt" to enforce that a score increment
+	/// is only given once, the first time the item is looked at.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (Category = "History"))
+	FGameplayTagContainer HistoryTags;
+	
+	/// Various tags for the state and past actions done on this hotspot.
+	/// For example can set "State.Opened" to store that the hot spot has been "opened".
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (Category = "State"))
+	FGameplayTagContainer StateTags;
+	
+	/// Various tags for the management of this hotspot.
+	/// For example can set "HotSpot.Hidden" to store that the hot spot has been "hidden" in the scene.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (Category = "HotSpot"))
+	FGameplayTagContainer HotSpotTags;
 
 private:
 	bool RegisteredForSaveAndLoad = false;
 	void RegisterForSaveAndLoad();
 
+protected:
+	/// IHistoryTagInterface compliance
+	virtual FGameplayTagContainer &GetTagContainer() override;
+	
 public:
+	
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+
 	//////////////////////////////////
 	///
 	/// HOTSPOT PROPERTIES
 	///
 
-	/// Various tags for the state and past actions done on this hotspot.
-	/// For example can set "History.Triggered.LookAt" to enforce that a score increment
-	/// is only given once, the first time the item is looked at.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Scripting", meta = (Categories = "History"))
-	FGameplayTagContainer HistoryTags;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HotSpot")
 	USphereComponent* WalkToPoint;
 

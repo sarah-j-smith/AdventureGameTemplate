@@ -22,4 +22,7 @@ enum class EItemAssetType: uint8
 
     /// Can be used <b>on</b> a hotspot
     Key         = 3    UMETA(DisplayName = "Key"),
+    
+    /// Item that can be picked up from a hotspot or otherwise added to the inventory
+    Takeable    = 4    UMETA(DisplayName = "Takeable"),
 };

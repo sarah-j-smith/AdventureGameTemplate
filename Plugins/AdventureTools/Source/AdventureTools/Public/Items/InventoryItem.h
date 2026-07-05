@@ -6,6 +6,8 @@
 
 #include "Gameplay/VerbInteractions.h"
 #include "DescribableItem.h"
+#include "GameplayTagAssetInterface.h"
+#include "HistoryTagInterface.h"
 #include "StoryAction.h"
 #include "ItemDataList.h"
 
@@ -20,7 +22,8 @@ class UItem;
  */
 UCLASS(BlueprintType, Blueprintable, EditInlineNew)
 class ADVENTURETOOLS_API UInventoryItem : public UObject, 
-    public IVerbInteractions, public IDescribableItem
+    public IVerbInteractions, public IDescribableItem,
+    public IHistoryTagInterface, public IGameplayTagAssetInterface
 {
     GENERATED_BODY()
     
@@ -33,10 +36,69 @@ class ADVENTURETOOLS_API UInventoryItem : public UObject,
     UBarkProvider* BarkProvider;
     
     bool bHandled = false;
+    
+public:
+    //////////////////////////////////
+    ///
+    /// GAME PLAY TAG COLLECTIONS
+    ///
 
+    /// Various tags for past actions done on this hotspot.
+    /// For example can set "History.Triggered.LookAt" to store that the hot spot has been looked at.
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (Category = "History"))
+    FGameplayTagContainer HistoryTags;
+    
+    /// Various tags for the state and disposition of this item.
+    /// For example can set "State.Opened" to store that the item, say a box, has been "opened".
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,meta = (Category = "State"))
+    FGameplayTagContainer StateTags;
+	
+    /// Various tags for the management of this item.
+    /// For example can set "Item.Consumed" to store that the item, say a potion, has been "consumed" in the game.
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite ,meta = (Category = "Item"))
+    FGameplayTagContainer ItemTags;
+    
+protected:
+    /// Get the history tags for this inventory item.
+    virtual FGameplayTagContainer &GetTagContainer() override;
+    
 public:
     UInventoryItem();
     
+    //////////////////////////////////
+    ///
+    /// BLUEPRINT SUPPORT
+    ///
+ 
+    virtual UWorld* GetWorld() const override
+    {
+        if (HasAllFlags(RF_ClassDefaultObject))
+        {
+            // If we are a CDO, we must return nullptr instead of calling Outer->GetWorld()
+            // to fool UObject::ImplementsGetWorld.
+            return nullptr;
+        }
+        return GetOuter()->GetWorld();
+    }
+    
+    /// The player will bark this text, and then exit the blueprint. Convenience function
+    /// to use instead of a <code>BarkTask</code> when you don't care about waiting for the
+    /// barking to finish.
+    UFUNCTION(BlueprintCallable, Category = "VerbInteractions")
+    void PlayerBarkAndEnd(FText Text);
+    
+    
+    //////////////////////////////////
+    ///
+    /// GAME PLAY TAG ASSET
+    ///
+ 
+    virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+    
+    //////////////////////////////////
+    ///
+    /// DESCRIBABLE ITEM
+    ///
     virtual FText GetShortDescription() const override;
 
     virtual FText GetLongDescription() const override;

@@ -76,7 +76,7 @@ void UAssetActionComponent::HandleSourceItem(UStoryAction *DataAsset, const EIte
     switch (ItemAssetType)
     {
     case EItemAssetType::Consumable:
-        ItemManager->ItemRemoveFromInventoryAsync(DataAsset->SourceItem);
+        ItemManager->ItemRemoveFromInventoryAsync(DataAsset->SourceItem.GetTagLeafName());
         break;
     case EItemAssetType::Tool:
         ItemManager->ItemAddToInventory(DataAsset->ToolResultItem);
@@ -84,6 +84,8 @@ void UAssetActionComponent::HandleSourceItem(UStoryAction *DataAsset, const EIte
     case EItemAssetType::Key:
         HandleKeyCase(Success);
         break;
+    case EItemAssetType::Takeable:
+        HandlePickupCase(Success, DataAsset);
     default:
         UE_LOG(LogAdventureGame, Error, TEXT("Item data asset has bad asset type: %s"),
             *UEnum::GetValueAsString(ItemAssetType));
@@ -97,7 +99,7 @@ void UAssetActionComponent::HandleTargetItem(UStoryAction *DataAsset, const EIte
     switch (ItemAssetType)
     {
     case EItemAssetType::Consumable:
-        ItemManager->ItemRemoveFromInventoryAsync(DataAsset->TargetItem);
+        ItemManager->ItemRemoveFromInventoryAsync(DataAsset->TargetItem.GetTagLeafName());
         break;
     default:
         break;
@@ -129,6 +131,12 @@ void UAssetActionComponent::HandleKeyCase(bool &Success)
             ItemManager->GetTargetItem()->DoorState = EDoorState::Closed; // Closed but not locked
         }
     }
+}
+
+void UAssetActionComponent::HandlePickupCase(bool& Success, UStoryAction *DataAsset)
+{
+    UItemManager *ItemManager = ManagerProvider->GetItemManager(this);
+    ItemManager->ItemAddToInventory(DataAsset->SourceItem.GetTagLeafName());
 }
 
 void UAssetActionComponent::OnItemActionFailure_Implementation(UStoryAction *DataAsset)

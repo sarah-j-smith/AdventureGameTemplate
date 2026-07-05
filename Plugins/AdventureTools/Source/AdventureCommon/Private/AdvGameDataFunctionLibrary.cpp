@@ -5,12 +5,12 @@
 
 #include "AdventureCommon.h"
 #include "GameplayTagContainer.h"
+#include "HistoryTagInterface.h"
 
-void UAdvGameDataFunctionLibrary::TagStateCheck(const UObject* WorldContextObject, 
-		FGameplayTagContainer HistorySourceTags, 
-		FGameplayTag CheckTag,
-		ETagQueryResultType &TagQueryResult,
-		ETagQuerySense TagQuerySense)
+void UAdvGameDataFunctionLibrary::TagStateCheck(FGameplayTagContainer HistorySourceTags,
+                                                FGameplayTag CheckTag,
+                                                ETagQueryResultType& TagQueryResult,
+                                                ETagQuerySense TagQuerySense)
 {
 	FGameplayTagQueryExpression CompleteQueryExpr;
 	switch (TagQuerySense)
@@ -23,9 +23,9 @@ void UAdvGameDataFunctionLibrary::TagStateCheck(const UObject* WorldContextObjec
 		break;
 	}
 	FGameplayTagQuery Query = FGameplayTagQuery::BuildQuery(CompleteQueryExpr);
-	
+
 	UE_LOG(LogAdventureCommon, VeryVerbose, TEXT("TagStateCheck for %s - %s"), *CheckTag.ToString(),
-		*Query.GetDescription());
+	       *Query.GetDescription());
 
 	if (Query.Matches(HistorySourceTags))
 	{
@@ -35,4 +35,15 @@ void UAdvGameDataFunctionLibrary::TagStateCheck(const UObject* WorldContextObjec
 	{
 		TagQueryResult = ETagQueryResultType::Blocked;
 	}
+}
+
+void UAdvGameDataFunctionLibrary::HistoryTagGate(TScriptInterface<IHistoryTagInterface> HistoryObject,
+                                                 FGameplayTag CheckTag, ETagQueryResultType& TagQueryResult)
+{
+	if (HistoryObject->AddHistoryTag(CheckTag))
+	{
+		TagQueryResult = ETagQueryResultType::Continue;
+		return;
+	}
+	TagQueryResult = ETagQueryResultType::Blocked;
 }

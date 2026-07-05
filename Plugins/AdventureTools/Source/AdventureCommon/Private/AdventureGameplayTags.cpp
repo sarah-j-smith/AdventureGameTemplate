@@ -12,9 +12,11 @@ namespace AdventureGameplayTags
 
     // Status for various items in the objects that appear in the game. The default state is when the
     // tag is not present. For example if its not Hidden then its Visible.
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(HotSpot, "HotSpot", "Root HotSpot tag, for parent tests");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(HotSpot_Hidden, "HotSpot.Hidden", "The entire HotSpot actor is hidden");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(HotSpot_SpriteHidden, "HotSpot.SpriteHidden", "The PickUp sprite is hidden");
 
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(History, "History", "Root history tag, for parent tests");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_ItemData_Succeeded, "History.ItemData.Succeeded", "The item data success case was triggered");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_ItemData_Failed, "History.ItemData.Succeeded", "The item data success case was triggered");
     
@@ -28,9 +30,12 @@ namespace AdventureGameplayTags
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_Triggered_Push, "History.Triggered.Push", "The item or hotspot had the push verb used on it");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(History_Triggered_Pull, "History.Triggered.Pull", "The item or hotspot had the pull verb used on it");
 
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item, "Item", "Root item tag, for parent tests");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Consumed, "Item.Consumed", "An item was consumed");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Fail, "Item.Treatment.Fail", "This story item will always fail");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Succeed, "Item.Treatment.Succeed", "This story item will always succeed");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Article, "Item.Treatment.Article", "Object that can be held, examined and given");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Take, "Item.Treatment.Take", "Object that should be taken, picked up and added to the inventory");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Consumable, "Item.Treatment.Consumable", "After being successfully used it is destroyed");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Tool, "Item.Treatment.Tool", "Can be used on another item to create a brand new item");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Treatment_Key, "Item.Treatment.Key", "Can be used on a hotspot to lock or unlock it");
@@ -85,6 +90,7 @@ namespace AdventureGameplayTags
         if (Tags.HasTag(Item_Treatment_Consumable)) Result.Add(EItemAssetType::Consumable);
         if (Tags.HasTag(Item_Treatment_Tool)) Result.Add(EItemAssetType::Tool);
         if (Tags.HasTag(Item_Treatment_Key)) Result.Add(EItemAssetType::Key);
+        if (Tags.HasTag(Item_Treatment_Take)) Result.Add(EItemAssetType::Takeable);
         return Result;
     }
 

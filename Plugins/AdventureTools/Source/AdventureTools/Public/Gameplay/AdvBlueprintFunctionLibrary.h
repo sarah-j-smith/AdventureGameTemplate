@@ -31,7 +31,6 @@ class ADVENTURETOOLS_API UAdvBlueprintFunctionLibrary : public UBlueprintFunctio
     static UManagerProvider *GetManagerProvider();
     static UBarkProvider *GetBarkProvider();
     static UAdventureControllerProvider *GetControllerProvider();
-    
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Gameplay", meta = (WorldContext = "WorldContextObject"))

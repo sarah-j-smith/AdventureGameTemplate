@@ -17,6 +17,7 @@ UItemListTestSut::UItemListTestSut()
         Def.bEnabled = true;
         Def.bValid = true;
         Def.TypeDescription = FText::FromString(TEXT("A key that is made from pickle"));
+        Def.Item = NewObject<UTestPickleKey>(DataTable);
         DataTable->ItemTypeDefs.Add(Def);
     }
     {
@@ -25,6 +26,7 @@ UItemListTestSut::UItemListTestSut()
         Def.bEnabled = true;
         Def.bValid = true;
         Def.TypeDescription = FText::FromString(TEXT("A tasty little sour treat"));
+        Def.Item = NewObject<UTestPickle>(DataTable);
         DataTable->ItemTypeDefs.Add(Def);
     }
     {
@@ -33,6 +35,7 @@ UItemListTestSut::UItemListTestSut()
         Def.bEnabled = true;
         Def.bValid = true;
         Def.TypeDescription = FText::FromString(TEXT("Sharp and cutting"));
+        Def.Item = NewObject<UTestKnife>(DataTable);
         DataTable->ItemTypeDefs.Add(Def);
     }
     

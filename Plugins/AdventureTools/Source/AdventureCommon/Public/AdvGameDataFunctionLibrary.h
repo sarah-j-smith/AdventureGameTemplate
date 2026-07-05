@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "HistoryTagInterface.h"
 
 #include "TagQuerySense.h"
 
@@ -32,18 +33,29 @@ public:
 	/**
 	 * Check a tag query against history tags, and continue on a success path if the check passes.
 	 * If the check fails, then continue on a failure path, eg display "I already opened the chest"
-	 * @param WorldContextObject Supplied by the blueprint, ignore.
 	 * @param HistorySourceTags Hotspot or Item History tags to test against.
-	 * @param CheckTag
-	 * @param TagQuerySense
-	 * @param TagQueryResult
-	 *
-	 * @return The created bark task will either end successfully or be interrupted. Use the appropriate pins to respond to each.
+	 * @param CheckTag The tag to use as a gate, eg <code>History.Triggered.Open</code>
+	 * @param TagQuerySense Whether to check for the tag being present, or absent
+	 * @param TagQueryResult Resulting path for the check
 	 */
-	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", ExpandEnumAsExecs = "TagQueryResult"), Category = "Flow Control")
-	static void TagStateCheck(const UObject* WorldContextObject, 
+	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "TagQueryResult"), Category = "Flow Control")
+	static void TagStateCheck(
 		FGameplayTagContainer HistorySourceTags, 
 		UPARAM(meta = (Categories = "History")) FGameplayTag CheckTag, 
 		ETagQueryResultType &TagQueryResult,
 		ETagQuerySense TagQuerySense = ETagQuerySense::TagMustBePresent);
+	
+	/**
+	 * Check a tag to see if its present in the history tags of a given <b>object</b>; and if it's <b>not present</b>
+	 * continue on a success path and <b>add the tag to the object</b> so that it will not execute the path next time.
+	 * If the tag is present, then continue on a failure path, eg display "I already opened the chest"
+	 * @param HistoryObject Hotspot or Item with History tags to test against.
+	 * @param CheckTag The tag to use as a gate, eg <code>History.Triggered.LookAt</code>
+	 * @param TagQueryResult Resulting path for the check
+	 */
+	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "TagQueryResult"), Category = "Flow Control")
+	static void HistoryTagGate(
+		TScriptInterface<IHistoryTagInterface> HistoryObject, 
+		UPARAM(meta = (Categories = "History")) FGameplayTag CheckTag, 
+		ETagQueryResultType &TagQueryResult);
 };

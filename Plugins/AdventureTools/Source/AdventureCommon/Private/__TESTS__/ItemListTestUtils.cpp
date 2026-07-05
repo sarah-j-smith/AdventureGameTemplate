@@ -38,7 +38,7 @@ TArray<FString> FItemListTestUtils::GetEnumStringsOfResult(TArray<UItem*> Result
     TArray<FString> ItemEnumStrings;
     for (UItem* Item : Result)
     {
-        ItemEnumStrings.Add(Item->ItemTypeDef.ToString());
+        ItemEnumStrings.Add(Item->ItemTypeDef.GetTagLeafName().ToString());
     }
     return ItemEnumStrings;
 }

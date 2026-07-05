@@ -49,7 +49,7 @@ void UAdventureGameInstance::OnSaveHotSpot(AHotSpot* HotSpot)
 	FDataSaveRecord SaveRecord;
 	SaveRecord.LevelName = CurrentLevelName.ToString();
 	SaveRecord.ObjectName = HotSpot->GetName();
-	SaveRecord.Tags = HotSpot->GetTags();
+	HotSpot->GetHistoryTags(SaveRecord.Tags);
 	bool RecordFound = false;
 	for (FDataSaveRecord& Record : AdventureSaves)
 	{
@@ -132,13 +132,20 @@ int UAdventureGameInstance::GetInventoryItemCount() const
 
 void UAdventureGameInstance::GetCustomInventoryItem(FName ItemName)
 {
-	if (UDataTable *Table = DataTable.Get())
+	if (UDataTable *Table = ItemBehavioursTable.Get())
 	{
 		GetCustomInventoryItemWithTable(ItemName, Table);
 		return;
 	}
-	TableOperationsQueue.Push(ItemName);
-	int32 _ = DataTable.LoadAsync(LoadTableDelegate);
+	if (ItemBehavioursTable.IsPending())
+	{
+		TableOperationsQueue.Push(ItemName);
+		int32 _ = ItemBehavioursTable.LoadAsync(LoadTableDelegate);
+		return;
+	}
+	/// There is no custom UInventoryItems at all, because there is no table
+	UE_LOG(LogAdventureGame, Warning, TEXT("AdventureGameInstance::GetCustomInventoryItem: No ItemBehavioursTable set."));
+	CustomInventoryItemLoadedDelegate.Execute(ItemName, nullptr);
 }
 
 void UAdventureGameInstance::InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object)
@@ -164,9 +171,10 @@ void UAdventureGameInstance::InventoryClassLoadCompleteHandler(const FSoftObject
 void UAdventureGameInstance::GetCustomInventoryItemWithTable(FName ItemName, UDataTable* DataTablePtr)
 {
 	ensureAlwaysMsgf(DataTablePtr, TEXT("GetCustomInventoryItemWithTable: Error, expected table to be loaded"));
-	const FItemData *ItemRow  = DataTable->FindRow<FItemData>(ItemName, "GetCustomInventoryItemWithTable");
+	const FItemData *ItemRow  = ItemBehavioursTable->FindRow<FItemData>(ItemName, "GetCustomInventoryItemWithTable");
 	if (ItemRow == nullptr)
 	{
+		/// There is no custom UInventoryItem for this ItemName
 		CustomInventoryItemLoadedDelegate.Execute(ItemName, nullptr);
 	}
 	if (const UClass *InventoryItemClass = ItemRow->ItemClass.Get())
@@ -317,7 +325,7 @@ void UAdventureGameInstance::SaveGame()
 	Inventory->GetInventoryItemsArray(Items);
 	for (const UItem* Item : Items)
 	{
-		CurrentSaveGame->Inventory.Add(Item->ItemTypeDef);
+		CurrentSaveGame->Inventory.Add(Item->ItemTypeDef.GetTagLeafName());
 	}
 
 	CurrentSaveGame->AdventureTags = GameplayTags;
@@ -472,6 +480,7 @@ void UAdventureGameInstance::CreateInventory()
 		Inventory->SetupHandlers();
 		UE_LOG(LogAdventureGame, Log, TEXT("Created new inventory."));
 		Inventory->Identifier = PLAYER_INVENTORY_NAME;
+		Inventory->InventoryDataTable = ItemDefinitionsTable;
 	}
 }
 

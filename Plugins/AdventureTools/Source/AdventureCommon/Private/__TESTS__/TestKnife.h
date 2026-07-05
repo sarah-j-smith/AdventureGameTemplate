@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item.h"
+#include "AdventureGameplayTags.h"
 #include "TestKnife.generated.h"
 
 /**
@@ -16,6 +17,7 @@ class ADVENTURECOMMON_API UTestKnife : public UItem
 	
 	UTestKnife()
 	{
-		ItemTypeDef = "Knife";
+		ItemTypeDef = AdventureGameplayTags::Item_Kind_Knife;
+		ShortDescription = FText::FromString(TEXT("knife"));
 	}
 };

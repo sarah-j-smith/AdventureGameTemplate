@@ -29,8 +29,8 @@ public:
 	/// or some other name.
 	/// 
 	/// @invariant Must be one of the names listed in ItemTypeDefs
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
-	FName ItemTypeDef;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration", meta=(Categories="Item.Kind"))
+	FGameplayTag ItemTypeDef;
 	
 	//////////////////////////////////
 	///
@@ -64,8 +64,8 @@ public:
 	/// An item kind that can meaningfully interact with this one. Used when
 	/// items are combined in the inventory, such as _Use knife on pickle_.
 	/// This has no effect on other verbs.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
-	FName InteractableItemName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling", meta=(Categories="Item.Kind"))
+	FGameplayTag InteractableItemName;
 	
 	//////////////////////////////////
 	///

@@ -16,6 +16,7 @@
 
 #include "AdventureGameInstance.generated.h"
 
+class UItemTypeDefs;
 class UManagerProvider;
 class UItem;
 class UInventory;
@@ -60,9 +61,18 @@ public:
 	/// INVENTORY
 	///
 
-	/// Custom inventory item behaviours
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Save Game")
-	TSoftObjectPtr<UDataTable> DataTable;
+	/// Custom inventory item behaviours. This table is optional but must be set to a new Data Table,
+	/// with FItemRow as the row type, if it is used. The entries in the table map _names_ of 
+	/// items in the game to sub-classes (usually Blueprints) of <code>UInventoryItem</code> which 
+	/// can have a Blueprint script attached to provide custom behaviours. 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Inventory Configuration")
+	TSoftObjectPtr<UDataTable> ItemBehavioursTable;
+	
+	/// Inventory item definitions. This table must be created by right-click in the content area,
+	/// choosing Adventure Tools > Item Type Definitions. Once the table is created set it here.
+	/// Or click the drop-down and choose _Create new Asset_ > _Item Type Definitions_.
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Inventory Configuration")
+	TSoftObjectPtr<UItemTypeDefs> ItemDefinitionsTable;
 	
 	DECLARE_DELEGATE_TwoParams(FCustomInventoryItemLoaded, FName /* ItemKind */, UInventoryItem * /* CustomInventoryItem */);
 	

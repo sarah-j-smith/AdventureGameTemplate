@@ -4,6 +4,9 @@
 #include "Misc/AutomationTest.h"
 #include "Tests/AutomationCommon.h"
 
+/**
+ * Tests for the UInventory class, which replaced the UItemList.
+ */
 IMPLEMENT_COMPLEX_AUTOMATION_TEST(ItemListTest, "AdventureGame.Items.ItemListTest",
                                   EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 

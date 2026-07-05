@@ -46,8 +46,8 @@ public:
 	FGameplayTagContainer SourceItemTreatmentTags;
 	
 	/// The <b>first</b> item required for the action to successfully initiate.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ItemAction")
-	FName SourceItem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ItemAction", meta = (Categories = "Item.Kind"))
+	FGameplayTag SourceItem;
 
 	/// How to treat the target item when using the default implementation
 	/// of OnItemUseSuccess.
@@ -56,8 +56,8 @@ public:
 	
 	/// The <b>second item</b> required for the action to successfully initiate, or null.
 	/// There must be either this set, or the <code>HotSpot</code> set.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ItemAction")
-	FName TargetItem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ItemAction", meta = (Categories = "Item.Kind"))
+	FGameplayTag TargetItem;
 
 	/// If the items are used the other way around, does it matter?
 	/// Using a TV remote on a TV might matter - may want to say "false"

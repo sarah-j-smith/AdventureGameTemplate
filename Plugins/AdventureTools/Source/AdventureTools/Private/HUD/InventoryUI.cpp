@@ -75,7 +75,7 @@ UItemSlot* UInventoryUI::GetFromInventory(FName ItemKind) const
 {
 	for (UItemSlot* ItemSlot : InventorySlots)
 	{
-		if (ItemSlot && ItemSlot->InventoryItem && ItemSlot->InventoryItem->ItemTypeDef == ItemKind)
+		if (ItemSlot && ItemSlot->InventoryItem && ItemSlot->InventoryItem->ItemTypeDef.GetTagLeafName() == ItemKind)
 		{
 			return ItemSlot;
 		}
