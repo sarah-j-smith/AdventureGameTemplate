@@ -39,21 +39,6 @@ void UInventoryItem::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) c
     TagContainer.AppendTags(ItemTags);
 }
 
-FText UInventoryItem::GetShortDescription() const
-{
-    return ItemDetails ? ItemDetails->ShortDescription : FText::GetEmpty();
-}
-	
-FText UInventoryItem::GetLongDescription() const
-{
-    return ItemDetails ? ItemDetails->Description : FText::GetEmpty();
-}
-	
-FName UInventoryItem::GetItemKind() const
-{
-    return ItemDetails ? ItemDetails->ItemTypeDef.GetTagLeafName() : NAME_None;
-}
-
 //////////////////////////////////
 ///
 /// STATIC IMPLEMENTATIONS

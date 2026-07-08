@@ -21,8 +21,7 @@ class UItem;
  * The `Item` in our inventory, that can be scripted with blueprints.
  */
 UCLASS(BlueprintType, Blueprintable, EditInlineNew)
-class ADVENTURETOOLS_API UInventoryItem : public UObject, 
-    public IVerbInteractions, public IDescribableItem,
+class ADVENTURETOOLS_API UInventoryItem : public UObject, public IVerbInteractions,
     public IHistoryTagInterface, public IGameplayTagAssetInterface
 {
     GENERATED_BODY()
@@ -94,16 +93,6 @@ public:
     ///
  
     virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
-    
-    //////////////////////////////////
-    ///
-    /// DESCRIBABLE ITEM
-    ///
-    virtual FText GetShortDescription() const override;
-
-    virtual FText GetLongDescription() const override;
-
-    virtual FName GetItemKind() const override;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemHandling")
     UItem *ItemDetails;

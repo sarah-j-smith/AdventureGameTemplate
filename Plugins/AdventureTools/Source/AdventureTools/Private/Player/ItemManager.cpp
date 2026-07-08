@@ -18,17 +18,18 @@
 UItemManager::UItemManager()
 {
     PrimaryComponentTick.bCanEverTick = true;
-    
+    UE_LOG(LogAdventureGame, VeryVerbose, TEXT(">>> Constructor: Item Manager %p"), this);
 }
 
-void UItemManager::OnComponentCreated()
+void UItemManager::BeginPlay()
 {
-    Super::OnComponentCreated();
+    Super::BeginPlay();
     
     UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this);
     UAdventureGameInstance *AdventureGameInstance = Cast<UAdventureGameInstance>(GameInstance);        
     AdventureGameInstance->PlayerInventoryChanged.AddDynamic(this, &UItemManager::OnInventoryChanged);
     AdventureGameInstance->CustomInventoryItemLoadedDelegate.BindUObject(this, &UItemManager::CreateCustomInventoryItemHandler);
+    UE_LOG(LogAdventureGame, VeryVerbose, TEXT(">>> OnComponentCreated Item Manager: %p"), this);
     Inventory = AdventureGameInstance->Inventory;
 }
 
@@ -291,7 +292,7 @@ void UItemManager::PerformItemInteraction(EVerbType CurrentVerb)
         break;
     default:
         UE_LOG(LogAdventureGame, Warning, TEXT("Unexpected interaction verb %s for perform item interaction with %s"),
-               *VerbGetDescriptiveString(CurrentVerb).ToString(), *TargetItem->GetShortDescription().ToString());
+               *VerbGetDescriptiveString(CurrentVerb).ToString(), *Target->GetShortDescription().ToString());
     }
     UpdateInventoryText();
 }
@@ -348,13 +349,6 @@ void UItemManager::PerformItemAction(EVerbType CurrentVerb)
                *VerbGetDescriptiveString(CurrentVerb).ToString())
     }
     UpdateInventoryText();
-}
-
-void UItemManager::BeginPlay()
-{
-    Super::BeginPlay();
-
-    //
 }
 
 void UItemManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

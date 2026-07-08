@@ -190,6 +190,7 @@ void UAdventureGameInstance::GetCustomInventoryItemWithTable(FName ItemName, UDa
 void UAdventureGameInstance::GetCustomInventoryItemWithClass(FName ItemName, const UClass* InventoryItemClass)
 {
 	UInventoryItem *InventoryItem = NewObject<UInventoryItem>(this, InventoryItemClass, ItemName);
+	ensureAlwaysMsgf(CustomInventoryItemLoadedDelegate.IsBound(), TEXT("GetCustomInventoryItemWithClass: CustomInventoryItem is not bound"));
 	CustomInventoryItemLoadedDelegate.Execute(ItemName, InventoryItem);
 }
 
@@ -227,7 +228,8 @@ void UAdventureGameInstance::OnRoomLoaded()
 	switch (RoomTransitionPhase)
 	{
 	case ERoomTransitionPhase::LoadStartingRoom:
-		UE_LOG(LogAdventureGame, Log, TEXT("UAdventureGameInstance::OnRoomLoaded - LoadStartingRoom"));
+		UE_LOG(LogAdventureGame, Log, TEXT("UAdventureGameInstance::OnRoomLoaded - LoadStartingRoom - %s"),
+			*StartingLevelName.ToString());
 		CurrentLevelName = StartingLevelName;
 		CurrentDoorLabel = StartingDoorLabel;
 		RoomTransitionPhase = ERoomTransitionPhase::NewRoomLoaded;

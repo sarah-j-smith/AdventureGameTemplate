@@ -47,6 +47,7 @@ void UPlayerBarkManager::PlayerBarkAndEnd(const FText &BarkText)
     const FBarkRequest* Request = FBarkRequest::CreatePlayerRequest(BarkText);
     AdventureHUDWidget->Bark->AddBarkRequest(Request);
     CurrentBarkTasks.Add(Request->GetUID());
+    BarkTasksShouldCausePlayerInterrupt.Add(Request->GetUID());
 }
 
 void UPlayerBarkManager::PlayerBark(const FText& BarkText, int32 BarkTaskUid)

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DescribableItem.h"
 #include "DoorState.h"
 #include "GameplayTagContainer.h"
 #include "ItemDataList.h"
@@ -19,10 +20,21 @@ class UPaperSprite;
  * by the FName property `ItemTypeDef`.
  */
 UCLASS()
-class ADVENTURECOMMON_API UItem : public UObject
+class ADVENTURECOMMON_API UItem : public UObject, public IDescribableItem
 {
 	GENERATED_BODY()
 public:
+	//////////////////////////////////
+	///
+	/// DESCRIBABLE ITEM
+	///
+
+	virtual FText GetShortDescription() const override { return ShortDescription;}
+	
+	virtual FText GetLongDescription() const override { return Description; }
+	
+	virtual FName GetItemKind() const override { return ItemTypeDef.GetTagLeafName(); }
+	
 	/// What item is this? Currently its only supported to have a single one 
 	/// of each item in the game. If there is a "Knife", and some other thing 
 	/// that is a knife is needed in another part of the game it must be "Switchblade" 
