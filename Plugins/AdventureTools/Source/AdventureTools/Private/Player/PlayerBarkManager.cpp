@@ -48,6 +48,7 @@ void UPlayerBarkManager::PlayerBarkAndEnd(const FText &BarkText)
     AdventureHUDWidget->Bark->AddBarkRequest(Request);
     CurrentBarkTasks.Add(Request->GetUID());
     BarkTasksShouldCausePlayerInterrupt.Add(Request->GetUID());
+    UE_LOG(LogAdventureGame, Log, TEXT("PlayerBarkAndEnd %s"), *BarkText.ToString());
 }
 
 void UPlayerBarkManager::PlayerBark(const FText& BarkText, int32 BarkTaskUid)
@@ -56,6 +57,7 @@ void UPlayerBarkManager::PlayerBark(const FText& BarkText, int32 BarkTaskUid)
     FBarkRequest* Request = FBarkRequest::CreatePlayerRequest(BarkText, 0.0f, BarkTaskUid);
     CurrentBarkTasks.Add(Request->GetUID());
     AdventureHUDWidget->Bark->AddBarkRequest(Request);
+    UE_LOG(LogAdventureGame, Log, TEXT("PlayerBark %s - %d"), *BarkText.ToString(), BarkTaskUid);
 }
 
 void UPlayerBarkManager::PlayerBarkLines(const TArray<FText>& BarkTextArray, int32 BarkTaskUid)
@@ -65,11 +67,12 @@ void UPlayerBarkManager::PlayerBarkLines(const TArray<FText>& BarkTextArray, int
     const FBarkRequest* Request = FBarkRequest::CreatePlayerMultilineRequest(BarkTextArray);
     CurrentBarkTasks.Add(Request->GetUID());
     AdventureHUDWidget->Bark->AddBarkRequest(Request);
+    UE_LOG(LogAdventureGame, Log, TEXT("PlayerBarkLines %s - %d"), *BarkTextArray[0].ToString(), BarkTaskUid);
 }
 
 void UPlayerBarkManager::ClearBark()
 {
-    UE_LOG(LogAdventureGame, Warning, TEXT("ClearBark"));
+    UE_LOG(LogAdventureGame, Log, TEXT("ClearBark"));
     if (IsBarking)
     {
         UE_LOG(LogAdventureGame, Warning, TEXT("ClearBark - bIsBarking"));
@@ -108,16 +111,20 @@ void UPlayerBarkManager::SetAdventureGameHUD(class UAdventureGameHUD* HUD)
 
 void UPlayerBarkManager::OnTimeoutBark(int32 BarkTaskId)
 {
+    UE_LOG(LogAdventureGame, Log, TEXT("OnTimeoutBark - %d"), BarkTaskId);
     if (const int TaskIndex = CurrentBarkTasks.IndexOfByKey(BarkTaskId); TaskIndex != INDEX_NONE)
     {
         CurrentBarkTasks.RemoveAt(TaskIndex);
+        UE_LOG(LogAdventureGame, Log, TEXT(">> Found TaskIndex - %d"), TaskIndex);
         if (BarkTasksShouldCausePlayerInterrupt.Contains(BarkTaskId))
         {
+            UE_LOG(LogAdventureGame, Log, TEXT("   >> EBarkRequestFinishedReason::BarkAndEnd - %d"), BarkTaskId);
             EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::BarkAndEnd);
             BarkTasksShouldCausePlayerInterrupt.Remove(BarkTaskId);
         } 
         else
         {
+            UE_LOG(LogAdventureGame, Log, TEXT("   >> EBarkRequestFinishedReason::Timeout - %d"), BarkTaskId);
             EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::Timeout);
         }
     }
@@ -126,17 +133,21 @@ void UPlayerBarkManager::OnTimeoutBark(int32 BarkTaskId)
 
 void UPlayerBarkManager::OnInterruptBark(int32 BarkTaskId)
 {
+    UE_LOG(LogAdventureGame, Log, TEXT("OnInterruptBark - %d"), BarkTaskId);
     if (const int TaskIndex = CurrentBarkTasks.IndexOfByKey(BarkTaskId); TaskIndex != INDEX_NONE)
     {
+        UE_LOG(LogAdventureGame, Log, TEXT("  >>> TaskIndex - %d"), TaskIndex);
         CurrentBarkTasks.RemoveAt(TaskIndex);
         if (BarkTasksShouldCausePlayerInterrupt.Contains(BarkTaskId))
         {
             EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::BarkAndEnd);
             BarkTasksShouldCausePlayerInterrupt.Remove(BarkTaskId);
+            UE_LOG(LogAdventureGame, Log, TEXT("   >> OnInterruptBark ::BarkAndEnd - %d"), BarkTaskId);
         } 
         else
         {
             EndPlayerBark.Broadcast(BarkTaskId, EBarkRequestFinishedReason::Interruption);
+            UE_LOG(LogAdventureGame, Log, TEXT("   >> OnInterruptBark ::Interruption - %d"), BarkTaskId);
         }
     }
     IsBarking = AdventureHUDWidget->Bark->IsBarking();

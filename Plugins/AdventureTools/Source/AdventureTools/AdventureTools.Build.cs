@@ -51,6 +51,8 @@ public class AdventureTools : ModuleRules
 				"AIModule", 
 				"EnhancedInput",
 				"GameplayTags",
+				"Paper2D",
+				"Paper2DEditor",
 				"UMG"
 				// ... add private dependencies that you statically link with here ...	
 			}
