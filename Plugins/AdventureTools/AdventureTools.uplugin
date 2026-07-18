@@ -62,6 +62,9 @@
 			"Name": "AdventureTypes",
 			"Type": "UncookedOnly",
 			"LoadingPhase": "PreDefault",
+			"AdditionalDependencies": [
+				"PlacementMode", "UnrealEd"
+			],
 			"PlatformAllowList": [
 				"Win64",
 				"Linux",

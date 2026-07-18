@@ -19,6 +19,7 @@ public class AdventureTypes : ModuleRules
                 "Core",
                 "AdventureCommon",
                 "UnrealEd",
+                "Engine",
                 "AssetDefinition",
                 "AssetRegistry"
             }
@@ -32,6 +33,7 @@ public class AdventureTypes : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
+                "PlacementMode",
                 
                 //Check which are needed
                 "PropertyEditor",

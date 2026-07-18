@@ -85,8 +85,8 @@ void UBarkText::SetPositionProvider(IPositionProvider* APositionProvider)
 
 void UBarkText::AddBarkRequest(const FBarkRequest *BarkRequest)
 {
-    // UE_LOG(LogDialog, Warning, TEXT("AddBarkRequest"));
-    // FBarkRequest::Dump(const_cast<FBarkRequest *>(BarkRequest));
+    UE_LOG(LogDialog, Warning, TEXT("AddBarkRequest"));
+    FBarkRequest::Dump(const_cast<FBarkRequest *>(BarkRequest));
     AddToLinkedList(BarkRequest);
     if (!bIsBarking)
     {
@@ -182,7 +182,8 @@ void UBarkText::LoadNextBarkRequest()
     BarkLines.Empty();
     CurrentBarkRequest->GetBarkLines(BarkLines);
     CurrentUID = CurrentBarkRequest->GetUID();
-    UE_LOG(LogDialog, Verbose, TEXT("LoadNextBarkRequest: %d - %s"), CurrentUID, *BarkLines[0].ToString());
+    UE_LOG(LogDialog, Verbose, TEXT("LoadNextBarkRequest: %d - %s - duration: %0.2f"), CurrentUID, 
+        *BarkLines[0].ToString(), CurrentBarkRequest->GetDuration());
     BarkPosition = CurrentBarkRequest->GetPosition();
     if (!IsValid(BarkPosition))
     {
@@ -227,6 +228,9 @@ void UBarkText::AddQueuedBarkLine(EBarkRequestFinishedReason Reason)
         case EBarkRequestFinishedReason::Interruption:
             BarkRequestInterruptedDelegate.Broadcast(CurrentUID);
             break;
+        case EBarkRequestFinishedReason::BarkAndEnd:
+            BarkRequestCompleteDelegate.Broadcast(CurrentUID);
+            break;
         }
         HideContainer();
         ClearText();
@@ -240,6 +244,37 @@ void UBarkText::AddQueuedBarkLine(EBarkRequestFinishedReason Reason)
             UE_LOG(LogDialog, Verbose, TEXT("AddQueuedBarkLine - request queue empty stop barking"));
             bIsBarking = false;
         }
+    }
+}
+
+void UBarkText::DoTick(float DeltaTime)
+{
+    if (GIsAutomationTesting)
+    {
+        FVector2D FakeSize(320.0f, 45.0f);
+        FSlateLayoutTransform FakeTransform(FVector2D(100.0f, 100.0f));
+
+        // 3. Make a geometry object using the helper constructor
+        const FGeometry MockGeometry = FGeometry::MakeRoot(FakeSize, FakeTransform);
+    
+        NativeTick(MockGeometry, DeltaTime);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Fatal, TEXT("UBarkText::DoTick - IS ONLY FOR TESTING"));
+    }
+}
+
+float UBarkText::ElapsedTime() const
+{
+    if (GIsAutomationTesting)
+    {
+        return BarkLineTimer;
+    }
+    else
+    {
+        UE_LOG(LogTemp, Fatal, TEXT("UBarkText::DoTick - IS ONLY FOR TESTING"));
+        return 0.0f; /// Never reached.
     }
 }
 

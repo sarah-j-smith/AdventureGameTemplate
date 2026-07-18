@@ -68,7 +68,10 @@ constexpr int32 GMax_Number_Of_Prompts = 5;
 
 #define NEW_LINE_SEPARATOR TEXT("\\n")
 
+/// People cannot absorb a lot of text on the screen. This should be more than enough.
+/// If this line is changed, also change the unit test logic in BarkTextTest.cpp
 #define G_MAX_BARK_LINES 3
+
 #define BARK_LINE_DELAY 2.0f
 #define BARK_LINE_WIDTH 30
 #define INVALID_BARK_DELAY -99.0f

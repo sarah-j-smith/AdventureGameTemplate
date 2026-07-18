@@ -166,7 +166,12 @@ private:
 public:
 	/// Remove all queued requests
 	void ClearBarkQueue();
-
+	
+	/// Testing only
+	void DoTick(float DeltaTime);
+	
+	/// Testing only
+	float ElapsedTime() const;
 };
 
 inline FBarkRequest *UBarkText::PopBarkRequest()

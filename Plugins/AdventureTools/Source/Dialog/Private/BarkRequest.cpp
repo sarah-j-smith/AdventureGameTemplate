@@ -89,10 +89,7 @@ FBarkRequest* FBarkRequest::CreatePlayerRequest(const FText& NewBarkLine, const 
         const auto Lines = FGameUtils::NewLineSeparatedToArrayText(NewBarkLine);
         return CreatePlayerMultilineRequest(Lines, Duration, UID);
     }
-    else
-    {
-        return CreatePlayerMultilineRequest({NewBarkLine}, Duration, UID);
-    }
+    return CreatePlayerMultilineRequest({NewBarkLine}, Duration, UID);
 }
 
 FBarkRequest* FBarkRequest::CreateNPCRequest(const FText& NewBarkLine, const float Duration, USphereComponent* Position,
