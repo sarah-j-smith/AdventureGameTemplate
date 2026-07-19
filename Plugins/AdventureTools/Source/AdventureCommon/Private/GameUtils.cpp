@@ -42,7 +42,7 @@ uint32 FGameUtils::GetDisplayTimeForString(const FString &BarkText)
     if (LetterCount <= MEDIUM_LETTER_COUNT) return LineDelay + MEDIUM_BARK_TIME;
     if (LetterCount <= LONG_LETTER_COUNT) return LineDelay + LONG_BARK_TIME;
     if (LetterCount <= EXTRA_LONG_LETTER_COUNT) return LineDelay + EXTRA_LONG_BARK_TIME;
-    return LineDelay * 2.0;
+    return ceilf(XXLONG_BARK_MULT * static_cast<float>(LetterCount) + LineDelay);
 }
 
 uint32 FGameUtils::GetUUID()

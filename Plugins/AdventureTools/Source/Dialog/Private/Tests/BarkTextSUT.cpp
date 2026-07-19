@@ -35,6 +35,14 @@ int UBarkTextSUT::TickUntil(float DeltaTime, float maxTime, std::function<bool(U
 	return TARGET_REACHED;
 }
 
+FBarkRequest *UBarkTextSUT::SetupTestData(const TArray<FText>& BarkTextArray)
+{
+	FBarkRequest *BarkRequest = FBarkRequest::CreatePlayerMultilineRequest(BarkTextArray);
+		
+	SUT->AddBarkRequest(BarkRequest);
+	return BarkRequest;
+}
+
 UBarkText* UBarkTextSUT::CreateBarkText(UWorld* World)
 {
 	// /Script/UMGEditor.WidgetBlueprint'/AdventureTools/PointAndClick/Blueprints/Dialog/BP_BarkHolder.BP_BarkHolder'
@@ -53,5 +61,39 @@ UBarkText* UBarkTextSUT::CreateBarkText(UWorld* World)
 	UFakePositionProvider *FakePositionProvider = NewObject<UFakePositionProvider>(World, "FakePositionProvider");
 	SUT->SetPositionProvider(FakePositionProvider);
 	
+	SUT->BarkRequestCompleteDelegate.AddLambda([this](int UID)
+	{
+		CompletedUID = UID;
+		FinishedReason = EBarkRequestFinishedReason::Timeout;
+	});
+	SUT->BarkRequestInterruptedDelegate.AddLambda([this](int UID)
+	{
+		CompletedUID = UID; 
+		FinishedReason = EBarkRequestFinishedReason::Interruption;
+	});
+	
 	return SUT;
+}
+
+int UBarkTextSUT::TickUntilChildCount(int Count, float MaxTime)
+{
+	int ResultCode = TickUntil(1.0f, MaxTime, [Count](UBarkText *BarkTextArg)
+	{
+		return BarkTextArg->BarkContainer->GetChildrenCount() == Count;
+	});
+	return ResultCode;
+}
+
+int UBarkTextSUT::TickUntilTextExists(const FText& SearchText, float MaxTime)
+{
+	return TickUntil(1.0f, MaxTime, [SearchText](UBarkText *BarkTextArg)
+	{
+		TArray<UWidget*> ChildrenNodes = BarkTextArg->BarkContainer->GetAllChildren();
+		for (UWidget* Child : ChildrenNodes)
+		{
+			UBarkLine *BarkLine = Cast<UBarkLine>(Child);
+			if (BarkLine->Text->GetText().ToString() == SearchText.ToString()) return true;
+		}
+		return false;
+	});
 }

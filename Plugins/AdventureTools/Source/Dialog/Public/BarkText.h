@@ -172,6 +172,9 @@ public:
 	
 	/// Testing only
 	float ElapsedTime() const;
+	
+	/// Testing only
+	FBarkRequest *GetCurrentBarkRequest() const;
 };
 
 inline FBarkRequest *UBarkText::PopBarkRequest()

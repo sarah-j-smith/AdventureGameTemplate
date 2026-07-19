@@ -66,7 +66,7 @@ constexpr FLinearColor G_NPC_Default_Text_Colour = FLinearColor( COL(0x44), COL(
 constexpr int32 GMax_Number_Of_Prompts = 5;
 
 
-#define NEW_LINE_SEPARATOR TEXT("\\n")
+#define NEW_LINE_SEPARATOR TEXT("\n")
 
 /// People cannot absorb a lot of text on the screen. This should be more than enough.
 /// If this line is changed, also change the unit test logic in BarkTextTest.cpp
@@ -83,10 +83,11 @@ constexpr int32 GMax_Number_Of_Prompts = 5;
 #define LONG_LETTER_COUNT 30
 #define EXTRA_LONG_LETTER_COUNT 45
 
-#define SHORT_BARK_TIME 1.5f
-#define MEDIUM_BARK_TIME 3.0f
-#define LONG_BARK_TIME 5.0f
-#define EXTRA_LONG_BARK_TIME 8.0f
+#define SHORT_BARK_TIME 1
+#define MEDIUM_BARK_TIME 3
+#define LONG_BARK_TIME 5
+#define EXTRA_LONG_BARK_TIME 8
+#define XXLONG_BARK_MULT 0.3f
 
 #define LOCATION_DEBUG_KEY 1
 #define DIALOGUE_FILL_KEY 2

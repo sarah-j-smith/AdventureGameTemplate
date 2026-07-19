@@ -278,6 +278,15 @@ float UBarkText::ElapsedTime() const
     }
 }
 
+FBarkRequest* UBarkText::GetCurrentBarkRequest() const
+{
+    if (GIsAutomationTesting)
+    {
+        return const_cast<FBarkRequest*>(CurrentBarkRequest);
+    }
+    return nullptr;
+}
+
 void UBarkText::SetBarkLineTimer()
 {
     BarkLineTimer = CurrentBarkRequest ? CurrentBarkRequest->GetDurationForLine(CurrentBarkLine) : BarkLineDisplayTime;
