@@ -24,7 +24,7 @@ bool BarkTextMultiLineTest::RunTest(const FString& Parameters)
 		TArray<FText> BarkTextArray;
 		BarkTestUtils::GetTestDataBarkArrays(BarkTextArray);
 		FBarkRequest *BarkRequest = SUTBuilder->SetupTestData(BarkTextArray);
-
+		
 		// Tick a beat to allow the display to put up the first line, check its there
 		BarkText->DoTick(1.0f);
 
@@ -67,4 +67,5 @@ bool BarkTextMultiLineTest::RunTest(const FString& Parameters)
 		WorldWrapper.ForwardErrorMessages(this);
 		return !HasAnyErrors();
 	}
-	return false;}
+	return false;
+}

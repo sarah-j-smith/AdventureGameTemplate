@@ -110,7 +110,10 @@ float FBarkRequest::GetDurationForLine(const int32 LineIndex) const
 
 FBarkRequest* FBarkRequest::CreatePlayerRequest(const FText& NewBarkLine, const float Duration, const int32 UID)
 {
-	if (NewBarkLine.ToString().Contains(NEW_LINE_SEPARATOR))
+	UE_LOG(LogDialog, Warning, TEXT("CreatePlayerRequest: %s - %s"), 
+		(NewBarkLine.IsFromStringTable() ? TEXT("String Table") : TEXT("From String")), *NewBarkLine.ToString());
+	const FString NewBarkLineString = NewBarkLine.ToString();
+	if (NewBarkLineString.Contains(NEW_LINE_SEPARATOR))
 	{
 		const auto Lines = FGameUtils::NewLineSeparatedToArrayText(NewBarkLine);
 		return CreatePlayerMultilineRequest(Lines, Duration, UID);

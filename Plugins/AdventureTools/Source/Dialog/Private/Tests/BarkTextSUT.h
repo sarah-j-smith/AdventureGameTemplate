@@ -34,6 +34,9 @@ public:
 	TSubclassOf<UUserWidget> BarkTextClass;
 	
 	UPROPERTY()
+	UStringTable *TestTextTable;
+	
+	UPROPERTY()
 	UBarkText *SUT;
 	
 	FBarkRequest *SetupTestData(const TArray<FText>& BarkTextArray);

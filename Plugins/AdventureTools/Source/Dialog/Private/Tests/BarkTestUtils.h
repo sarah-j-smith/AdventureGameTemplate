@@ -18,6 +18,8 @@ public:
 	/// feeds so after parsing should expand to 6 lines in the request.
 	static void GetMultilineTestDataBarkArrays(TArray<FText>& BarkTextArray);
 	
+	static void GetGameText(TArray<FText>& BarkTextArray);
+	
 	static void GetTestDataForParam(const FString& ParamName, TArray<FText>& BarkTextArray);
 	
 	static int GetTestCountForParam(const FString& ParamName);

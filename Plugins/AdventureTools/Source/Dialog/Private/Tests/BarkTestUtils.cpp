@@ -6,6 +6,7 @@ void BarkTestUtils::GetTestDataForParam(const FString& ParamName, TArray<FText>&
 	if (ParamName == TEXT("Two_lines_one_very_long")) { GetTestDataVeryLongLine(BarkTextArray); return; }
 	if (ParamName == TEXT("Four_short_lines_of_text")) { GetTestDataBarkArrays(BarkTextArray); return; }
 	if (ParamName == TEXT("Four_lines_of_text_one_long")) { GetMultilineTestDataBarkArrays(BarkTextArray); return; }
+	if (ParamName == TEXT("Game_text")) { GetGameText(BarkTextArray); return; }
 	throw std::invalid_argument(TCHAR_TO_UTF8(*ParamName));
 }
 
@@ -15,6 +16,7 @@ int BarkTestUtils::GetTestCountForParam(const FString& ParamName)
 	if (ParamName == TEXT("Two_lines_one_very_long")) return 3;
 	if (ParamName == TEXT("Four_short_lines_of_text")) return 4;
 	if (ParamName == TEXT("Four_lines_of_text_one_long")) return 6;
+	if (ParamName == TEXT("Game_text")) return 4;
 	throw std::invalid_argument(TCHAR_TO_UTF8(*ParamName));
 }
 
@@ -24,6 +26,7 @@ int BarkTestUtils::GetTestElapsedTimeForParam(const FString& ParamName)
 	if (ParamName == TEXT("Two_lines_one_very_long")) return 17.0f;
 	if (ParamName == TEXT("Four_short_lines_of_text")) return 22.0f;
 	if (ParamName == TEXT("Four_lines_of_text_one_long")) return 43.0f;
+	if (ParamName == TEXT("Game_text")) return 24.0f;
 	throw std::invalid_argument(TCHAR_TO_UTF8(*ParamName));
 }
 
@@ -64,3 +67,15 @@ void BarkTestUtils::GetMultilineTestDataBarkArrays(TArray<FText>& BarkTextArray)
 		FText::FromString("This is the 4th line")
 	});
 }
+
+void BarkTestUtils::GetGameText(TArray<FText>& BarkTextArray)
+{
+	BarkTextArray.Empty();
+	BarkTextArray.Append({
+		FText::FromString("A tatty old recruitment poster"),
+		FText::FromString("the Global Marines."),
+		FText::FromString("Something odd about it."),
+		FText::FromString("What's this lump?"),
+	});
+}
+

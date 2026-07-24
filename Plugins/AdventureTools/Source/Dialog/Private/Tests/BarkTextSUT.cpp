@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "BarkLine.h"
+#include "Internationalization/StringTable.h"
 #include "FakePositionProvider.h"
 #include "GameFramework/Character.h"
 
@@ -17,6 +18,13 @@ UBarkTextSUT::UBarkTextSUT(const FObjectInitializer &ObjectInitializer)
 	if (BlueprintActor.Succeeded())
 	{
 		BarkTextClass = BlueprintActor.Class;
+	}
+	
+	static ConstructorHelpers::FObjectFinder<UStringTable> TableFinder(
+		TEXT("/AdventureTools/PointAndClick/StringTables/Test_StringTable.Test_StringTable"));
+	if (TableFinder.Succeeded())
+	{
+		TestTextTable = TableFinder.Object;
 	}
 }
 

@@ -15,6 +15,14 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003Astdexcept_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FApplications_003FXcode_002Eapp_003FContents_003FDeveloper_003FPlatforms_003FMacOSX_002Eplatform_003FDeveloper_003FSDKs_003FMacOSX_002Esdk_003Fusr_003Finclude_003Fc_002B_002B_003Fv1_003Fstdexcept/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AVulkan_002EBuild_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FShared_003FEpic_0020Games_003FUE_005F5_002E6_003FEngine_003FSource_003FThirdParty_003FVulkan_003FVulkan_002EBuild_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AXofuqeb_002Easm_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003Fvar_003Ffolders_003Ftn_003F6hbclrt96gv2_005Fys2s_005Fx6x4rh0000gn_003FT_003FSandboxFiles_003FHeqyhyk_003FXofuqeb_002Easm/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5e87dcd0_002D81fe_002D4b4a_002D9017_002Df6784eae705a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from BarkTextMultiLineTest.cpp" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Or&gt;
+    &lt;ProjectFile&gt;9106F79E-B0E4-2AB9-AB66-84CCF0980358/d:Private/d:Tests/f:BarkTextMultiLineTest.cpp&lt;/ProjectFile&gt;
+    &lt;TestAncestor&gt;
+      &lt;TestId&gt;UnrealTest::9106F79E-B0E4-2AB9-AB66-84CCF0980358::::Private.Tests.BarkRequestTest&lt;/TestId&gt;
+    &lt;/TestAncestor&gt;
+  &lt;/Or&gt;
+&lt;/SessionState&gt;</s:String>
 	
 	
 	

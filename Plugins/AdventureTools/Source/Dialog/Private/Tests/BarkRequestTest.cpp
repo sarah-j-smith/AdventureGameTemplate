@@ -12,12 +12,14 @@ void BarkRequestTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FStri
 		TEXT("Two lines one very long"),
 		TEXT("Four short lines of text"),
 		TEXT("Four lines of text one long"),
+		TEXT("Text used in an actual game"),
 	});
 	OutTestCommands.Append({
 		TEXT("Simply_one_line_of_text"),
 		TEXT("Two_lines_one_very_long"),
 		TEXT("Four_short_lines_of_text"),
 		TEXT("Four_lines_of_text_one_long"),
+		TEXT("Game_text"),
 	});
 }
 

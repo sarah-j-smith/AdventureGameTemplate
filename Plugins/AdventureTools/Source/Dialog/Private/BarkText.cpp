@@ -31,6 +31,18 @@ bool UBarkText::IsPlayerRequest() const
 void UBarkText::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
+    
+    static int debugCount = 0;
+    
+    if (debugCount++ % 50 == 0 || (bIsBarking && BarkLineTimer <= 0.0f))
+    {
+        UE_LOG(LogDialog, Log, TEXT("%0.2f - isBarking: %s"), BarkLineTimer, (bIsBarking ? TEXT("true") : TEXT("false")));
+        if (bIsBarking)
+        {
+            UE_LOG(LogDialog, Log, TEXT("   IsRenderTransitionSet: %s"), (IsRenderTransitionSet ? TEXT("true") : TEXT("false")));
+            UE_LOG(LogDialog, Log, TEXT("   IsOneLineAtMinimumSet: %s"), (IsOneLineAtMinimumSet ? TEXT("true") : TEXT("false")));
+        }
+    }
 
     if (bIsBarking && IsRenderTransitionSet && IsOneLineAtMinimumSet)
     {
@@ -85,8 +97,8 @@ void UBarkText::SetPositionProvider(IPositionProvider* APositionProvider)
 
 void UBarkText::AddBarkRequest(const FBarkRequest *BarkRequest)
 {
-    UE_LOG(LogDialog, Warning, TEXT("AddBarkRequest"));
-    FBarkRequest::Dump(const_cast<FBarkRequest *>(BarkRequest));
+    UE_LOG(LogDialog, Warning, TEXT("AddBarkRequest - %d lines"), BarkRequest->GetLineCount());
+    // FBarkRequest::Dump(const_cast<FBarkRequest *>(BarkRequest));
     AddToLinkedList(BarkRequest);
     if (!bIsBarking)
     {
@@ -102,14 +114,9 @@ void UBarkText::SetText(const FText &NewText)
     APlayerController* PlayerController = GetOwningPlayer();
     check(PlayerController);
     check(BarkLineClass);
-    DumpBarkText();
     if (BarkContainer->GetChildrenCount() >= G_MAX_BARK_LINES)
     {
-        UWidget *OldChild = BarkContainer->GetChildAt(0);
-        BarkContainer->ShiftChild(2, OldChild);
-        UBarkLine *BarkLine = Cast<UBarkLine>(OldChild);
-        BarkLine->Text->SetText(NewText);
-        return;
+        BarkContainer->RemoveChildAt(0);
     }
     UUserWidget* Widget = CreateWidget(PlayerController, BarkLineClass);
     if (UBarkLine* BarkLine = Cast<UBarkLine>(Widget))
@@ -182,7 +189,7 @@ void UBarkText::LoadNextBarkRequest()
     BarkLines.Empty();
     CurrentBarkRequest->GetBarkLines(BarkLines);
     CurrentUID = CurrentBarkRequest->GetUID();
-    UE_LOG(LogDialog, Verbose, TEXT("LoadNextBarkRequest: %d - %s - duration: %0.2f"), CurrentUID, 
+    UE_LOG(LogDialog, VeryVerbose, TEXT("LoadNextBarkRequest: %d - %s - duration: %0.2f"), CurrentUID, 
         *BarkLines[0].ToString(), CurrentBarkRequest->GetDuration());
     BarkPosition = CurrentBarkRequest->GetPosition();
     if (!IsValid(BarkPosition))
@@ -291,7 +298,7 @@ void UBarkText::SetBarkLineTimer()
 {
     BarkLineTimer = CurrentBarkRequest ? CurrentBarkRequest->GetDurationForLine(CurrentBarkLine) : BarkLineDisplayTime;
     bIsBarking = true;
-    UE_LOG(LogDialog, VeryVerbose, TEXT("#### SetBarkLineTimer: %f"), BarkLineTimer);
+    UE_LOG(LogDialog, Warning, TEXT("#### SetBarkLineTimer: %f"), BarkLineTimer);
 }
 
 void UBarkText::ClearBarkLineTimer()
@@ -314,8 +321,9 @@ void UBarkText::DumpBarkText()
         i++;
     }
 
-    for (FText Text : BarkLines)
+    for (int line = CurrentBarkLine; line < BarkLines.Num(); line++)
     {
+        const FText &Text = BarkLines[line];
         UE_LOG(LogDialog, VeryVerbose, TEXT("Queued Barkline: %d - %s"), i, *(Text.ToString()));
     }
 }
