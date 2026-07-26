@@ -1,3 +1,5 @@
+[![CMake on multiple platforms](https://github.com/sarah-j-smith/AdventureGameTemplate/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/sarah-j-smith/AdventureGameTemplate/actions/workflows/cmake-multi-platform.yml)
+
 # 2D Point and Click Adventure Game Plugin
 
 * Current status: working - still much to do
