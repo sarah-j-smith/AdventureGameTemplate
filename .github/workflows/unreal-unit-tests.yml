@@ -32,14 +32,13 @@ jobs:
       - name: AdventureGameTemplate checkout code
         uses: actions/checkout@v6.1.0
         with:
-          path: /project
           lfs: true
 
       - name: PaperZD checkout code
         uses: actions/checkout@v6.1.0
         with:
           repository: https://github.com/heavybullets/PaperZD
-          path: /project/Plugins
+          path: ${GITHUB_WORKSPACE}/Plugins
           ref: v2.2.4
 
       - name: Build project
