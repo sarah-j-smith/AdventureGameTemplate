@@ -18,3 +18,32 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+
+      volumes:
+        - /project
+
+    steps:
+      - name: AdventureGameTemplate checkout code
+        uses: actions/checkout@v4.4.0
+        with:
+          path: /project
+          lfs: true
+
+      - name: PaperZD checkout code
+        uses: actions/checkout@v4.4.0
+        with:
+          repository: https://github.com/heavybullets/PaperZD
+          path: /project/Plugins
+          ref: v2.2.4
+
+      - name: Build project
+        working-directory: /project
+        run: |
+          sed -i 's/"EngineVersion":.*/"EngineVersion": "5.6.0",/g' Plugins/PaperZD/PaperZD.uplugin
+          ./Scripts/Build.sh
+
+      - name: Tests
+        working-directory: /project
+        run: |
+          ./Scripts/Test.sh
+          
