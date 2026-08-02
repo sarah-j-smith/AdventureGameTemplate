@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Check credentials
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_IO_USERNAME }} --password-stdin
+          echo "${{ secrets.REPO_ACCESS_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_IO_USERNAME }} --password-stdin
           
   build:
     # Containers require a Linux-based runner host
@@ -25,12 +25,9 @@ jobs:
       image: ghcr.io/epicgames/unreal-engine:dev-5.6.1
       credentials:
         username: ${{ secrets.GHCR_IO_USERNAME }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ secrets.REPO_ACCESS_TOKEN }}
       volumes:
         - /project
-        
-    permissions:
-      packages: read # this you also need
 
     steps:
       - name: AdventureGameTemplate checkout code
