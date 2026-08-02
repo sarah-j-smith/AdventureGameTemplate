@@ -37,18 +37,16 @@ jobs:
       - name: PaperZD checkout code
         uses: actions/checkout@v6.1.0
         with:
-          repository: https://github.com/heavybullets/PaperZD
+          repository: heavybullets/PaperZD
           path: ${GITHUB_WORKSPACE}/Plugins
           ref: v2.2.4
 
       - name: Build project
-        working-directory: /project
         run: |
           sed -i 's/"EngineVersion":.*/"EngineVersion": "5.6.0",/g' Plugins/PaperZD/PaperZD.uplugin
           ./Scripts/Build.sh
 
       - name: Tests
-        working-directory: /project
         run: |
           ./Scripts/Test.sh
           
