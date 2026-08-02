@@ -1,0 +1,18 @@
+﻿services:
+  unreal:
+    # Requires membership of the Epic Games Github organisation and acceptance of the Terms
+    # https://github.com/orgs/epicgames/packages/container/unreal-engine/492471794?tag=dev-5.6.1
+    #
+    # To run this locally, must do a podman / docker login to the Github container registry
+    # - version with templates and debug symbols - ghcr.io/epicgames/unreal-engine:dev-5.6.1
+    image: ghcr.io/epicgames/unreal-engine:dev-slim-5.6.1
+    volumes:
+      - ./Source:/project
+      - ./Scripts/Build.sh:/home/ue4/Build.sh
+      - ./AdventureTemplate.uproject:/home/ue4/AdventureTemplate.uproject
+    stdin_open: true # Equivalent to docker run -i
+    tty: true        # Equivalent to docker run -t
+    command:
+      - /usr/bin/bash /home/
+      - cd /home/ue4 && /usr/bin/bash ./Build.sh
+

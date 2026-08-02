@@ -89,7 +89,7 @@ void UItemSlot::SetButtonImageFromInventoryItem(const UItem* Item)
 #if WITH_EDITOR
 	NewBrush.SetResourceObject(Item->Thumbnail->GetSourceTexture());
 #else
-	NewBrush.SetResourceObject(AnInventoryItem->Thumbnail->GetBakedTexture());
+	NewBrush.SetResourceObject(Item->Thumbnail->GetBakedTexture());
 #endif
 	ItemSlot->SetBrush(NewBrush);
 }

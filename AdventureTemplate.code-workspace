@@ -1,0 +1,634 @@
+{
+	"folders": [
+		{
+			"name": "AdventureTemplate",
+			"path": "."
+		},
+		{
+			"name": "UE5",
+			"path": "/home/ue4/UnrealEngine"
+		}
+	],
+	"settings": {
+		"typescript.tsc.autoDetect": "off",
+		"npm.autoDetect": "off",
+		"terminal.integrated.env.linux": {
+			"PATH": "/home/ue4/UnrealEngine/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64:${env:PATH}",
+			"DOTNET_ROOT": "/home/ue4/UnrealEngine/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64",
+			"DOTNET_HOST_PATH": "/home/ue4/UnrealEngine/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64/dotnet",
+			"DOTNET_MULTILEVEL_LOOKUP": "0",
+			"DOTNET_ROLL_FORWARD": "LatestMajor"
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools",
+			"ms-dotnettools.csharp"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "AdventureTemplate Linux Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Debug",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Debug",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"AdventureTemplate Linux Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Debug",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"DebugGame",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"DebugGame",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"AdventureTemplate Linux DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"DebugGame",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Development",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Development",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"AdventureTemplate Linux Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Development",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Test Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Test",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Test Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Test",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"AdventureTemplate Linux Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Test Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Test",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Shipping Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Shipping",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Shipping Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Shipping",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"AdventureTemplate Linux Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplate Linux Shipping Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplate",
+					"Linux",
+					"Shipping",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplateEditor Linux Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplateEditor",
+					"Linux",
+					"Debug",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplateEditor Linux Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplateEditor",
+					"Linux",
+					"Debug",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"AdventureTemplateEditor Linux Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplateEditor Linux Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplateEditor",
+					"Linux",
+					"Debug",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplateEditor Linux DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplateEditor",
+					"Linux",
+					"DebugGame",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplateEditor Linux DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplateEditor",
+					"Linux",
+					"DebugGame",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"AdventureTemplateEditor Linux DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplateEditor Linux DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplateEditor",
+					"Linux",
+					"DebugGame",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplateEditor Linux Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplateEditor",
+					"Linux",
+					"Development",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplateEditor Linux Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplateEditor",
+					"Linux",
+					"Development",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"AdventureTemplateEditor Linux Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"label": "AdventureTemplateEditor Linux Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"AdventureTemplateEditor",
+					"Linux",
+					"Development",
+					"/project/AdventureTemplate.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/ue4/UnrealEngine"
+				}
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch AdventureTemplate (Debug)",
+				"request": "launch",
+				"program": "/project/Binaries/Linux/UnrealGame-Linux-Debug",
+				"preLaunchTask": "AdventureTemplate Linux Debug Build",
+				"args": [
+				],
+				"cwd": "/home/ue4/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/ue4/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/project": "/project",
+					"/UEVFS/Root": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"name": "Launch AdventureTemplate (DebugGame)",
+				"request": "launch",
+				"program": "/project/Binaries/Linux/UnrealGame-Linux-DebugGame",
+				"preLaunchTask": "AdventureTemplate Linux DebugGame Build",
+				"args": [
+				],
+				"cwd": "/home/ue4/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/ue4/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/project": "/project",
+					"/UEVFS/Root": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"name": "Launch AdventureTemplate (Development)",
+				"request": "launch",
+				"program": "/project/Binaries/Linux/UnrealGame",
+				"preLaunchTask": "AdventureTemplate Linux Development Build",
+				"args": [
+				],
+				"cwd": "/home/ue4/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/ue4/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/project": "/project",
+					"/UEVFS/Root": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"name": "Launch AdventureTemplate (Test)",
+				"request": "launch",
+				"program": "/project/Binaries/Linux/UnrealGame-Linux-Test",
+				"preLaunchTask": "AdventureTemplate Linux Test Build",
+				"args": [
+				],
+				"cwd": "/home/ue4/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/ue4/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/project": "/project",
+					"/UEVFS/Root": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"name": "Launch AdventureTemplate (Shipping)",
+				"request": "launch",
+				"program": "/project/Binaries/Linux/UnrealGame-Linux-Shipping",
+				"preLaunchTask": "AdventureTemplate Linux Shipping Build",
+				"args": [
+				],
+				"cwd": "/home/ue4/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/ue4/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/project": "/project",
+					"/UEVFS/Root": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"name": "Launch AdventureTemplateEditor (Debug)",
+				"request": "launch",
+				"program": "/home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor-Linux-Debug",
+				"preLaunchTask": "AdventureTemplateEditor Linux Debug Build",
+				"args": [
+					"/project/AdventureTemplate.uproject"
+				],
+				"cwd": "/home/ue4/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/ue4/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/project": "/project",
+					"/UEVFS/Root": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"name": "Launch AdventureTemplateEditor (DebugGame)",
+				"request": "launch",
+				"program": "/home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor-Linux-DebugGame",
+				"preLaunchTask": "AdventureTemplateEditor Linux DebugGame Build",
+				"args": [
+					"/project/AdventureTemplate.uproject"
+				],
+				"cwd": "/home/ue4/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/ue4/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/project": "/project",
+					"/UEVFS/Root": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"name": "Launch AdventureTemplateEditor (Development)",
+				"request": "launch",
+				"program": "/home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor",
+				"preLaunchTask": "AdventureTemplateEditor Linux Development Build",
+				"args": [
+					"/project/AdventureTemplate.uproject"
+				],
+				"cwd": "/home/ue4/UnrealEngine",
+				"type": "cppdbg",
+				"visualizerFile": "/home/ue4/UnrealEngine/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/project": "/project",
+					"/UEVFS/Root": "/home/ue4/UnrealEngine"
+				}
+			},
+			{
+				"name": "Generate Project Files",
+				"type": "coreclr",
+				"request": "launch",
+				"preLaunchTask": "UnrealBuildTool Linux Development Build",
+				"program": "/home/ue4/UnrealEngine/Engine/Build/BatchFiles/RunUBT.bat",
+				"args": [
+					"-projectfiles",
+					"-vscode",
+					"-engine",
+					"-dotnet"
+				],
+				"env": {
+					"PATH": "/home/ue4/UnrealEngine/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64:${env:PATH}",
+					"DOTNET_ROOT": "/home/ue4/UnrealEngine/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64",
+					"DOTNET_HOST_PATH": "/home/ue4/UnrealEngine/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64/dotnet",
+					"DOTNET_MULTILEVEL_LOOKUP": "0",
+					"DOTNET_ROLL_FORWARD": "LatestMajor"
+				},
+				"console": "internalConsole",
+				"internalConsoleOptions": "openOnSessionStart",
+				"stopAtEntry": false,
+				"cwd": "/home/ue4/UnrealEngine"
+			}
+		]
+	}
+}

@@ -1,5 +1,6 @@
 # Visual Studio 2015 user specific files
 .vs/
+.vscode/
 
 # IntelliJ config files
 .idea/
@@ -55,6 +56,9 @@ Plugins/**/Binaries/*
 # Builds
 Build/*
 
+#Logs
+Logs/*
+
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
 Build/*/**
@@ -72,6 +76,9 @@ Saved/*
 # Compiled source files for the engine to use
 Intermediate/*
 Plugins/**/Intermediate/*
+
+# Ignore build files from PaperZD
+Plugins/PaperZD
 
 # Cache files for the editor to use
 DerivedDataCache/*

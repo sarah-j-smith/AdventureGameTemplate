@@ -1,0 +1,34 @@
+# Name of the project and uproject file - 
+# eg should have a PROJECT_NAME.uproject file in the top level
+PROJECT_NAME=AdventureTemplate
+
+# Directory inside the container where the project tree is mounted
+# and this is where the PROJECT_NAME.uproject file should be
+PROJECT_DIR=/project
+
+# Needed to prevent the dotNet environment crashing due to memory protection issues
+export DOTNET_EnableWriteXorExecute=0
+
+# Path to this directory inside the build container - add our config into this container's config
+SCRIPT_PATH=$(dirname $0)
+CONFIG_FILE="${SCRIPT_PATH}/BuildConfiguration.xml"
+cat $CONFIG_FILE > "/home/ue4/.config/Unreal Engine/UnrealBuildTool/BuildConfiguration.xml"
+
+# Path to the build scripts in the containerised linux Unreal Engine install
+UE_BATCH_FILES="/home/ue4/UnrealEngine/Engine/Build/BatchFiles/Linux"
+
+mkdir -p "{PROJECT_DIR}/Logs"
+
+TIMESTAMP=$(date "+%Y-%m0%d_%H0%M-%S")
+
+# Configure and build
+${UE_BATCH_FILES}/GenerateProjectFiles.sh \
+  -Minimize -Log=/project/Logs/Build-1.log \
+  -Platforms=Linux -TargetTypes=Editor -TargetConfigurations=Development \
+   ${PROJECT_DIR}/${PROJECT_NAME}.uproject \
+   \
+   && \
+   \   
+${UE_BATCH_FILES}/Build.sh "${PROJECT_NAME}Editor" Linux Development \
+    ${PROJECT_DIR}/${PROJECT_NAME}.uproject -waitmutex \
+    -archivedirectory=/project/Packaged

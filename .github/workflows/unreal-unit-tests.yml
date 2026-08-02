@@ -1,0 +1,20 @@
+name: Unreal Engine Unit tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+      
+jobs:
+  build:
+    # Containers require a Linux-based runner host
+    runs-on: ubuntu-latest
+      
+    container:
+      # Requires membership of the Epic Games Github organisation and acceptance of the Terms
+      # https://github.com/orgs/epicgames/packages/container/unreal-engine/492471794?tag=dev-5.6.1
+      image: ghcr.io/epicgames/unreal-engine:dev-5.6.1
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
