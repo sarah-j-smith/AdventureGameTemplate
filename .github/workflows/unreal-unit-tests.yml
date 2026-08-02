@@ -7,14 +7,6 @@ on:
     branches: [ "main" ]
       
 jobs:
-  check_creds:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check credentials
-        run: |
-          echo "${{ secrets.REPO_ACCESS_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_IO_USERNAME }} --password-stdin
-          
   build:
     # Containers require a Linux-based runner host
     runs-on: ubuntu-latest
@@ -22,22 +14,29 @@ jobs:
     container:
       # Requires membership of the Epic Games Github organisation and acceptance of the Terms
       # https://github.com/orgs/epicgames/packages/container/unreal-engine/492471794?tag=dev-5.6.1
-      image: ghcr.io/epicgames/unreal-engine:dev-5.6.1
+      # Note that here I use a specifically created PAT with access only to the packages, the PAT has 
+      # no privileges to operate on any of the rest of my github. I add that to the secrets manager
+      # in github, along with the username I access github with. By doing this I avoid the need to 
+      # add the 
+      #   `permissions: packages`
+      # that is required if using the GitHub supplied vars - https://stackoverflow.com/a/78866108/813919
+      image: ghcr.io/epicgames/unreal-engine:dev-slim-5.6.1
       credentials:
         username: ${{ secrets.GHCR_IO_USERNAME }}
         password: ${{ secrets.REPO_ACCESS_TOKEN }}
+      options: --user root
       volumes:
         - /project
 
     steps:
       - name: AdventureGameTemplate checkout code
-        uses: actions/checkout@v4.4.0
+        uses: actions/checkout@v6.1
         with:
           path: /project
           lfs: true
 
       - name: PaperZD checkout code
-        uses: actions/checkout@v4.4.0
+        uses: actions/checkout@v6.1
         with:
           repository: https://github.com/heavybullets/PaperZD
           path: /project/Plugins
