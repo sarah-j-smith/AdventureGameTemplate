@@ -7,6 +7,14 @@ on:
     branches: [ "main" ]
       
 jobs:
+  check_creds:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check credentials
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_IO_USERNAME }} --password-stdin
+          
   build:
     # Containers require a Linux-based runner host
     runs-on: ubuntu-latest
