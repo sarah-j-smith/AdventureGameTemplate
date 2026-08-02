@@ -16,7 +16,7 @@ jobs:
       # https://github.com/orgs/epicgames/packages/container/unreal-engine/492471794?tag=dev-5.6.1
       image: ghcr.io/epicgames/unreal-engine:dev-5.6.1
       credentials:
-        username: ${{ github.actor }}
+        username: ${{ secrets.GHCR_IO_USERNAME }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
       volumes:
