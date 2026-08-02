@@ -26,9 +26,11 @@ jobs:
       credentials:
         username: ${{ secrets.GHCR_IO_USERNAME }}
         password: ${{ secrets.GITHUB_TOKEN }}
-
       volumes:
         - /project
+        
+    permissions:
+      packages: read # this you also need
 
     steps:
       - name: AdventureGameTemplate checkout code
