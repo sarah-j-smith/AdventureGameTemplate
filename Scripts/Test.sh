@@ -6,6 +6,11 @@ PROJECT_NAME=AdventureTemplate
 # and this is where the PROJECT_NAME.uproject file should be
 PROJECT_DIR=/project
 
+# Allow for GitHub actions
+if [[ -n $GITHUB_WORKSPACE ]]; then
+  PROJECT_DIR="${GITHUB_WORKSPACE}"
+fi 
+
 # Needed to prevent the dotNet environment crashing due to memory protection issues
 export DOTNET_EnableWriteXorExecute=0
 

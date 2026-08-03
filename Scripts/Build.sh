@@ -7,7 +7,7 @@ PROJECT_NAME=AdventureTemplate
 PROJECT_DIR=/project
 
 # Allow for GitHub actions
-if [ "${GITHUB_WORKSPACE}x" = "x" ]; then
+if [[ -n $GITHUB_WORKSPACE ]]; then
   PROJECT_DIR="${GITHUB_WORKSPACE}"
 fi 
 
