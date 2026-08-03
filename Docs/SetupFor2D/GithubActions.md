@@ -83,5 +83,5 @@ At present the file `unreal-unit-tests.yml` does the following:
 * Checks out the AdventureTemplate source code in the workdir (see above shell command)
 * Checks out the PaperZD plugin source code in `Plugins/PaperZD`
 * If the PaperZD plugin has a line `EngineVersion` then it patches that line to be "5.6.0"
-* Runs `./Scripts/Build.sh`
-* Runs `./Scripts/Test.sh`
+* Runs `./Scripts/Build.sh` and puts the builds in $PROJECT_DIR/Packaged
+* Runs `./Scripts/Test.sh` 

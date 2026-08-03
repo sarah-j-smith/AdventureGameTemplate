@@ -36,4 +36,4 @@ ${UE_BATCH_FILES}/GenerateProjectFiles.sh \
    \   
 ${UE_BATCH_FILES}/Build.sh "${PROJECT_NAME}Editor" Linux Development \
     ${PROJECT_DIR}/${PROJECT_NAME}.uproject -waitmutex \
-    -archivedirectory=/project/Packaged
+    -archivedirectory="${PROJECT_DIR}/Packaged"

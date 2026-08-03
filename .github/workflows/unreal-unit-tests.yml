@@ -16,7 +16,6 @@ jobs:
       credentials:
         username: ${{ secrets.GHCR_IO_USERNAME }}
         password: ${{ secrets.REPO_ACCESS_TOKEN }}
-      options: --user root
       volumes:
         - /project
 
