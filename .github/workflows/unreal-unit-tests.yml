@@ -43,11 +43,10 @@ jobs:
 
       - name: Build project
         run: |
-          pwd && env && ls -l -a
-          sed -i 's/"EngineVersion":.*/"EngineVersion": "5.6.0",/g' Plugins/PaperZD/PaperZD.uplugin
-          ./Scripts/Build.sh
+          grep -q EngineVersion Plugins/PaperZD/PaperZD.uplugin && sed -i 's/"EngineVersion":.*/"EngineVersion": "5.6.0",/g' Plugins/PaperZD/PaperZD.uplugin
+          /usr/bin/bash -X ./Scripts/Build.sh
 
       - name: Tests
         run: |
-          ./Scripts/Test.sh
+          /usr/bin/bash -X ./Scripts/Test.sh
           
