@@ -12,14 +12,6 @@ jobs:
     runs-on: ubuntu-latest
       
     container:
-      # Requires membership of the Epic Games Github organisation and acceptance of the Terms
-      # https://github.com/orgs/epicgames/packages/container/unreal-engine/492471794?tag=dev-5.6.1
-      # Note that here I use a specifically created PAT with access only to the packages, the PAT has 
-      # no privileges to operate on any of the rest of my github. I add that to the secrets manager
-      # in github, along with the username I access github with. By doing this I avoid the need to 
-      # add the 
-      #   `permissions: packages`
-      # that is required if using the GitHub supplied vars - https://stackoverflow.com/a/78866108/813919
       image: ghcr.io/epicgames/unreal-engine:dev-slim-5.6.1
       credentials:
         username: ${{ secrets.GHCR_IO_USERNAME }}
