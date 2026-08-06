@@ -23,9 +23,13 @@ cat $CONFIG_FILE > "/home/ue4/.config/Unreal Engine/UnrealBuildTool/BuildConfigu
 UE_BINARIES_FILES="/home/ue4/UnrealEngine/Engine/Binaries/Linux"
 
 mkdir -p "{PROJECT_DIR}/Logs"
+mkdir -p "{PROJECT_DIR}/Reports"
 
 TIMESTAMP=$(date "+%Y-%m0%d_%H0%M-%S")
 
 /home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor "${PROJECT_DIR}/${PROJECT_NAME}.uproject" \
-  -execcmds="Automation RunTests AdventureGame.Dialog.ConversationDataTest+Private.Tests.BarkTextMultiLineTest;Quit" \
-  -stdout -unattended -NOSPLASH -AllowStdOutLogVerbosity -NullRHI
+   -execcmds="Automation RunTests AdventureGame.Dialog.ConversationDataTest+Private.Tests.BarkTextMultiLineTest;Quit" \
+   -stdout -unattended -NOSPLASH -AllowStdOutLogVerbosity -NullRHI \
+   -ReportExportPath="${PROJECT_DIR}/Reports" \
+   -AbsLog="${PROJECT_DIR}/Logs" \
+   -TestExit="Automation Test Queue Empty"

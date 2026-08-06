@@ -58,6 +58,7 @@ Build/*
 
 #Logs
 Logs/*
+Reports/*
 
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
