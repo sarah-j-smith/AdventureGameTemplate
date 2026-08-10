@@ -40,7 +40,7 @@ jobs:
 
       - name: Tests
         run: |
-          sudo -u ue4 bash -c '/usr/bin/bash -x ./Scripts/Test.sh'
+          sudo -E -u ue4 bash -c '/usr/bin/bash -x ./Scripts/Test.sh'
 
       - name: Results
         uses: dorny/test-reporter@v3.0.0
