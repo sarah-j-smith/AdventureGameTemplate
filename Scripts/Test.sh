@@ -27,6 +27,7 @@ mkdir -p "{PROJECT_DIR}/Reports"
 
 TIMESTAMP=$(date "+%Y-%m0%d_%H0%M-%S")
 
+# Outputs results in JSON format - can we get dart-json? https://github.com/dart-lang/test/blob/master/pkgs/test/doc/json_reporter.schema.json
 /home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor "${PROJECT_DIR}/${PROJECT_NAME}.uproject" \
    -execcmds="Automation RunTests AdventureGame.Dialog.ConversationDataTest+Private.Tests.BarkTextMultiLineTest;Quit" \
    -stdout -unattended -NOSPLASH -AllowStdOutLogVerbosity -NullRHI \
