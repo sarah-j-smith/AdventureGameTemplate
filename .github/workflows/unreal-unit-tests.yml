@@ -40,6 +40,7 @@ jobs:
 
       - name: Tests
         run: |
+          chown -R ue4:ue4 ${{ GITHUB_WORKSPACE }}
           sudo -E -u ue4 bash -c '/usr/bin/bash -x ./Scripts/Test.sh'
 
       - name: Results
