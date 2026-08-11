@@ -40,5 +40,14 @@ jobs:
 
       - name: Tests
         run: |
-          /usr/bin/bash -x ./Scripts/Test.sh
+          sudo -E -u ue4 bash -c '/usr/bin/bash -x ./Scripts/Test.sh'
+
+      - name: Results
+        uses: dorny/test-reporter@v3.0.0
+        with:
+          name: Unreal Engine Automation Tests
+          path: Reports/*.json
+          reporter: dart-json
+          
+          
           
