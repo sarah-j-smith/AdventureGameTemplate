@@ -1,4 +1,4 @@
-[![CMake on multiple platforms](https://github.com/sarah-j-smith/AdventureGameTemplate/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/sarah-j-smith/AdventureGameTemplate/actions/workflows/cmake-multi-platform.yml)
+[![.github/workflows/unreal-unit-tests.yml](https://github.com/sarah-j-smith/AdventureGameTemplate/actions/workflows/unreal-unit-tests.yml/badge.svg)](https://github.com/sarah-j-smith/AdventureGameTemplate/actions/workflows/unreal-unit-tests.yml)
 
 # 2D Point and Click Adventure Game Plugin
 
