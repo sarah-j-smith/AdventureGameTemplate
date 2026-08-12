@@ -16,6 +16,7 @@ jobs:
       credentials:
         username: ${{ secrets.GHCR_IO_USERNAME }}
         password: ${{ secrets.REPO_ACCESS_TOKEN }}
+      # Docker options - https://docs.docker.com/reference/cli/docker/container/create/#options
       options: --user 1001:1001
       volumes:
         - /project
@@ -38,6 +39,8 @@ jobs:
           ls -la 
           env
           id
+          whoami
+          la -la /home/ue4/UnrealEngine/Engine/Build/BatchFiles/Linux/*
           grep -q EngineVersion Plugins/PaperZD/PaperZD.uplugin && sed -i 's/"EngineVersion":.*/"EngineVersion": "5.6.0",/g' Plugins/PaperZD/PaperZD.uplugin
           /usr/bin/bash -x ./Scripts/Build.sh
 
