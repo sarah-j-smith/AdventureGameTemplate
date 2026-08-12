@@ -37,7 +37,7 @@ jobs:
       - name: Fix User Permissions
         run: |
           sudo groupadd -g 1001 runner
-          sudo useradd -u 1001 -g 1001 -m -U -s /bin/bash -d ${{ HOME }} runner
+          sudo useradd -u 1001 -g 1001 -U -s /bin/bash -d /github/home runner
           sudo chown -R 1001:1001 /home/ue4
 
       - name: Build project
