@@ -34,11 +34,14 @@ jobs:
           path: Plugins/PaperZD
           ref: v2.2.4
           
-      - name: Fix User Permissions
+      - name: Add User Permissions
         run: |
-          sudo groupadd -g 1001 runner
-          sudo useradd -u 1001 -g 1001 -U -s /bin/bash -d /github/home runner
-          sudo chown -R 1001:1001 /home/ue4
+          sudo groupadd -g 121 runner
+          sudo useradd -u 1001 -g 121 -U -s /bin/bash -d /github/home runner
+          
+      - name: Chown files
+        run: |
+          sudo chown -R runner:runner /home/ue4
 
       - name: Build project
         run: |
