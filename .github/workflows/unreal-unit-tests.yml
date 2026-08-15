@@ -17,9 +17,7 @@ jobs:
         username: ${{ secrets.GHCR_IO_USERNAME }}
         password: ${{ secrets.REPO_ACCESS_TOKEN }}
       # Docker options - https://docs.docker.com/reference/cli/docker/container/create/#options
-      options: --user 1001:1001
-      volumes:
-        - /project
+      options: --user root
 
     steps:
       - name: AdventureGameTemplate checkout code
@@ -34,15 +32,6 @@ jobs:
           path: Plugins/PaperZD
           ref: v2.2.4
           
-      - name: Add User Permissions
-        run: |
-          sudo groupadd -g 121 runner
-          sudo useradd -u 1001 -g 121 -U -s /bin/bash -d /github/home runner
-          
-      - name: Chown files
-        run: |
-          sudo chown -R runner:runner /home/ue4
-
       - name: Build project
         run: |
           ls -la 
@@ -55,6 +44,7 @@ jobs:
 
       - name: Tests
         run: |
+          su ue4 -
           /usr/bin/bash -x ./Scripts/Test.sh'
 
       - name: Results
