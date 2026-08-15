@@ -38,6 +38,8 @@ jobs:
           env
           id
           whoami
+          chown -R ue4:ue4 .
+          su -p ue4 -
           ls -la /home/ue4/UnrealEngine/Engine/Build/BatchFiles/Linux/*
           grep -q EngineVersion Plugins/PaperZD/PaperZD.uplugin && sed -i 's/"EngineVersion":.*/"EngineVersion": "5.6.0",/g' Plugins/PaperZD/PaperZD.uplugin
           /usr/bin/bash -x ./Scripts/Build.sh
@@ -45,6 +47,8 @@ jobs:
       - name: Tests
         run: |
           su -p ue4 -
+          id
+          whoami
           /usr/bin/bash -x ./Scripts/Test.sh
 
       - name: Results
