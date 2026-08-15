@@ -45,7 +45,7 @@ jobs:
       - name: Tests
         run: |
           su -p ue4 -
-          /usr/bin/bash -x ./Scripts/Test.sh'
+          /usr/bin/bash -x ./Scripts/Test.sh
 
       - name: Results
         uses: dorny/test-reporter@v3.0.0
