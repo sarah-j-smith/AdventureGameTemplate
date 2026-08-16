@@ -18,13 +18,9 @@ jobs:
         password: ${{ secrets.REPO_ACCESS_TOKEN }}
       # Docker options - https://docs.docker.com/reference/cli/docker/container/create/#options
       # ue4 user in the unreal engine container is uid 1000, gid 1000, has passwordless sudo
-      options: --user 1000
+      options: --user root
 
-    steps:
-      - name: Check permissions
-        run: |
-          sudo chown -R 1001:121 $(pwd)
-          
+    steps:          
       - name: AdventureGameTemplate checkout code
         uses: actions/checkout@v6.1.0
         with:
@@ -46,9 +42,7 @@ jobs:
 
       - name: Tests
         run: |
-          id
-          whoami
-          /usr/bin/bash -x ./Scripts/Test.sh
+          su ue4 -c "/usr/bin/bash -x ./Scripts/Test.sh"
 
       - name: Results
         uses: dorny/test-reporter@v3.0.0
