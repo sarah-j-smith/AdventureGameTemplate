@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@v6.1.0
         with:
           lfs: true
+          set-safe-directory: $GITHUB_WORKSPACE
 
       - name: PaperZD checkout code
         uses: actions/checkout@v6.1.0
@@ -36,7 +37,7 @@ jobs:
       - name: Build project
         run: |
           grep -q EngineVersion Plugins/PaperZD/PaperZD.uplugin && sed -i 's/"EngineVersion":.*/"EngineVersion": "5.6.0",/g' Plugins/PaperZD/PaperZD.uplugin
-          /usr/bin/bash ./Scripts/Build.sh
+          ./Scripts/Build.sh
 
       - name: Tests
         run: |
