@@ -36,12 +36,12 @@ jobs:
       - name: Build project
         run: |
           grep -q EngineVersion Plugins/PaperZD/PaperZD.uplugin && sed -i 's/"EngineVersion":.*/"EngineVersion": "5.6.0",/g' Plugins/PaperZD/PaperZD.uplugin
-          /usr/bin/bash -x ./Scripts/Build.sh
+          /usr/bin/bash ./Scripts/Build.sh
 
       - name: Tests
         run: |
           chown -R 1000:1000 $RUNNER_WORKSPACE
-          su ue4 -c "/usr/bin/env GITHUB_WORKSPACE=$GITHUB_WORKSPACE -x ./Scripts/Test.sh"
+          su ue4 -c "/usr/bin/env GITHUB_WORKSPACE=$GITHUB_WORKSPACE ./Scripts/Test.sh"
 
       - name: Results
         uses: dorny/test-reporter@v3.0.0

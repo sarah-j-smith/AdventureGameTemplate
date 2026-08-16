@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+set -e -x
+
 # Name of the project and uproject file - 
 # eg should have a PROJECT_NAME.uproject file in the top level
 PROJECT_NAME=AdventureTemplate
