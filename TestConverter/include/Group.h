@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <optional>
 
@@ -8,7 +10,7 @@ class Group {
   int id;
 
   // The name of the group, including prefixes from any containing groups.
-  std::string name;
+  std::wstring name;
 
   // The ID of the suite containing this group.
   int suiteID;
@@ -26,7 +28,7 @@ class Group {
   std::optional<int> column;
 
   // The URL for the file in which the group was defined, or `null`.
-  std::optional<std::string> url;
+  std::optional<std::wstring> url;
 
   // This field is deprecated and should not be used.
   Metadata metadata;

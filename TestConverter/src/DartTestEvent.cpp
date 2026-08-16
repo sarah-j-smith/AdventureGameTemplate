@@ -18,25 +18,17 @@ json Event::ToJson() const
     return j2;
 }
 
-std::optional<std::string> Event::JsonLine() const
-{
-    const json j2 = ToJson();
-    return j2.dump();
-}
-
-std::string Event::Serialize() const
+std::wstring Event::Serialize() const
 {
     try {
-        const auto result = JsonLine();
-        if (result.has_value()) {
-            return result.value();
-        }
+        json j2 = ToJson();
+        return j2.dump();
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Error in" << type << e.what() << '\n';
+        std::cerr << "Error in " << type << " - " << e.what() << '\n';
     }
-    return std::string();
+    return std::wstring();
 }
 
 ///////////////////////////////////
@@ -87,6 +79,9 @@ void AllSuitesEvent::AddData(const json &Data)
         // for now only support a single test suite - that can have groups and multiple tests
         count = 1;
     }
-    catch
+    catch(std::exception e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 }
 

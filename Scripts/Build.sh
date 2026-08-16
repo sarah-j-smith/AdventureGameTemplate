@@ -22,18 +22,14 @@ cat $CONFIG_FILE > "/home/ue4/.config/Unreal Engine/UnrealBuildTool/BuildConfigu
 # Path to the build scripts in the containerised linux Unreal Engine install
 UE_BATCH_FILES="/home/ue4/UnrealEngine/Engine/Build/BatchFiles/Linux"
 
-mkdir -p "{PROJECT_DIR}/Logs"
-
-TIMESTAMP=$(date "+%Y-%m0%d_%H0%M-%S")
+mkdir -p "${PROJECT_DIR}/Logs"
 
 # Configure and build
 ${UE_BATCH_FILES}/GenerateProjectFiles.sh \
-  -Minimize -Log=/project/Logs/Build-1.log \
+  -Minimize -Log="${PROJECT_DIR}/Logs/Build.log" \
   -Platforms=Linux -TargetTypes=Editor -TargetConfigurations=Development \
-   ${PROJECT_DIR}/${PROJECT_NAME}.uproject \
-   \
-   && \
-   \   
+   ${PROJECT_DIR}/${PROJECT_NAME}.uproject
+
 ${UE_BATCH_FILES}/Build.sh "${PROJECT_NAME}Editor" Linux Development \
     ${PROJECT_DIR}/${PROJECT_NAME}.uproject -waitmutex \
     -archivedirectory="${PROJECT_DIR}/Packaged"

@@ -7,7 +7,7 @@
       "platform": "LinuxEditor",
       "oSVersion": "Ubuntu 22.04.2 LTS 7.0.12-201.fc44.aarch64",
       "model": "Default",
-      "gPU": "UnknownVendor",
+      "gPL": "UnknownVendor",
       "cPUModel": "QEMU TCG CPU version 2.5+",
       "rAMInGB": 15,
       "renderMode": "SM6",

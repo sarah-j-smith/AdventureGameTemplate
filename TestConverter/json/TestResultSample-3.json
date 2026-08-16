@@ -7,7 +7,7 @@
 			"platform": "MacEditor",
 			"oSVersion": "macOS 26.5.2 25F84",
 			"model": "Default",
-			"gPU": "Apple M3 Max",
+			"gPL": "Apple M3 Max",
 			"cPUModel": "Apple M3 Max",
 			"rAMInGB": 36,
 			"renderMode": "SM6",

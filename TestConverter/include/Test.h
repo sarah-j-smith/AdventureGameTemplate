@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <vector>
 #include <optional>
@@ -9,7 +11,7 @@ class Test {
   int id;
 
   // The name of the test, including prefixes from any containing groups.
-  std::string name;
+  std::wstring name;
 
   // The ID of the suite containing this test.
   int suiteID;
@@ -25,7 +27,7 @@ class Test {
   std::optional<int> column;
 
   // The URL for the file in which the test was defined, or `null`.
-  std::optional<std::string> url;
+  std::optional<std::wstring> url;
 
   // The (1-based) line in the original test suite from which the test
   // originated.
@@ -42,7 +44,7 @@ class Test {
   // The URL for the original test suite in which the test was defined.
   //
   // Will only be present if different from `url`.
-  std::optional<std::string> root_url;
+  std::optional<std::wstring> root_url;
 
   // This field is deprecated and should not be used.
   Metadata metadata;

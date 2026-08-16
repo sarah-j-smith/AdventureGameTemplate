@@ -22,10 +22,8 @@ cat $CONFIG_FILE > "/home/ue4/.config/Unreal Engine/UnrealBuildTool/BuildConfigu
 # Path to the build scripts in the containerised linux Unreal Engine install
 UE_BINARIES_FILES="/home/ue4/UnrealEngine/Engine/Binaries/Linux"
 
-mkdir -p "{PROJECT_DIR}/Logs"
-mkdir -p "{PROJECT_DIR}/Reports"
-
-TIMESTAMP=$(date "+%Y-%m0%d_%H0%M-%S")
+mkdir -p "${PROJECT_DIR}/Logs"
+mkdir -p "${PROJECT_DIR}/Reports"
 
 # Outputs results in JSON format - can we get dart-json? https://github.com/dart-lang/test/blob/master/pkgs/test/doc/json_reporter.schema.json
 /home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor "${PROJECT_DIR}/${PROJECT_NAME}.uproject" \

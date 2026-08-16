@@ -6,43 +6,46 @@
 #define EXAMPLE_TEST_DATA_FILE_NAME "json/TestResultSample-2.json"
 
 /** https://github.com/nlohmann/json  */
-using json = nlohmann::json;
+using Json = nlohmann::json;
 
 #include "DartTestEvent.h"
-
+#include "TestModel.h"
 
 int main(int argc, char *argv[]) 
 {
-    const char *unrealTestDataFileName;
+    const char *UnrealTestDataFileName;
     if (argc > 1) // 0 is prog name, 1 is 1st arg
     {
-        unrealTestDataFileName = argv[1];
+        UnrealTestDataFileName = argv[1];
     }
     else
     {
-        unrealTestDataFileName = EXAMPLE_TEST_DATA_FILE_NAME;
+        UnrealTestDataFileName = EXAMPLE_TEST_DATA_FILE_NAME;
     }
 
     /// Read in the test data
-    json data;
-    std::ifstream unrealTestDataFile(unrealTestDataFileName);
+    Json Data;
+    std::ifstream UnrealTestDataFile(UnrealTestDataFileName);
     try {
-        data = json::parse(unrealTestDataFile);
+        Data = Json::parse(UnrealTestDataFile);
     } catch(std::exception e) {
-        std::cout << "Error reading file " << unrealTestDataFileName << ": " << e.what() << std::endl;
+        std::cout << "Error reading file " << UnrealTestDataFileName << ": " << e.what() << std::endl;
     }
 
     // std::cout << data.dump(2) << std::endl;
 
+    TestModel *Model = new TestModel();
+    Model->AddData(Data);
+
     {
         // {"protocolVersion":"0.1.0","runnerVersion":"0.12.13+1","type":"start","time":0}
         StartEvent start;
-        start.AddData(data);
-        std::cout << start.Serialize() << std::endl;
+        start.AddData(Data);
+        std::wcout << start.Serialize() << std::endl;
     }
 
     {
         auto allSuites = std::make_shared<AllSuitesEvent>();
-        allSuites->AddData(data);
+        allSuites->AddData(Data);
     }
 }

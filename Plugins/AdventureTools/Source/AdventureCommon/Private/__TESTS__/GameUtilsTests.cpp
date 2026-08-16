@@ -3,6 +3,10 @@
 #include "GameUtils.h"
 #include "Misc/AutomationTest.h"
 
+// https://minifloppy.it/posts/2024/automated-testing-specs-ue5/
+//  Should re-write these to use spec tests
+//  https://dev.epicgames.com/documentation/unreal-engine/automation-spec-in-unreal-engine?application_version=5.5&lang=en-US
+
 
 // #if WITH_DEV_AUTOMATION_TESTS
 

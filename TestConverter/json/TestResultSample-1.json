@@ -6,7 +6,7 @@
       "platform": "WindowsEditor",
       "oSVersion": "Windows Server 2022 (21H2) [10.0.20348.524] ",
       "model": "Default",
-      "gPU": "Microsoft Basic Display Adapter",
+      "gPL": "Microsoft Basic Display Adapter",
       "cPUModel": "Intel(R) Xeon(R) Platinum 8259CL CPU @ 2.50GHz",
       "rAMInGB": 127,
       "renderMode": "D3D11_SM5",

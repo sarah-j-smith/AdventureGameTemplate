@@ -35,14 +35,13 @@ jobs:
           
       - name: Build project
         run: |
-          id
-          whoami
           grep -q EngineVersion Plugins/PaperZD/PaperZD.uplugin && sed -i 's/"EngineVersion":.*/"EngineVersion": "5.6.0",/g' Plugins/PaperZD/PaperZD.uplugin
           /usr/bin/bash -x ./Scripts/Build.sh
 
       - name: Tests
         run: |
-          su ue4 -c "/usr/bin/bash -x ./Scripts/Test.sh"
+          chown -R 1000:1000 ${{ RUNNER_WORKSPACE }}
+          su ue4 -c "/usr/bin/env GITHUB_WORKSPACE=${{ GITHUB_WORKSPACE }} -x ./Scripts/Test.sh"
 
       - name: Results
         uses: dorny/test-reporter@v3.0.0

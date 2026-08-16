@@ -7,15 +7,11 @@
 
 #include "Test.h"
 
-#define PROTOCOL_VERSION "0.1.0"
-
-/** https://github.com/nlohmann/json  */
-using json = nlohmann::json;
 
 class Event
 {
 public:
-	std::string Serialize() const;
+	std::wstring Serialize() const;
 
 	/** 
 	 * Populate the event from the json data. 
@@ -28,12 +24,10 @@ protected:
 	// The type of the event.
 	//
 	// This is always one of the subclass types listed below.
-	std::string type;
+	std::wstring type;
 
 	// The time (in milliseconds) that has elapsed since the test runner started.
 	int time;
-
-	virtual std::optional<std::string> JsonLine() const = 0;
 
 	virtual json ToJson() const;
 };
@@ -52,18 +46,18 @@ public:
 
 protected:
 
-	std::string type = "start";
+	std::wstring type = L"start";
 
 	// The version of the JSON reporter protocol being used.
 	//
 	// This is a semantic version, but it reflects only the version of the
 	// protocol—it's not identical to the version of the test runner itself.
-	std::string protocolVersion = PROTOCOL_VERSION;
+	std::wstring protocolVersion = PROTOCOL_VERSION;
 
 	// The version of the test runner being used.
 	//
 	// This is null if for some reason the version couldn't be loaded.
-	std::optional<std::string> runnerVersion;
+	std::optional<std::wstring> runnerVersion;
 
 	// The pid of the VM process running the tests.
 	std::optional<int> pid;
@@ -85,7 +79,7 @@ public:
 
 protected:
 
-	std::string type = "allSuites";
+	std::wstring type = L"allSuites";
 
 	/// The total number of suites that will be loaded.
 	int count;
@@ -107,10 +101,10 @@ public:
 
 protected:
 
-	std::string type = "suite";
+	std::wstring type = L"suite";
 
 	/// Metadata about the suite.
-	std::string suite;
+	std::wstring suite;
 
 	virtual json ToJson() const override;
 };
@@ -129,18 +123,18 @@ public:
 
 protected:
 
-	std::string type = "debug";
+	std::wstring type = L"debug";
 
 	/// The suite for which debug information is reported.
 	int suiteID;
 
 	/// The HTTP URL for the Dart Observatory, or `null` if the Observatory isn't
 	/// available for this suite.
-	std::optional<std::string> observatory;
+	std::optional<std::wstring> observatory;
 
 	/// The HTTP URL for the remote debugger for this suite's host page, or `null`
 	/// if no remote debugger is available for this suite.
-	std::optional<std::string> remoteDebugger;
+	std::optional<std::wstring> remoteDebugger;
 
 	virtual json ToJson() const override;
 };
@@ -160,10 +154,10 @@ public:
 
 protected:
 
-	std::string type = "group";
+	std::wstring type = L"group";
 
 	/// Metadata about the group.
-	std::string group;
+	std::wstring group;
 
 	virtual json ToJson() const override;
 };
@@ -183,7 +177,7 @@ public:
 
 protected:
 
-	std::string type = "testStart";
+	std::wstring type = L"testStart";
 
 	// Metadata about the test that started.
 	Test test;
@@ -206,16 +200,16 @@ public:
 
 protected:
 
-	std::string type = "print";
+	std::wstring type = L"print";
 
 	// The ID of the test that printed a message.
 	int testID;
 
 	// The type of message being printed.
-	std::string messageType;
+	std::wstring messageType;
 
 	// The message that was printed.
-	std::string message;
+	std::wstring message;
 
 	virtual json ToJson() const override;
 };
@@ -235,16 +229,16 @@ public:
 
 protected:
 
-	std::string type = "error";
+	std::wstring type = L"error";
 
 	// The ID of the test that experienced the error.
 	int testID;
 
 	// The result of calling toString() on the error object.
-	std::string error;
+	std::wstring error;
 
 	// The error's stack trace, in the stack_trace package format.
-	std::string stackTrace;
+	std::wstring stackTrace;
 
 	// Whether the error was a TestFailure.
 	bool isFailure;
@@ -267,7 +261,7 @@ public:
 
 protected:
 
-	std::string type = "testDone";
+	std::wstring type = L"testDone";
 
 	// The ID of the test that completed.
 	int testID;
@@ -278,7 +272,7 @@ protected:
 		  "failure" if the test had a TestFailure but no other errors.
 		  "error" if the test had an error other than a TestFailure.
 	  */
-	std::string result;
+	std::wstring result;
 
 	// Whether the test's result should be hidden.
 	bool hidden;
@@ -311,7 +305,7 @@ public:
 
 protected:
 
-	std::string type = "done";
+	std::wstring type = L"done";
 
 	// Whether all tests succeeded (or were skipped).
 	//

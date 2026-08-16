@@ -8,10 +8,12 @@
 /Scripts
 /.github
 /.git
+/TestConverter
 /.vscode
 /Intermediate
 /AdventureTemplate (IOS).xcworkspace
 /AdventureTemplate (TVOS).xcworkspace
+/Reports
 /.idea
 /Plugins/AdventureTools/Content
 /Plugins/AdventureTools/Intermediate
