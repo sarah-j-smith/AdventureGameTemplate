@@ -20,12 +20,14 @@ jobs:
       # ue4 user in the unreal engine container is uid 1000, gid 1000, has passwordless sudo
       options: --user root
 
-    steps:          
+    steps:
+      - name: Set safe directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        
       - name: AdventureGameTemplate checkout code
         uses: actions/checkout@v6.1.0
         with:
           lfs: true
-          set-safe-directory: $GITHUB_WORKSPACE
 
       - name: PaperZD checkout code
         uses: actions/checkout@v6.1.0
