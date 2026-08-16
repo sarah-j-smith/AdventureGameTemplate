@@ -18,13 +18,15 @@ jobs:
         password: ${{ secrets.REPO_ACCESS_TOKEN }}
       # Docker options - https://docs.docker.com/reference/cli/docker/container/create/#options
       # ue4 user in the unreal engine container is uid 1000, gid 1000, has passwordless sudo
-      options: --user ue4
+      options: --user 1000
 
     steps:
-      # The checkout runs as the github user 1000
-      - name: Fix permissions
+      - name: Check permissions
         run: |
-          sudo chown -R 1001:127 ${{ github.workspace }} 
+          id
+          whoami
+          ls -la 
+          pwd
           
       - name: AdventureGameTemplate checkout code
         uses: actions/checkout@v6.1.0
@@ -37,14 +39,6 @@ jobs:
           repository: heavybullets/PaperZD
           path: Plugins/PaperZD
           ref: v2.2.4
-          
-      # The checkout runs as the github user 1000
-      - name: Fix permissions again
-        run: |
-          id
-          whoami
-          ls -la
-          sudo chown -R 1001:127 ${{ github.workspace }} 
           
       - name: Build project
         run: |
