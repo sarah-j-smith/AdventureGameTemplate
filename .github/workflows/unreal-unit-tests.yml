@@ -23,10 +23,7 @@ jobs:
     steps:
       - name: Check permissions
         run: |
-          id
-          whoami
-          ls -la 
-          pwd
+          sudo chown -R 1001:121 $(pwd)
           
       - name: AdventureGameTemplate checkout code
         uses: actions/checkout@v6.1.0
