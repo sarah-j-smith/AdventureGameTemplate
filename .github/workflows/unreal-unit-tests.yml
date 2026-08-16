@@ -40,8 +40,8 @@ jobs:
 
       - name: Tests
         run: |
-          chown -R 1000:1000 ${{ RUNNER_WORKSPACE }}
-          su ue4 -c "/usr/bin/env GITHUB_WORKSPACE=${{ GITHUB_WORKSPACE }} -x ./Scripts/Test.sh"
+          chown -R 1000:1000 $RUNNER_WORKSPACE
+          su ue4 -c "/usr/bin/env GITHUB_WORKSPACE=$GITHUB_WORKSPACE -x ./Scripts/Test.sh"
 
       - name: Results
         uses: dorny/test-reporter@v3.0.0
