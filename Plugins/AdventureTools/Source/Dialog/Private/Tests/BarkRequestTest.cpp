@@ -45,5 +45,5 @@ bool BarkRequestTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("Color is correctly set to player color"), BarkRequest->GetColor(), 
 		G_Player_Default_Text_Colour.ToFColor(true));
 
-	return true;
+	return !HasAnyErrors();
 }

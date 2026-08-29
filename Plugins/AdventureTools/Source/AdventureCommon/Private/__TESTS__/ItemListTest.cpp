@@ -68,7 +68,5 @@ bool ItemListTest::RunTest(const FString& Parameters)
     {
         TestEqual(TEXT("After removal expect correct items"), ResultStrings[i], EnumStrings[i]);
     }
-    
-    // Make the test pass by returning true, or fail by returning false.
-    return true;
+    return !HasAnyErrors();
 }

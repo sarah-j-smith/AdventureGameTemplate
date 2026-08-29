@@ -60,10 +60,6 @@ Build/*
 Logs/*
 Reports/*
 
-#TestReporter
-TestReporter/build
-TestReporter/json/node_modules/*
-
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
 Build/*/**

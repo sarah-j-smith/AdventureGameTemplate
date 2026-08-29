@@ -3,9 +3,6 @@
 
 #include "ConversationTestUtils.h"
 
-// IMPLEMENT_SIMPLE_AUTOMATION_TEST(ConversationDataVerifyTest, "Dialog.ConversationDataVerifyTest",
-//                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
-
 IMPLEMENT_COMPLEX_AUTOMATION_TEST(ConversationDataVerifyTest, "AdventureGame.Dialog.ConversationDataVerifyTest",
      EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 
@@ -74,6 +71,5 @@ bool ConversationDataVerifyTest::RunTest(const FString& Parameters)
     const FString Expected = GetErrorMessageForTestName(Parameters);
     TestEqualSensitive(Parameters, ErrorText, Expected);
 
-    // Make the test pass by returning true, or fail by returning false.
-    return true;
+    return !HasAnyErrors();
 }

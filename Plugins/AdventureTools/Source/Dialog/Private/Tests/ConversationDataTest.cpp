@@ -29,5 +29,5 @@ bool ConversationDataTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("Query members second number"), PromptsToDisplay[1].PromptNumber, 1);
     TestEqual(TEXT("Query members second txt"), PromptsToDisplay[1].PromptNumber, 1);
 
-    return true;
+	return !HasAnyErrors();
 }

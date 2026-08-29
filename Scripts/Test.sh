@@ -29,9 +29,21 @@ UE_BINARIES_FILES="/home/ue4/UnrealEngine/Engine/Binaries/Linux"
 mkdir -p "${PROJECT_DIR}/Logs"
 mkdir -p "${PROJECT_DIR}/Reports"
 
+TESTS=""
+CONNECTOR=""
+for TEST_NAME in \
+  "Private.Tests" \
+  "AdventureGame" \
+  "Dialog" 
+do
+  TESTS+="${CONNECTOR}${TEST_NAME}"
+  CONNECTOR='+'
+done 
+
+
 # Outputs results in JSON format - can we get dart-json? https://github.com/dart-lang/test/blob/master/pkgs/test/doc/json_reporter.schema.json
 /home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor "${PROJECT_DIR}/${PROJECT_NAME}.uproject" \
-   -execcmds="Automation RunTests AdventureGame.Dialog.ConversationDataTest+Private.Tests.BarkTextMultiLineTest;Quit" \
+   -execcmds="Automation RunTests ${TESTS};Quit" \
    -stdout -unattended -NOSPLASH -AllowStdOutLogVerbosity -NullRHI \
    -ReportExportPath="${PROJECT_DIR}/Reports" \
    -AbsLog="${PROJECT_DIR}/Logs" \
