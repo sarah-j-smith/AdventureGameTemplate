@@ -47,7 +47,7 @@ jobs:
           su ue4 -c "/usr/bin/env GITHUB_WORKSPACE=$GITHUB_WORKSPACE ./Scripts/Test.sh"
 
       - name: Results
-        uses: sarah-j-smith/test-reporter-unreal@v1.0
+        uses: sarah-j-smith/test-reporter-unreal@v3.1.1
         with:
           name: Unreal Engine Automation Tests
           path: Reports/*.json
