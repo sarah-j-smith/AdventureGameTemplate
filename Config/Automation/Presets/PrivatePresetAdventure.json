@@ -1,0 +1,28 @@
+{
+	"id": "PrivatePresetAdventure",
+	"name": "PrivatePresetAdventure",
+	"enabledTests": [
+		"AdventureGame.Dialog.ConversationDataVerifyTest.Bad Order Sequence",
+		"AdventureGame.Dialog.ConversationDataVerifyTest.Bad Sub-Sequence",
+		"AdventureGame.Dialog.ConversationDataVerifyTest.Empty Text Item",
+		"AdventureGame.Dialog.ConversationDataVerifyTest.Empty Text Row",
+		"AdventureGame.Dialog.ConversationDataVerifyTest.Long Bad Sequence",
+		"AdventureGame.Dialog.ConversationDataVerifyTest.Single Use Error",
+		"AdventureGame.Dialog.ConversationDataTest",
+		"AdventureGame.Items.ItemListTest.Three Items, Remove First Item",
+		"AdventureGame.Items.ItemListTest.Three Items, Remove Last Item",
+		"AdventureGame.Items.ItemListTest.Three Items, Remove Middle Item",
+		"Private.Tests.BarkRequestTest.Four lines of text one long",
+		"Private.Tests.BarkRequestTest.Four short lines of text",
+		"Private.Tests.BarkRequestTest.Simply one line of text",
+		"Private.Tests.BarkRequestTest.Text used in an actual game",
+		"Private.Tests.BarkRequestTest.Two lines one very long",
+		"Private.Tests.BarkTextTest.Bark completed normally",
+		"Private.Tests.BarkTextTest.Bark interrupted",
+		"Private.Tests.GameUtilsTests.22 chars - medium bucket - one line",
+		"Private.Tests.GameUtilsTests.34 chars - long bucket - three lines",
+		"Private.Tests.GameUtilsTests.80 chars - extra long bucket - four lines",
+		"Private.Tests.GameUtilsTests.9 chars - short bucket - two lines",
+		"Private.Tests.BarkTextMultiLineTest"
+	]
+}
