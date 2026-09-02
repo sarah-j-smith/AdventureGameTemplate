@@ -30,6 +30,7 @@
 
 #include "DescribableItem.h"
 #include "Constants.h"
+#include "ItemDisposition.h"
 
 void UAdventureGameHUD::NativeOnInitialized()
 {

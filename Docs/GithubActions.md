@@ -2,15 +2,27 @@
 
 [Github Actions is a continuous integration platform] built into the Github code hosting platform.
 
-It can be used to make builds, and to run unit tests among other things.
+It can be used to make builds, and to run unit tests; among other things.
 
-At present the goal is to have it run some simple automation tests. The idea would be to have 
-anyone else who wants to contribute to the project be able to have their code checked by 
-a set of unit tests.
+The [test driver script] for this repo is in `.github/workflows/unreal-unit-tests.yml`. This script
+is run by Github when a PR is made or when the code is pushed into the `main` branch.
+
+The test script when executed by Github:
+
+* downloads the Unreal Engine official container image
+* checks out the source code for this project
+* and the source code for dependencies (currently just PaperZD)
+* builds the project inside the container
+* runs the tests inside the container
+* collects the test results and checks them using [my fork of test reporter]
+
+You can also do these steps locally if you have [membership to the Unreal Engine github repository].
 
 [Github Actions is a continuous integration platform]: https://docs.github.com/en/actions/get-started/quickstart
+[my fork of test reporter]: https://github.com/sarah-j-smith/test-reporter-unreal
+[membership to the Unreal Engine github repository]: https://github.com/EpicGames/Signup
 
-## Using the Github Hosted Unreal Docker images
+## Running the Unreal Engine container images
 
 This repo shows the container references in the `ghcr.io` repository for all different versions of
 Unreal Engine. The next section shows how to use these container references:
@@ -21,12 +33,15 @@ Requires membership of the Epic Games Github organisation and acceptance of the 
 
 ## Running the Docker Image locally
 
-* Install Podman or Docker
+* Install [Podman] or [Docker] and enable the command line tools
 * Run the commands below:
   * The login command will ask for a password to a GitHub account 
   * That account must be a member of the Epic Games github
 
-```
+[Podman]: https://podman-desktop.io/docs/installation
+[Docker]: https://www.docker.com/get-started/
+
+```shell
 podman login myuser@domain.com ghcr.io
 
 podman run --platform linux/amd64 --rm -ti \
@@ -75,7 +90,7 @@ to work.
     --entrypoint "tail" ghcr.io/epicgames/unreal-engine:dev-slim-5.6.1 "-f" "/dev/null"
 ```
 
-## The Yaml File Steps
+## Debugging problems with Github
 
 At present the file `unreal-unit-tests.yml` does the following:
 
@@ -85,3 +100,5 @@ At present the file `unreal-unit-tests.yml` does the following:
 * If the PaperZD plugin has a line `EngineVersion` then it patches that line to be "5.6.0"
 * Runs `./Scripts/Build.sh` and puts the builds in $PROJECT_DIR/Packaged
 * Runs `./Scripts/Test.sh` 
+
+If your PR or push to main fails then figure out which step went wrong and try it locally.

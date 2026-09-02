@@ -72,6 +72,11 @@ FBarkRequest* FBarkRequest::CreatePlayerMultilineRequest(const TArray<FText>& Ne
 		{
 			LineDuration = Duration * (static_cast<float>(Text.ToString().Len()) / static_cast<float>(BarkLinesNum));
 		}
+#if WITH_EDITOR
+		UE_LOG(LogDialog, Warning, TEXT(" > \"%s\" duration %s, calculated %f based characters"), 
+			*Text.ToString(), 
+			(ShouldCalculateDuration ? TEXT("look-up table") : TEXT("specified")), LineDuration);
+#endif
 		BarkLinesArray.Add(FLineInfo(false, FText(Text), LineDuration));
 	}
 	if (HasLongLines(NewBarkLines))

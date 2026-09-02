@@ -15,10 +15,10 @@ IMPLEMENT_COMPLEX_AUTOMATION_TEST(GameUtilsTests, "Private.Tests.GameUtilsTests"
 
 uint32 GetExpectedDurationForString(const FString &ParamName)
 {
-	if (ParamName == TEXT("22_medium_one_line"))   return 7;     // 22 chars - 20-30 bucket - one line
-	if (ParamName == TEXT("9_short_two_lines"))    return 5;     // 9 chars - < 10 short bucket - two lines
-	if (ParamName == TEXT("34_long_three_lines"))  return 14;    // 34 chars - 30-45 bucket - three lines
-	if (ParamName == TEXT("80_xxlong_four_lines"))  return 33;   // 80 chars - 45+ overflow bucket - four lines
+	if (ParamName == TEXT("22_medium_one_line"))   return 6;     // 22 chars - 20-30 bucket - one line
+	if (ParamName == TEXT("9_short_two_lines"))    return 3;     // 9 chars - < 10 short bucket - two lines
+	if (ParamName == TEXT("34_long_three_lines"))  return 99;    // 34 chars - 30-45 bucket - three lines
+	if (ParamName == TEXT("80_xxlong_four_lines"))  return 29;   // 80 chars - 45+ overflow bucket - four lines
 	UE_LOG(LogTemp, Fatal, TEXT("Unexpected test parameter %s"), *ParamName);
 	return 0;
 }
@@ -58,7 +58,7 @@ bool GameUtilsTests::RunTest(const FString& Parameters)
 	float GotDuration = FGameUtils::GetDisplayTimeForString(GetArgumentForString(Parameters));
 	float ExpectedDuration = GetExpectedDurationForString(Parameters);
 	TestEqual(TEXT("Duration is correct"), GotDuration, ExpectedDuration);
-	return true;
+	return !HasAnyErrors();
 }
 
 // #endif

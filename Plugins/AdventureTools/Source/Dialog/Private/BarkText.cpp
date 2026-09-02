@@ -196,7 +196,7 @@ void UBarkText::LoadNextBarkRequest()
     {
         // Invariant: any bark request with a null position is the player barking
         ensureAlwaysMsgf(CurrentBarkRequest->IsPlayer(), TEXT("All bark requests that are NPCs must have a bark position!"));
-        UE_LOG(LogDialog, VeryVerbose, TEXT("BarkPosition Invalid - using player position - GetAdventureCharacter"));
+        UE_LOG(LogDialog, VeryVerbose, TEXT("BarkPosition using player position - GetAdventureCharacter"));
         if (const IPositionProvider *HavePositionProvider = this->PositionProvider)
         {
             BarkPosition = HavePositionProvider->GetPosition();

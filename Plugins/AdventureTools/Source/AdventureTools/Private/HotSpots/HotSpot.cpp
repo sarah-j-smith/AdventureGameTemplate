@@ -109,25 +109,6 @@ void AHotSpot::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 
 UStoryAction* AHotSpot::ItemDataAssetForAction(EVerbType Verb) const
 {
-	// TODO - remove this bit of code once the deprecated OnUseSuccessItem and OnGiveSuccessItem are gone
-	if (Verb == EVerbType::Use)
-	{
-		if (UStoryAction *UseItem = OnUseSuccessItem.LoadSynchronous())
-		{
-			UE_LOG(LogAdventureGame, Warning, TEXT("OnUseSuccessItem is deprecated in %s - use OnItemActivated instead"),
-				*(ShortDescription.ToString()));
-			return UseItem;
-		}
-	}
-	else if (Verb == EVerbType::Give)
-	{
-		if (UStoryAction *UseItem = OnGiveSuccessItem.LoadSynchronous())
-		{
-			UE_LOG(LogAdventureGame, Warning, TEXT("OnGiveSuccessItem is deprecated in %s - use OnItemActivated instead"),
-				*(ShortDescription.ToString()));
-			return UseItem;
-		}
-	}
 	return OnItemActivated.GetItemDataAssetForAction(Verb);
 }
 
@@ -170,49 +151,98 @@ void AHotSpot::OnOpen_Implementation()
 {
 	IVerbInteractions::OnOpen_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On open"));
-	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "OpenDefaultText"), this);
+	if (auto ItemDataAsset = ItemDataAssetForAction(EVerbType::Open))
+	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+	}
+	else
+	{
+		BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "OpenDefaultText"), this);
+	}
 }
 
 void AHotSpot::OnGive_Implementation()
 {
 	IVerbInteractions::OnGive_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On give"));
-	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "GiveDefaultText"), this);
+	if (auto ItemDataAsset = ItemDataAssetForAction(EVerbType::Give))
+	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+	}
+	else
+	{
+		BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "GiveDefaultText"), this);
+	}
 }
 
 void AHotSpot::OnPickUp_Implementation()
 {
 	IVerbInteractions::OnPickUp_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Pickup"));
-	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PickUpDefaultText"), this);
+	if (auto ItemDataAsset = ItemDataAssetForAction(EVerbType::PickUp))
+	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+	}
+	else
+	{
+		BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PickUpDefaultText"), this);
+	}
 }
 
 void AHotSpot::OnTalkTo_Implementation()
 {
 	IVerbInteractions::OnTalkTo_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On talk to"));
-	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "TalkToDefaultText"), this);
+	if (auto ItemDataAsset = ItemDataAssetForAction(EVerbType::TalkTo))
+	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+	}
+	else
+	{
+		BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "TalkToDefaultText"), this);
+	}
 }
 
 void AHotSpot::OnLookAt_Implementation()
 {
 	IVerbInteractions::OnLookAt_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On look at"));
-	BarkProvider->BarkAndEnd(Description.IsEmpty() ? LOCTABLE(ITEM_STRINGS_KEY, "LookAtDefaultText") : Description, this);
+	if (auto ItemDataAsset = ItemDataAssetForAction(EVerbType::LookAt))
+	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+	}
+	else
+	{
+		BarkProvider->BarkAndEnd(Description.IsEmpty() ? LOCTABLE(ITEM_STRINGS_KEY, "LookAtDefaultText") : Description, this);
+	}
 }
 
 void AHotSpot::OnPull_Implementation()
 {
 	IVerbInteractions::OnPull_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On pull"));
-	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PullDefaultText"), this);
+	if (auto ItemDataAsset = ItemDataAssetForAction(EVerbType::Pull))
+	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+	}
+	else
+	{
+		BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PullDefaultText"), this);
+	}
 }
 
 void AHotSpot::OnPush_Implementation()
 {
 	IVerbInteractions::OnPush_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On push"));
-	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PushDefaultText"), this);
+	if (auto ItemDataAsset = ItemDataAssetForAction(EVerbType::Open))
+	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+	}
+	else
+	{
+		BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PushDefaultText"), this);
+	}
 }
 
 void AHotSpot::OnUse_Implementation()
@@ -223,7 +253,14 @@ void AHotSpot::OnUse_Implementation()
 	// terminal or a water-fountain then a custom script would need to be done.
 	IVerbInteractions::OnUse_Implementation();
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On use from AHotSpot default implement."));
-	BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "UseDefaultText"), this);
+	if (auto ItemDataAsset = ItemDataAssetForAction(EVerbType::Use))
+	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
+	}
+	else
+	{
+		BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "UseDefaultText"), this);
+	}
 }
 
 void AHotSpot::OnWalkTo_Implementation()
@@ -266,8 +303,9 @@ void AHotSpot::OnItemUsed_Implementation()
 void AHotSpot::OnItemGiven_Implementation()
 {
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Item Given"));
-	if (UStoryAction *ItemDataAsset = OnGiveSuccessItem.LoadSynchronous())
+	if (const auto ItemDataAsset = ItemDataAssetForAction(EVerbType::Open))
 	{
+		AssetActionComponent->OnItemActionSuccess(ItemDataAsset);
 		if (const UItemManager *ItemManager = ManagerProvider->GetItemManager(this))
 		{
 			if (ItemManager->SourceItemTag == ItemDataAsset->SourceItem)

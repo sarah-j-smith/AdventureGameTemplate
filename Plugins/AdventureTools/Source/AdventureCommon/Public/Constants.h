@@ -72,7 +72,7 @@ constexpr int32 GMax_Number_Of_Prompts = 5;
 /// If this line is changed, also change the unit test logic in BarkTextTest.cpp
 #define G_MAX_BARK_LINES 3
 
-#define BARK_LINE_DELAY 2.0f
+#define BARK_LINE_DELAY 1.0f
 #define BARK_LINE_WIDTH 30
 #define INVALID_BARK_DELAY -99.0f
 #define BARK_UID_NONE -1
