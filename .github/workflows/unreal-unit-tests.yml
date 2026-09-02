@@ -53,5 +53,17 @@ jobs:
           path: Reports/*.json
           reporter: unreal-json
           
+      - name: Upload test report HTML
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: Test report Unreal HTML
+          path: Reports/index.html 
           
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: Test reporter Markdown
+          path: "$RUNNER_TEMP/*.md"
           
