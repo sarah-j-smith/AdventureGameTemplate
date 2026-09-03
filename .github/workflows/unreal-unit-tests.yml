@@ -17,7 +17,7 @@ jobs:
       image: ghcr.io/epicgames/unreal-engine:dev-slim-5.6.1
       credentials:
         username: ${{ secrets.GHCR_IO_USERNAME }}
-        password: ${{ secrets.REPO_ACCESS_TOKEN }}
+        password: ${{ secrets.GITHUB_TOKEN }}
       # Docker options - https://docs.docker.com/reference/cli/docker/container/create/#options
       # ue4 user in the unreal engine container is uid 1000, gid 1000, has passwordless sudo
       options: --user root
