@@ -10,7 +10,9 @@ jobs:
   build:
     # Containers require a Linux-based runner host
     runs-on: ubuntu-latest
-      
+    permissions:
+      contents: read
+      packages: read
     container:
       image: ghcr.io/epicgames/unreal-engine:dev-slim-5.6.1
       credentials:
