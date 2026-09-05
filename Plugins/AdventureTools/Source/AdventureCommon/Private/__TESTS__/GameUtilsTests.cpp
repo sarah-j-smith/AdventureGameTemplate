@@ -28,12 +28,11 @@ void GameUtilsTests::Define()
 		for (auto Case : TestData)
 		{
 			const auto [ArgString, ExpectedDuration] = Case.Value;
-			It(FString::Printf(TEXT("Duration for: %s"), *Case.Key),
-			   [this, ArgString, ExpectedDuration]()
-			   {
-				   float GotDuration = FGameUtils::GetDisplayTimeForString(ArgString);
-				   TestEqual(TEXT("Duration is correct"), (int)GotDuration, ExpectedDuration);
-			   });
+			It(Case.Key, [this, ArgString, ExpectedDuration]()
+			{
+				float GotDuration = FGameUtils::GetDisplayTimeForString(ArgString);
+				TestEqual(TEXT("Duration is correct"), (int)GotDuration, ExpectedDuration);
+			});
 		};
 	});
 }

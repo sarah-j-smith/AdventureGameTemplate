@@ -1,5 +1,4 @@
 #include "BarkLine.h"
-#include "BarkTestUtils.h"
 #include "BarkText.h"
 #include "BarkTextSUT.h"
 #include "Misc/AutomationTest.h"
@@ -8,12 +7,26 @@
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(BarkTextMultiLineTest, "Private.Tests.BarkTextMultiLineTest",
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
+
+static void GetTestDataBarkArrays(TArray<FText>& BarkTextArray)
+{
+	BarkTextArray.Empty();
+	BarkTextArray.Append({
+		FText::FromString("This is the first line"),
+		FText::FromString("Hello World!"),
+		FText::FromString("This is the third line"),
+		FText::FromString("This is the 4th line")
+	});
+}
+
 bool BarkTextMultiLineTest::RunTest(const FString& Parameters)
 {
 	// This will get cleaned up when it leaves scope
 	FTestWorldWrapper WorldWrapper;
 	WorldWrapper.CreateTestWorld(EWorldType::Game);
 	UWorld* World = WorldWrapper.GetTestWorld();
+	
+	SetTestContext(__FILE__);
 
 	if (World)
 	{
@@ -22,7 +35,7 @@ bool BarkTextMultiLineTest::RunTest(const FString& Parameters)
 		UBarkText *BarkText = SUTBuilder->CreateBarkText(World);
 		
 		TArray<FText> BarkTextArray;
-		BarkTestUtils::GetTestDataBarkArrays(BarkTextArray);
+		GetTestDataBarkArrays(BarkTextArray);
 		FBarkRequest *BarkRequest = SUTBuilder->SetupTestData(BarkTextArray);
 		
 		// Tick a beat to allow the display to put up the first line, check its there

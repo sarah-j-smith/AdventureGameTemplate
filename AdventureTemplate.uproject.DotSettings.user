@@ -20,9 +20,11 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AVulkan_002EBuild_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FShared_003FEpic_0020Games_003FUE_005F5_002E6_003FEngine_003FSource_003FThirdParty_003FVulkan_003FVulkan_002EBuild_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AXofuqeb_002Easm_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003Fvar_003Ffolders_003Ftn_003F6hbclrt96gv2_005Fys2s_005Fx6x4rh0000gn_003FT_003FSandboxFiles_003FHeqyhyk_003FXofuqeb_002Easm/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=F313F6BB_002DFE93_002D716F_002DD00A_002D85564AC20E06_002Fd_003APrivate_002Ff_003AActor_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=9be93f34_002D99d4_002D42d9_002Da56c_002D85ea7ef8e92f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;AdventureTemplate&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5a059f5d_002D86f7_002D4793_002D9ab5_002D1a760cfa2ac1/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;AdventureTemplate&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/Users/sez/depot/AdventureTemplate" Presentation="&amp;lt;AdventureTemplate&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
+	
+	
 	
 	
 	

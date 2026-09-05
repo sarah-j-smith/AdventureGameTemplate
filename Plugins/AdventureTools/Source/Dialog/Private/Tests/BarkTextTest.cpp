@@ -1,13 +1,24 @@
+#include "Misc/AutomationTest.h"
+
+#if WITH_AUTOMATION_TESTS
+
 #include "BarkLine.h"
-#include "BarkTestUtils.h"
 #include "BarkText.h"
 #include "BarkTextSUT.h"
 #include "Components/VerticalBox.h"
-#include "Misc/AutomationTest.h"
+
 #include "Tests/AutomationCommon.h"
 
 IMPLEMENT_COMPLEX_AUTOMATION_TEST(BarkTextTest, "Private.Tests.BarkTextTest",
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+static void GetTestDataBarkSingleLine(TArray<FText>& BarkTextArray)
+{
+	BarkTextArray.Empty();
+	BarkTextArray.Append({
+		FText::FromString("Just a single line!")
+	});
+}
 
 void BarkTextTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& OutTestCommands) const
 {
@@ -35,7 +46,7 @@ bool BarkTextTest::RunTest(const FString& Parameters)
 		UBarkText *BarkText = SUTBuilder->CreateBarkText(World);
 		
 		TArray<FText> BarkTextArray;
-		BarkTestUtils::GetTestDataBarkSingleLine(BarkTextArray);
+		GetTestDataBarkSingleLine(BarkTextArray);
 		FBarkRequest *BarkRequest = SUTBuilder->SetupTestData(BarkTextArray);
 
 		// Tick a beat to allow the display to put up the first line, check its there
@@ -72,3 +83,5 @@ bool BarkTextTest::RunTest(const FString& Parameters)
 	}
 	return false;
 }
+
+#endif
