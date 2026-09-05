@@ -63,7 +63,15 @@ add the
 
   `permissions: packages`
 
-that is [required if using the GitHub supplied vars]
+that is [required if using the GitHub supplied vars]. The PAT must be as follows:
+
+ - [x] Classic token (not fine grained)
+ - [x] Repo scope
+ - [x] Package scope
+
+More [GHCR auth information can be found here].
+
+[GHCR auth information can be found here]: https://www.gecko.security/blog/ghcr-github-container-registry-guide
 
 [required if using the GitHub supplied vars]: https://stackoverflow.com/a/78866108/813919
 

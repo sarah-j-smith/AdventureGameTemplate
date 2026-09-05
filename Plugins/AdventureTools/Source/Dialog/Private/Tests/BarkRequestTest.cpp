@@ -1,3 +1,7 @@
+#include "Misc/AutomationTest.h"
+
+#if WITH_AUTOMATION_TESTS
+
 #include "BarkTestUtils.h"
 #include "BarkText.h"
 #include "Misc/AutomationTest.h"
@@ -28,15 +32,15 @@ bool BarkRequestTest::RunTest(const FString& Parameters)
 	TArray<FText> BarkTextArray;
 	BarkTestUtils::GetTestDataForParam(Parameters, BarkTextArray);
 	int ExpectedCount = BarkTestUtils::GetTestCountForParam(Parameters);
-	float ElapsedTime = BarkTestUtils::GetTestElapsedTimeForParam(Parameters);
+	float Expected = BarkTestUtils::GetTestElapsedTimeForParam(Parameters);
 	
 	FBarkRequest *BarkRequest = FBarkRequest::CreatePlayerMultilineRequest(BarkTextArray);
 	
 	const int GotDuration = BarkRequest->GetDuration();
 	TestNotEqual(TEXT("UID has been set to valid value"), BarkRequest->GetUID(), BARK_UID_NONE);
 		
-	TestEqual(TEXT("Should have correct display time for whole request"), ElapsedTime, 
-		BarkRequest->GetDuration());
+	TestEqual(TEXT("Should have correct display time for whole request"), 
+		BarkRequest->GetDuration(), Expected);
 		
 	TestTrue(TEXT("IsPlayerRequest"), BarkRequest->IsPlayer());
 	
@@ -47,3 +51,5 @@ bool BarkRequestTest::RunTest(const FString& Parameters)
 
 	return !HasAnyErrors();
 }
+
+#endif

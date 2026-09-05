@@ -51,9 +51,11 @@ struct DIALOG_API FPromptData: public FTableRowBase
         if (PreviousIndex == INVALID_PROMPT_INDEX && PreviousSubIndex == INVALID_PROMPT_INDEX && Index == 0 && SubIndex == 0) return true;
         if (PreviousIndex == INVALID_PROMPT_INDEX || PreviousSubIndex == INVALID_PROMPT_INDEX)
         {
+#if WITH_EDITOR
             // PreviousIndex == INVALID_PROMPT_INDEX || PreviousSubIndex == INVALID_PROMPT_INDEX means this is the first row.
             UE_LOG(LogDialog, Fatal, TEXT("Expect first row index == 0 and sub-index == 0"));
             return false;
+#endif
         }
         if (PreviousIndex == Index - 1 && SubIndex == 0) return true;
         if (PreviousIndex == Index && PreviousSubIndex == SubIndex - 1) return true;

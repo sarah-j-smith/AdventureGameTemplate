@@ -1,5 +1,7 @@
 #include "BarkTestUtils.h"
 
+#if WITH_AUTOMATION_TESTS
+
 void BarkTestUtils::GetTestDataForParam(const FString& ParamName, TArray<FText>& BarkTextArray)
 {
 	if (ParamName == TEXT("Simply_one_line_of_text")) { GetTestDataBarkSingleLine(BarkTextArray); return; }
@@ -23,10 +25,10 @@ int BarkTestUtils::GetTestCountForParam(const FString& ParamName)
 
 int BarkTestUtils::GetTestElapsedTimeForParam(const FString& ParamName)
 {
-	if (ParamName == TEXT("Simply_one_line_of_text")) return 5.0f;
-	if (ParamName == TEXT("Two_lines_one_very_long")) return 17.0f;
-	if (ParamName == TEXT("Four_short_lines_of_text")) return 22.0f;
-	if (ParamName == TEXT("Four_lines_of_text_one_long")) return 43.0f;
+	if (ParamName == TEXT("Simply_one_line_of_text")) return 4.0f;
+	if (ParamName == TEXT("Two_lines_one_very_long")) return 15.0f;
+	if (ParamName == TEXT("Four_short_lines_of_text")) return 18.0f;
+	if (ParamName == TEXT("Four_lines_of_text_one_long")) return 37.0f;
 	if (ParamName == TEXT("Game_text")) return 24.0f;
 	UE_LOG(LogTemp, Fatal, TEXT("Unexpected test parameter %s"), *ParamName);
 	return 0;
@@ -81,3 +83,4 @@ void BarkTestUtils::GetGameText(TArray<FText>& BarkTextArray)
 	});
 }
 
+#endif

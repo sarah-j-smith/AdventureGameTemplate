@@ -1,6 +1,9 @@
+#include "Misc/AutomationTest.h"
+
+#if WITH_AUTOMATION_TESTS
+
 #include "MockAGHUD.h"
 #include "Gameplay/AdventureGameInstance.h"
-#include "Misc/AutomationTest.h"
 #include "Player/CommandManager.h"
 #include "Tests/AutomationCommon.h"
 
@@ -68,3 +71,5 @@ void CommandManagerButtonSpec::Define()
 		});
 	});
 }
+
+#endif

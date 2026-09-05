@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Misc/AutomationTest.h"
+
+#if WITH_AUTOMATION_TESTS
+
 #include "CoreMinimal.h"
 
 class BarkTestUtils
@@ -28,3 +32,5 @@ public:
 
 	static int GetTestElapsedTimeForParam(const FString& ParamName);
 };
+
+#endif
