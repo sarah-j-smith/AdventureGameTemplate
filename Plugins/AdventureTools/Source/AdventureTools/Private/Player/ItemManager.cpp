@@ -243,16 +243,20 @@ void UItemManager::MouseEnterInventoryItem(UItemSlot* ItemSlot)
 void UItemManager::MouseLeaveInventoryItem()
 {
     if (SourceLocked == EChoiceState::Locked && TargetLocked == EChoiceState::Locked) return;
+    bool InventoryDisplayChanged = false;
     if (SourceLocked == EChoiceState::Unlocked)
     {
+        if (Source != nullptr) InventoryDisplayChanged = true;
         Source = nullptr;
     }
     else
     {
+        if (Target != nullptr) InventoryDisplayChanged = true;
         Target = nullptr;
     }
+    if (CurrentItemSlot != nullptr) InventoryDisplayChanged = true;
     CurrentItemSlot = nullptr;
-    UpdateInventoryTextDelegate.Broadcast();
+    if (InventoryDisplayChanged) UpdateInventoryText();
 }
 
 void UItemManager::PerformItemInteraction(EVerbType CurrentVerb)

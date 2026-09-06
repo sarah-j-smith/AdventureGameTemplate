@@ -58,7 +58,18 @@ void CommandManagerButtonSpec::Define()
 			WorldWrapper.DestroyTestWorld(false);
 		});
 	
-		It("Do a verb works", [this]()
+		It("Basic verb command defaults", [this]()
+		{
+			TestEqual("Default verb should be walk to", CommandManager->CurrentCommand, EPlayerCommand::None);
+			TestEqual("Default command should be none", CommandManager->CurrentVerb, EVerbType::WalkTo);
+
+			// Mouse over the UI panel at the bottom of the screen
+			CommandManager->UpdateMouseOverUI(true);
+			TestEqual("But keep none for the command", CommandManager->CurrentCommand, EPlayerCommand::None);
+			TestEqual("Once moved over the panel change verb to look at", CommandManager->CurrentVerb, EVerbType::LookAt);
+		});
+		
+		It("Default look at", [this]()
 		{
 			// Press the LookAt verb button
 			CommandManager->AssignVerb(EVerbType::LookAt);
@@ -67,7 +78,7 @@ void CommandManagerButtonSpec::Define()
 				CommandManager->CurrentCommand, EPlayerCommand::VerbPending);
 	
 			TestEqual("Should set current verb to look at, and state to 'VerbPending'", 
-				CommandManager->CurrentVerb, EVerbType::LookAt);			
+				CommandManager->CurrentVerb, EVerbType::LookAt);
 		});
 	});
 }

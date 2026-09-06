@@ -714,6 +714,19 @@ UAdventureGameInstance* ACommandManager::GetAdventureGameInstance() const
 
 void ACommandManager::UpdateMouseOverUI(const bool NewMouseIsOverUI)
 {
+#if WITH_EDITOR
+    static FString TheLogMessage;
+    FString LogMessage = FString::Printf(TEXT("NewMouseIsOverUI: %s - CurrentVerb: %s - CurrentCommand: %s"),
+        (NewMouseIsOverUI ? TEXT("true") : TEXT("false")),
+        *VerbGetDescriptiveString(CurrentVerb).ToString(), 
+        *UEnum::GetValueAsString(CurrentCommand));
+    if (LogMessage != TheLogMessage)
+    {
+        UE_LOG(LogAdventureGame, Log, TEXT("UpdateMouseOverUI - %s"), *LogMessage);
+        TheLogMessage = LogMessage;
+    }
+#endif
+    
     if (NewMouseIsOverUI)
     {
         if (CurrentVerb == EVerbType::WalkTo && CurrentCommand == EPlayerCommand::None)
@@ -752,7 +765,7 @@ void ACommandManager::HandleInventoryItemClicked(UItemSlot* ItemSlot)
         InterruptCurrentAction();
         return;
     }
-    if (!ItemManager->MaybeHandleInventoryItemClicked(ItemSlot)) return;
+    if (ItemManager->MaybeHandleInventoryItemClicked(ItemSlot)) return;
 
     // This handler is only called if `HasItem` is true
     switch (CurrentCommand)

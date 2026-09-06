@@ -3,6 +3,7 @@
 
 #include "HUD/InteractionHUD.h"
 
+#include "AdventureTools.h"
 #include "Constants.h"
 #include "Components/Image.h"
 #include "Internationalization/StringTableRegistry.h"
@@ -34,6 +35,7 @@ void UInteractionHUD::UnhighlightText()
 
 void UInteractionHUD::ResetText()
 {
+    UE_LOG(LogAdventureGame, Log, TEXT("UInteractionHUD::ResetText"))
     UnhighlightText();
     SetText(LOCTABLE(ITEM_DESCRIPTIONS_KEY, G_WALK_TO_KEY));
 }
