@@ -139,7 +139,7 @@ void UAdventureGameHUD::SetInteractionText()
             InteractionText = FGameUtils::GetVerbWithHotSpotText(Cast<IDescribableItem>(CurrentHotspot), Verb);
         }
         InteractionUI->SetText(InteractionText);
-        UE_LOG(LogAdventureGame, Log, TEXT("Set interaction text to: %s"), *InteractionText.ToString());
+        UE_LOG(LogAdventureGame, Log, TEXT("Set HotSpot interaction text to: %s"), *InteractionText.ToString());
         if (Command->ShouldHighlightInteractionText())
         {
             InteractionUI->HighlightText();
@@ -148,6 +148,7 @@ void UAdventureGameHUD::SetInteractionText()
     else
     {
         FText VerbStr = VerbGetDescriptiveString(Verb);
+        UE_LOG(LogAdventureGame, Log, TEXT("Set interaction text to: %s"), *VerbStr.ToString());
         InteractionUI->SetText(VerbStr);
     }
 }
@@ -164,6 +165,7 @@ void UAdventureGameHUD::SetInventoryText()
     const AHotSpot* HotSpot = Command->CurrentHotSpot;
     if (SourceItem == nullptr)
     {
+        UE_LOG(LogAdventureGame, Log, TEXT("UAdventureGameHUD::SetInventoryText - no source item, resetting"));
         InteractionUI->ResetText();
         return;
     }

@@ -82,7 +82,8 @@ void UVerbsUI::PullTriggered()
 
 void UVerbsUI::ClearActiveButton()
 {
-	UE_LOG(LogAdventureGame, Warning, TEXT(">>>> Clear active button - %s"), *UEnum::GetValueAsString(CurrentVerb));
+	UE_LOG(LogAdventureGame, Warning, TEXT(">>>> Clear active button - %s"), 
+		*UEnum::GetValueAsString(CurrentVerb));
 	switch (CurrentVerb)
 	{
 	case EVerbType::Close:
