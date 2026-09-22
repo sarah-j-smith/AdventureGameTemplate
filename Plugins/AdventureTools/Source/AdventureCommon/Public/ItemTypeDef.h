@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Item.h"
-
 #include "ItemTypeDef.generated.h"
 
 /**

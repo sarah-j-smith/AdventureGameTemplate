@@ -6,20 +6,21 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetSwitcher.h"
+#include "Items/InventoryManager.h"
 #include "AdventureGameHUD.generated.h"
 
-class UManagerProvider;
-class ACommandManager;
-class UImage;
-class UAdventureGameInstance;
+struct IManagerProvider;
 class USphereComponent;
-class AAdventureGameModeBase;
-class UInteractionNotifier;
-class UVerbsUI;
-class UInteractionHUD;
+class UImage;
+class UBarkText;
 class UPromptList;
 class UInventoryUI;
-class UBarkText;
+class UVerbsUI;
+class UInteractionHUD;
+class UInteractionNotifier;
+class AAdventureGameModeBase;
+class UAdventureGameInstance;
+class ACommandManager;
 
 /**
  * 
@@ -36,18 +37,15 @@ public:
 	static UAdventureGameHUD *Create(APlayerController *PlayerController, TSubclassOf<UAdventureGameHUD> AdventureHUDClass);
 
 	/// Subscribe to messages for command & action updates to show in the interaction display.
-	void BindCommandHandlers(ACommandManager *CommandManager);
-
-	/// Subscribe to messages for changes in the player inventory to show in the inventory UI
-	void BindInventoryHandlers(UAdventureGameInstance* AdventureGameInstance);
+	virtual void BindCommandHandlers(ACommandManager *CommandManager);
 
 	/// Subscribe to messages for changes in the player score to show in the score UI
-	void BindScoreHandlers(AAdventureGameModeBase* AdventureGameMode);
+	virtual void BindScoreHandlers(AAdventureGameModeBase* AdventureGameMode);
 
 	/// Subscribe to messages for commands from the player, used to open or close
 	/// the conversation UI, or signal that a UI interaction happened to dismiss the
 	/// current bark or NPC conversation
-	void BindNotifierHandlers(UInteractionNotifier* Notifier);
+	virtual void BindNotifierHandlers(UInteractionNotifier* Notifier);
 
 	/// Bindings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget), Category = "Adventure HUD")
@@ -109,10 +107,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Adventure HUD")
 	void HidePromptList();
 
-	void AddBarkText(const FText &BarkText, USphereComponent *Position,
+	virtual void AddBarkText(const FText &BarkText, USphereComponent *Position,
 		TOptional<FColor> TextColor = TOptional<FColor>());
 
-	void AddBarkText(const TArray<FText> &BarkTextArray, USphereComponent* Position, TOptional<FColor> TextColor);
+	virtual void AddBarkText(const TArray<FText> &BarkTextArray, USphereComponent* Position, TOptional<FColor> TextColor);
 
 	void ClearBarkText();
 	
@@ -122,6 +120,7 @@ private:
 	UPROPERTY()
 	UWidget *DefaultWidget = nullptr;
 	
-	UPROPERTY()
-	UManagerProvider *ManagerProvider;
+	TSharedPtr<IManagerProvider> ManagerProvider;
+	
+	TSharedPtr<IInventoryManager> InventoryManager;
 };

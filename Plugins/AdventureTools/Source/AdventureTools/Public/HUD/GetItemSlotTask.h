@@ -14,7 +14,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetSlotSuccessOutputPin, UItemSlot 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGetSlotFailOutputPin);
 
 /**
- * 
+ * Try to asynchronously fetch an ItemSlot (an inventory button) that contains
+ * a given item. Mostly useful for tests.
  */
 UCLASS()
 class ADVENTURETOOLS_API UGetItemSlotTask : public UBlueprintAsyncActionBase

@@ -10,6 +10,7 @@
 
 #include "ItemSlot.generated.h"
 
+class UInventoryItem;
 class UItem;
 class UImage;
 
@@ -23,8 +24,7 @@ class ADVENTURETOOLS_API UItemSlot : public UUserWidget
 {
 	GENERATED_BODY()
 	
-	UPROPERTY()
-	UManagerProvider* ManagerProvider;
+	TSharedPtr<IManagerProvider> ManagerProvider;
 	
 protected:
 	virtual void NativeOnInitialized() override;
@@ -44,6 +44,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot")
 	UItem *InventoryItem;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot")
+	UInventoryItem *CustomInventoryItem;
 
 	void AddItem(UItem* InventoryItem);
 

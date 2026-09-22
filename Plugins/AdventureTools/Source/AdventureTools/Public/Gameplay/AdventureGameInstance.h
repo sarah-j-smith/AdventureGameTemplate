@@ -12,28 +12,19 @@
 #include "Engine/GameInstance.h"
 #include "Enums/RoomTransitionPhase.h"
 #include "Items/InventoryItem.h"
+#include "Items/ItemTableProvider.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "AdventureGameInstance.generated.h"
 
-class UItemTypeDefs;
-class UManagerProvider;
-class UItem;
-class UInventory;
-class UInventoryItem;
-class AHotSpot;
-class UItemList;
-class UAdventureSave;
-class ADoor;
 class UAdventureGameHUD;
+class UAdventureSave;
+struct IInventoryManager;
+struct IItemTableProvider;
+class AHotSpot;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerInventoryChanged, FName, ItemKind, 
-	EItemDisposition, ItemDisposition);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomTransitioned, 
-	ERoomTransitionPhase, RoomTransitionPhase);
-
-#define PLAYER_INVENTORY_NAME "PlayerInventory"
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomTransitioned,
+                                            ERoomTransitionPhase, RoomTransitionPhase);
 
 /**
  * 
@@ -41,13 +32,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomTransitioned,
 UCLASS()
 class ADVENTURETOOLS_API UAdventureGameInstance : public UGameInstance, public IGameplayTagAssetInterface
 {
-	GENERATED_BODY()
-public:
+	GENERATED_UCLASS_BODY()
+
 	//////////////////////////////////
 	///
 	/// EVENT HANDLERS
 	///
 
+	void SetupProviderRegistrations();
+	
 	virtual void Init() override;
 
 	UFUNCTION()
@@ -58,76 +51,15 @@ public:
 	
 	//////////////////////////////////
 	///
-	/// INVENTORY
+	/// ITEM TABLE PROVIDER
 	///
-
-	/// Custom inventory item behaviours. This table is optional but must be set to a new Data Table,
-	/// with FItemRow as the row type, if it is used. The entries in the table map _names_ of 
-	/// items in the game to sub-classes (usually Blueprints) of <code>UInventoryItem</code> which 
-	/// can have a Blueprint script attached to provide custom behaviours. 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Inventory Configuration")
-	TSoftObjectPtr<UDataTable> ItemBehavioursTable;
 	
-	/// Inventory item definitions. This table must be created by right-click in the content area,
-	/// choosing Adventure Tools > Item Type Definitions. Once the table is created set it here.
-	/// Or click the drop-down and choose _Create new Asset_ > _Item Type Definitions_.
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Inventory Configuration")
-	TSoftObjectPtr<UItemTypeDefs> ItemDefinitionsTable;
-	
-	DECLARE_DELEGATE_TwoParams(FCustomInventoryItemLoaded, FName /* ItemKind */, UInventoryItem * /* CustomInventoryItem */);
-	
-	FCustomInventoryItemLoaded CustomInventoryItemLoadedDelegate;
-
-	/// Try to load a custom <code>UInventoryItem</code> for the item with the given name.
-	void GetCustomInventoryItem(FName ItemKind);
-
-private:
-	FLoadSoftObjectPathAsyncDelegate LoadTableDelegate;
-	FLoadSoftObjectPathAsyncDelegate LoadClassDelegate;
-	
-	UFUNCTION()
-	void InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object);
-
-	UFUNCTION()
-	void InventoryClassLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object);
-
-	void GetCustomInventoryItemWithTable(FName ItemKind, UDataTable* DataTablePtr);
-	
-	void GetCustomInventoryItemWithClass(FName ItemKind, const UClass* InventoryItemClass);
-	
-	TArray<FName> TableOperationsQueue;
-	TMap<FString, FName> ClassOperationsQueue;
-	
-public:
-	/// Bind to this event to be notified of changes to the players inventory.
-	UPROPERTY(BlueprintAssignable, Category="Inventory")
-	FPlayerInventoryChanged PlayerInventoryChanged;
-
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void AddItemToInventory(FName ItemKind);
-
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void RemoveItemFromInventory(FName ItemKind);
-
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void RemoveItemsFromInventory(const TSet<FName>& ItemsToRemove);
-
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	bool IsInInventory(const FName &ItemToCheck) const;
-
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	UItem* GetItemFromInventory(const FName &ItemToCheck);
-
-	void GetInventoryItems(TArray<UItem*> &Items);
-
-	int GetInventoryItemCount() const;
-	
-	/// Do not save a reference to this inventory object. It will get created and destroyed whenever
-	/// the player saves or loads the game. To keep a reference safely, handle the 
-	/// <code>PlayerInventoryChanged</code> event, and when the _ItemDisposition_ is 
-	/// <code>Reloaded</code> get the new instance from here.
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Inventory")
-	UInventory *Inventory;
+	/** 
+	 * The Blueprint Class to read to get the custom item data and definitions.
+	 * Must make a Blueprint class off UItemTableProvider and fill out 
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ItemManagement")
+	TSubclassOf<UItemTableProvider> ItemTableProviderClass;
 	
 	/// All the tags currently set in the game
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Save Game")
@@ -137,22 +69,20 @@ public:
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 	
 private:
-	FDelegateHandle OnInventoryChangedHandle;
-
-	void CreateInventory();
-
-	void DestroyInventory();
-
-	void BindInventoryChangedHandlers();
-
-	void InventoryChanged(FName ItemKind, EItemDisposition ItemDisposition);
-
+	// Host the singleton instance of the ItemTableProvider here. The UProvider
+	// takes care of providing it to other classes. It will only be garbage
+	// collected when this UGameInstance is destroyed.
+	TSharedPtr<IItemTableProvider> ItemTableProvider;
+	bool bOKToCallItp = false;
+	
+public:
+	virtual void PostInitProperties() override { bOKToCallItp = true; };
+	
 	//////////////////////////////////
 	///
 	/// DOOR MANAGEMENT
 	///
-
-public:
+	
 	
 	/// Call from a blueprint of a door to trigger loading the room.
 	UFUNCTION(BlueprintCallable, Category="GameInstance")
@@ -187,6 +117,8 @@ public:
 	/// TRANSITION CURRENT ROOM -> NEW ROOM VIA DOOR
 	///
 
+	TSharedPtr<IManagerProvider> ManagerProvider;
+	
 	/// Event to handle requests to load and transition from an old room
 	/// to a new room based on the current door
 	UFUNCTION(BlueprintCallable, Category="Room")
@@ -211,6 +143,8 @@ public:
 	/// SAVE GAME
 	///
 
+	TSharedPtr<IInventoryManager> InventoryManager;
+	
 	/// If true, when the game is launched a saved game will be checked for, and if it
 	/// exists it will be loaded. Useful for debugging though.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="GameInstance")
@@ -343,7 +277,4 @@ private:
 	ADoor *FindDoor(FName DoorLabel);
 
 	void LogSaveGameStatus(USaveGame *SaveGame);
-	
-	UPROPERTY()
-	UManagerProvider *ManagerProvider;
 };

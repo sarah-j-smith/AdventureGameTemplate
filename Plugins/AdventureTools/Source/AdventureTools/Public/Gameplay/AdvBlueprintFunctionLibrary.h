@@ -10,8 +10,10 @@
 
 #include "AdvBlueprintFunctionLibrary.generated.h"
 
-class UBarkProvider;
-class UManagerProvider;
+struct IManagerProvider;
+struct IBarkProvider;
+class FBarkProvider;
+class FManagerProvider;
 class UItemManager;
 class ACommandManager;
 class AAdventureCharacter;
@@ -28,8 +30,8 @@ class ADVENTURETOOLS_API UAdvBlueprintFunctionLibrary : public UBlueprintFunctio
 {
     GENERATED_BODY()
     
-    static UManagerProvider *GetManagerProvider();
-    static UBarkProvider *GetBarkProvider();
+    static TSharedRef<IManagerProvider> GetManagerProvider();
+    static TSharedRef<IBarkProvider> GetBarkProvider();
     static UAdventureControllerProvider *GetControllerProvider();
 
 public:

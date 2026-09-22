@@ -20,8 +20,8 @@ class ADVENTURETOOLS_API UAdventureControllerProvider : public UObject
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "AdventureController", meta = (WorldContext = "WorldContextObject"))
-	AAdventurePlayerController *GetAdventurePlayerController(UObject *WorldContextObject);
+	virtual AAdventurePlayerController *GetAdventurePlayerController(UObject *WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category = "AdventureController", meta = (WorldContext = "WorldContextObject"))
-	AAdventureCharacter *GetAdventureCharacter(UObject *WorldContextObject);
+	virtual AAdventureCharacter *GetAdventureCharacter(UObject *WorldContextObject);
 };

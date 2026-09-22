@@ -5,16 +5,15 @@
 #include "CoreMinimal.h"
 
 #include "Gameplay/VerbInteractions.h"
-#include "DescribableItem.h"
 #include "GameplayTagAssetInterface.h"
 #include "HistoryTagInterface.h"
 #include "StoryAction.h"
 #include "ItemDataList.h"
+#include "Gameplay/IManagerProvider.h"
+#include "Gameplay/IBarkProvider.h"
 
 #include "InventoryItem.generated.h"
 
-class UBarkProvider;
-class UManagerProvider;
 class UItem;
 
 /**
@@ -28,11 +27,9 @@ class ADVENTURETOOLS_API UInventoryItem : public UObject, public IVerbInteractio
     
     UStoryAction* ItemDataAssetForAction(EVerbType Verb) const;
     
-    UPROPERTY()
-    UManagerProvider* ManagerProvider;
+    TSharedPtr<IManagerProvider> ManagerProvider;
     
-    UPROPERTY()
-    UBarkProvider* BarkProvider;
+    TSharedPtr<IBarkProvider> BarkProvider;
     
     bool bHandled = false;
     

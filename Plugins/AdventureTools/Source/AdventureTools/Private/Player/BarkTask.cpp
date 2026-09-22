@@ -4,9 +4,7 @@
 
 #include "AdventureTools.h"
 #include "GameUtils.h"
-
-#include "Gameplay/BarkProvider.h"
-#include "Gameplay/ManagerProvider.h"
+#include "Provider.h"
 #include "Player/CommandManager.h"
 #include "Player/PlayerBarkManager.h"
 
@@ -14,6 +12,7 @@ UBarkTask::UBarkTask(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)
     , WorldContextObject(nullptr)
     , BarkText(FText::GetEmpty())
+    , ManagerProvider(UProvider::Get()->GetInstance<IManagerProvider>())
 {
     MyUID = FGameUtils::GetUUID();
 }
@@ -23,7 +22,6 @@ UBarkTask* UBarkTask::DoBarkTask(const UObject* WorldContextObject, const FText 
     UBarkTask* BlueprintNode = NewObject<UBarkTask>(const_cast<UObject*>(WorldContextObject));
     BlueprintNode->WorldContextObject = WorldContextObject;
     BlueprintNode->BarkText = BarkText;
-    BlueprintNode->ManagerProvider = NewObject<UManagerProvider>(BlueprintNode);
     BlueprintNode->MyUID = FGameUtils::GetUUID();
 
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("UBarkTask created"));

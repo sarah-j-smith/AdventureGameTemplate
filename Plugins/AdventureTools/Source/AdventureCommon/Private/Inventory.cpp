@@ -1,25 +1,35 @@
 // (c) 2026 Storybridge Games
 
-
 #include "Inventory.h"
 #include "Item.h"
 #include "AdventureCommon.h"
+#include "IItemTableProvider.h"
 #include "ItemTypeDefs.h"
-#include "Kismet/GameplayStatics.h"
+#include "Provider.h"
 
-void UInventory::SetupHandlers()
+void FInventory::SetupHandlers()
 {
-	InventoryTableLoadCompleteDelegate.BindUObject(this, &UInventory::InventoryTableLoadCompleteHandler);
-	ItemDetailsLoadCompleteDelegate.BindUObject(this, &UInventory::ItemDetailLoadCompleteHandler);
+	InventoryTableLoadCompleteDelegate.BindRaw(this, &FInventory::InventoryTableLoadCompleteHandler);
+	ItemDetailsLoadCompleteDelegate.BindRaw(this, &FInventory::ItemDetailLoadCompleteHandler);
 }
 
-void UInventory::TearDownHandlers()
+void FInventory::TearDownHandlers()
 {
 	if (InventoryTableLoadCompleteDelegate.IsBound()) InventoryTableLoadCompleteDelegate.Unbind();
 	if (ItemDetailsLoadCompleteDelegate.IsBound()) ItemDetailsLoadCompleteDelegate.Unbind();
 }
 
-void UInventory::AddItemToInventory(UItem* InventoryItem)
+FInventory::FInventory()
+	: ItemTableProvider(UProvider::Get()->GetInstance<IItemTableProvider>())
+{
+}
+
+FInventory::~FInventory()
+{
+	TearDownHandlers();
+}
+
+void FInventory::AddItemToInventory(UItem* InventoryItem)
 {
 	if (!InventoryItem) return;
 	FListOfItems *NewListElement = new FListOfItems(InventoryItem);
@@ -38,7 +48,7 @@ void UInventory::AddItemToInventory(UItem* InventoryItem)
 	InventorySize++;
 }
 
-void UInventory::DeleteElementFromInventory(FListOfItems* Element)
+void FInventory::DeleteElementFromInventory(FListOfItems* Element)
 {
 	FListOfItems *Tmp = Inventory;
 	if (Element == Inventory)
@@ -62,7 +72,7 @@ void UInventory::DeleteElementFromInventory(FListOfItems* Element)
 	}
 }
 
-void UInventory::DumpInventoryToLog() const
+void FInventory::DumpInventoryToLog() const
 {
 	unsigned int Index = 0;
 	for (const FListOfItems *Iterator = Inventory; Iterator; Iterator = Iterator->Next)
@@ -72,23 +82,7 @@ void UInventory::DumpInventoryToLog() const
 	}
 }
 
-void UInventory::RegisterWithGameInstance(UItem* InventoryItem)
-{
-	if (UGameInstance *GameInstance = UGameplayStatics::GetGameInstance(this))
-	{
-		GameInstance->RegisterReferencedObject(InventoryItem);
-	}
-}
-
-void UInventory::UnregisterFromGameInstance(UItem* InventoryItem)
-{
-	if (UGameInstance *GameInstance = UGameplayStatics::GetGameInstance(this))
-	{
-		GameInstance->UnregisterReferencedObject(InventoryItem);
-	}
-}
-
-bool UInventory::Contains(const FName ItemName) const
+bool FInventory::Contains(const FName ItemName) const
 {
 	for (const FListOfItems *Iterator = Inventory; Iterator; Iterator = Iterator->Next)
 	{
@@ -97,7 +91,7 @@ bool UInventory::Contains(const FName ItemName) const
 	return false;
 }
 
-UItem* UInventory::FindItemByName(FName ItemName) const
+UItem* FInventory::FindItemByName(FName ItemName) const
 {
 	for (const FListOfItems *Iterator = Inventory; Iterator; Iterator = Iterator->Next)
 	{
@@ -106,7 +100,7 @@ UItem* UInventory::FindItemByName(FName ItemName) const
 	return nullptr;
 }
 
-void UInventory::AddItemInstanceByName(const FName ItemToAdd)
+void FInventory::AddItemInstanceByName(const FName ItemToAdd)
 {
 	if (Contains(ItemToAdd))
 	{
@@ -118,11 +112,14 @@ void UInventory::AddItemInstanceByName(const FName ItemToAdd)
 		UE_LOG(LogAdventureCommon, Error, TEXT("Item name was invalid: %s"), *OutReason.ToString());
 		return;
 	}
+	const auto InventoryDataTable = ItemTableProvider->GetItemDefinitionsTable();
 	if (const UItemTypeDefs *Table = InventoryDataTable.Get())
 	{
 		AddNewItemToInventoryWithTable(ItemToAdd, Table);
 		return;
 	}
+	UE_LOG(LogAdventureCommon, Log, TEXT("Async loading inventory data table: %s for %s"),
+		*InventoryDataTable.ToString(), *ItemToAdd.ToString())
 	TableOperationsQueue.Push(ItemToAdd);
 	if (!Loading)
 	{
@@ -130,9 +127,9 @@ void UInventory::AddItemInstanceByName(const FName ItemToAdd)
 	}
 }
 
-void UInventory::InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object)
+void FInventory::InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object)
 {
-	UItemTypeDefs* Table = InventoryDataTable.Get();
+	const UItemTypeDefs* Table = ItemTableProvider->GetItemDefinitionsTable().Get();
 	ensureAlwaysMsgf(Table, TEXT("InventoryTableLoadCompleteHandler: Table not valid"));
 	while (!TableOperationsQueue.IsEmpty())
 	{
@@ -141,7 +138,7 @@ void UInventory::InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, 
 	}
 }
 
-void UInventory::AddNewItemToInventoryWithTable(FName ItemName, const UItemTypeDefs *Table)
+void FInventory::AddNewItemToInventoryWithTable(FName ItemName, const UItemTypeDefs *Table)
 {
 	const FItemTypeDef ItemTypeDef = Table->FindDefByName(ItemName);
 	if (!ItemTypeDef.bValid)
@@ -165,11 +162,11 @@ void UInventory::AddNewItemToInventoryWithTable(FName ItemName, const UItemTypeD
 	UE_LOG(LogAdventureCommon, Warning,TEXT("ItemClass missing in ItemTypeDef for: %s"), *ItemName.ToString());
 }
 
-void UInventory::ItemDetailLoadCompleteHandler(const FSoftObjectPath& Path, UObject* /* Object */)
+void FInventory::ItemDetailLoadCompleteHandler(const FSoftObjectPath& Path, UObject* /* Object */)
 {
-	const UItemTypeDefs *Table = InventoryDataTable.Get();
+	const UItemTypeDefs *Table = ItemTableProvider->GetItemDefinitionsTable().Get();
 	ensureAlwaysMsgf(Table, TEXT("ItemDetailLoadCompleteHandler: Error, expected table to be loaded!"));
-	TSoftObjectPtr<UItem> ItemDetailPtr(Path);
+	const TSoftObjectPtr<UItem> ItemDetailPtr(Path);
 	UItem *ItemDetails = ItemDetailPtr.Get();
 	ensureAlwaysMsgf(ItemDetails, TEXT("Details expected once loaded %s"), *Path.GetAssetPathString());
 	const FItemTypeDef ItemTypeDef = Table->FindDefByName(ItemDetails->ItemTypeDef.GetTagLeafName());
@@ -177,13 +174,13 @@ void UInventory::ItemDetailLoadCompleteHandler(const FSoftObjectPath& Path, UObj
 	AddNewItemToInventoryWithDetails(ItemDetails, ItemTypeDef.UniqueName.GetTagLeafName());
 }
 
-void UInventory::AddNewItemToInventoryWithDetails(UItem *ItemDetails, FName ItemName)
+void FInventory::AddNewItemToInventoryWithDetails(UItem *ItemDetails, FName ItemName)
 {
 	AddItemToInventory(ItemDetails);
 	OnInventoryChanged.Broadcast(ItemName, EItemDisposition::Added);
 }
 
-void UInventory::RemoveItemInstanceByName(const FName ItemToRemove)
+void FInventory::RemoveItemInstanceByName(const FName ItemToRemove)
 {
 	if (IsEmpty()) return;
 	for (FListOfItems *Iterator = Inventory; Iterator; Iterator = Iterator->Next)
@@ -191,14 +188,14 @@ void UInventory::RemoveItemInstanceByName(const FName ItemToRemove)
 		if (ItemToRemove == Iterator->Element->ItemTypeDef.GetTagLeafName())
 		{
 			OnInventoryChanged.Broadcast(ItemToRemove, EItemDisposition::Removed);
-			UnregisterFromGameInstance(Iterator->Element);
+			ItemTableProvider->UnregisterFromGameInstance(Iterator->Element);
 			DeleteElementFromInventory(Iterator);
 			return;
 		}
 	}
 }
 
-void UInventory::RemoveItemKindsFromInventory(const TSet<FName>& ItemsToRemove)
+void FInventory::RemoveItemKindsFromInventory(const TSet<FName>& ItemsToRemove)
 {
 	if (IsEmpty()) return;
 	if (ItemsToRemove.IsEmpty()) return;
@@ -208,7 +205,7 @@ void UInventory::RemoveItemKindsFromInventory(const TSet<FName>& ItemsToRemove)
 	}
 }
 
-void UInventory::GetInventoryItemsArray(TArray<UItem*>& Result) const
+void FInventory::GetInventoryItemsArray(TArray<UItem*>& Result) const
 {
 	Result.Empty();
 	for (const FListOfItems *Iterator = Inventory; Iterator; Iterator = Iterator->Next)

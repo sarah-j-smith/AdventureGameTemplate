@@ -6,6 +6,7 @@
 #include "AdventureGameplayTags.h"
 #include "AdventureTools.h"
 #include "Constants.h"
+#include "Provider.h"
 #include "Gameplay/ManagerProvider.h"
 #include "Player/ItemManager.h"
 #include "Player/CommandManager.h"
@@ -17,12 +18,11 @@
 
 // Sets default values for this component's properties
 UAssetActionComponent::UAssetActionComponent()
+    : ManagerProvider(UProvider::Get()->GetInstance<IManagerProvider>())
 {
     // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
     // off to improve performance if you don't need them.
     PrimaryComponentTick.bCanEverTick = true;
-
-    ManagerProvider = CreateDefaultSubobject<UManagerProvider>("ManagerProvider");
 }
 
 
@@ -31,6 +31,7 @@ void UAssetActionComponent::BeginPlay()
 {
     Super::BeginPlay();
     
+    // ...
 }
 
 

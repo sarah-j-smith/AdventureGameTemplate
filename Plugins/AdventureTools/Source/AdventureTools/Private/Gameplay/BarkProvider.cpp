@@ -3,16 +3,22 @@
 
 #include "Gameplay/BarkProvider.h"
 
+#include "Provider.h"
 #include "Gameplay/ManagerProvider.h"
 #include "Player/CommandManager.h"
 #include "Player/PlayerBarkManager.h"
 
-UBarkProvider::UBarkProvider()
+FBarkProvider::FBarkProvider()
+    : ManagerProvider(UProvider::Get()->GetInstance<IManagerProvider>())
 {
-    ManagerProvider = CreateDefaultSubobject<UManagerProvider>("ItemManagerProvider");
 }
 
-void UBarkProvider::Bark(FText BarkText, UObject* WorldContextObject)
+FBarkProvider::~FBarkProvider()
+{
+    // RAAI - nothing to do
+}
+
+void FBarkProvider::Bark(FText BarkText, UObject* WorldContextObject)
 {
     const ACommandManager *CommandManager = ManagerProvider->GetCommandManager(WorldContextObject);
     if (CommandManager == nullptr) return;
@@ -22,7 +28,7 @@ void UBarkProvider::Bark(FText BarkText, UObject* WorldContextObject)
     }
 }
 
-void UBarkProvider::BarkAndEnd(FText BarkText, UObject* WorldContextObject)
+void FBarkProvider::BarkAndEnd(FText BarkText, UObject* WorldContextObject)
 {
     const ACommandManager *CommandManager = ManagerProvider->GetCommandManager(WorldContextObject);
     if (CommandManager == nullptr) return;
@@ -32,7 +38,7 @@ void UBarkProvider::BarkAndEnd(FText BarkText, UObject* WorldContextObject)
     }
 }
 
-void UBarkProvider::BarkLines(TArray<FText> BarkTextArray, UObject* WorldContextObject)
+void FBarkProvider::BarkLines(TArray<FText> BarkTextArray, UObject* WorldContextObject)
 {
     const ACommandManager *CommandManager = ManagerProvider->GetCommandManager(WorldContextObject);
     if (CommandManager == nullptr) return;
@@ -42,7 +48,7 @@ void UBarkProvider::BarkLines(TArray<FText> BarkTextArray, UObject* WorldContext
     }
 }
 
-void UBarkProvider::ClearBark(UObject* WorldContextObject)
+void FBarkProvider::ClearBark(UObject* WorldContextObject)
 {
     const ACommandManager *CommandManager = ManagerProvider->GetCommandManager(WorldContextObject);
     if (CommandManager == nullptr) return;

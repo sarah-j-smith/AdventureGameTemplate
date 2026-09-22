@@ -6,17 +6,17 @@
 #include "Item.h"
 #include "Components/Image.h"
 #include "Player/AdventurePlayerController.h"
-#include "Items/InventoryItem.h"
 #include "Player/ItemManager.h"
 
 #include "PaperSprite.h"
+#include "Provider.h"
 
 void UItemSlot::NativeOnInitialized()
 {
 	ItemButton->OnClicked.AddDynamic(this, & UItemSlot::HandleOnClicked);
 	ItemButton->OnHovered.AddDynamic(this, & UItemSlot::HandleOnHover);
 	ItemButton->OnUnhovered.AddDynamic(this, & UItemSlot::HandleOnUnhover);
-	ManagerProvider = NewObject<UManagerProvider>(this);
+	ManagerProvider = UProvider::Get()->GetInstance<IManagerProvider>();
 
 	if (!HasItem)
 	{

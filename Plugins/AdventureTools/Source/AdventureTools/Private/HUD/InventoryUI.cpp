@@ -6,11 +6,14 @@
 #include "AdventureTools.h"
 #include "Gameplay/AdventureGameInstance.h"
 #include "Item.h"
+#include "Provider.h"
 
 #include "Kismet/GameplayStatics.h"
 
 void UInventoryUI::NativeOnInitialized()
 {
+	InventoryManager = UProvider::Get()->GetInstance<IInventoryManager>();
+	
 	UpArrowButton->OnClicked.AddDynamic(this, &UInventoryUI::OnUpArrowButtonClicked);
 	DownArrowButton->OnClicked.AddDynamic(this, &UInventoryUI::OnDownArrowButtonClicked);
 
@@ -40,10 +43,10 @@ void UInventoryUI::PopulateInventory(bool ScrollToLastAdded)
 	UGameInstance *GameInstance = UGameplayStatics::GetGameInstance(GetWorld());
 	UAdventureGameInstance *AdventureGameInstance = Cast<UAdventureGameInstance>(GameInstance);
 	TArray<UItem*> Items;
-	InventoryCount = AdventureGameInstance->GetInventoryItemCount();
+	InventoryCount = InventoryManager->GetInventoryItemCount();
 	if (InventoryCount > 0)
 	{
-		AdventureGameInstance->GetInventoryItems(Items);
+		InventoryManager->GetInventoryItems(Items);
 		MaxRowIndex = InventoryCount > 8 ? ceilf((InventoryCount - 8) / 4.0f) : 0;
 	}
 

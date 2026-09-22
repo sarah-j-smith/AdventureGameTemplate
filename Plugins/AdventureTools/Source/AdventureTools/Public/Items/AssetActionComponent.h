@@ -7,8 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "AssetActionComponent.generated.h"
 
-
-class UManagerProvider;
+struct IManagerProvider;
 enum class EItemAssetType : uint8;
 class UStoryAction;
 
@@ -16,9 +15,8 @@ UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ADVENTURETOOLS_API UAssetActionComponent : public UActorComponent
 {
     GENERATED_BODY()
-
-    UPROPERTY()
-    UManagerProvider *ManagerProvider;
+    
+    TSharedPtr<IManagerProvider> ManagerProvider;
     
 public:
     // Sets default values for this component's properties

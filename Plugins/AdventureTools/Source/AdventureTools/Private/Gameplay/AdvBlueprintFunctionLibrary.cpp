@@ -13,22 +13,21 @@
 
 #include "AdventureTools.h"
 #include "GameUtils.h"
+#include "Provider.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "Gameplay/ManagerProvider.h"
 #include "Gameplay/BarkProvider.h"
 
-UManagerProvider* UAdvBlueprintFunctionLibrary::GetManagerProvider()
+TSharedRef<IManagerProvider> UAdvBlueprintFunctionLibrary::GetManagerProvider()
 {
-    static UManagerProvider *ManagerProvider = NewObject<UManagerProvider>();
-    return ManagerProvider;
+    return UProvider::Get()->GetInstance<IManagerProvider>();
 }
 
-UBarkProvider* UAdvBlueprintFunctionLibrary::GetBarkProvider()
+TSharedRef<IBarkProvider> UAdvBlueprintFunctionLibrary::GetBarkProvider()
 {
-    static UBarkProvider *BarkProvider = NewObject<UBarkProvider>();
-    return BarkProvider;
+    return UProvider::Get()->GetInstance<IBarkProvider>();
 }
 
 UAdventureControllerProvider* UAdvBlueprintFunctionLibrary::GetControllerProvider()
@@ -67,10 +66,7 @@ UItemManager* UAdvBlueprintFunctionLibrary::GetItemManager(UObject* WorldContext
 
 void UAdvBlueprintFunctionLibrary::PlayerBark(UObject* WorldContextObject, FText BarkText)
 {
-    if (UBarkProvider *BarkProvider = UAdvBlueprintFunctionLibrary::GetBarkProvider())
-    {
-        BarkProvider->Bark(BarkText, WorldContextObject);
-    }
+    GetBarkProvider()->Bark(BarkText, WorldContextObject);
 }
 
 void UAdvBlueprintFunctionLibrary::ClearVerb(UObject* WorldContextObject)

@@ -9,7 +9,7 @@
 
 void UMockAghud::BeginDestroy()
 {
-	UObject::BeginDestroy();
+	Super::BeginDestroy();
 	
 	UE_LOG(LogTemp, Log, TEXT("####  MockAghud::BeginDestroy"));
 }
@@ -18,45 +18,24 @@ void UMockAghud::BindCommandHandlers(ACommandManager* CommandManager)
 {
 	check(CommandManager);
 
-	CommandManager->BeginAction.AddUObject(this, &UMockAghud::BeginActionEvent);
-	CommandManager->UpdateInteractionTextDelegate.AddUObject(this, &UMockAghud::UpdateInteractionTextEvent);
-	CommandManager->InterruptAction.AddUniqueDynamic(this, &UMockAghud::InterruptActionEvent);
+	CommandManager->BeginAction.AddUObject(this, &UMockAghud::Mock_BeginActionEvent);
+	CommandManager->UpdateInteractionTextDelegate.AddUObject(this, &UMockAghud::Mock_UpdateInteractionTextEvent);
+	CommandManager->InterruptAction.AddUniqueDynamic(this, &UMockAghud::Mock_InterruptActionEvent);
     
 	if (UItemManager *ItemManager = CommandManager->ItemManager)
 	{
-		ItemManager->UpdateInventoryTextDelegate.AddUObject(this, &UMockAghud::UpdateInventoryTextEvent);
+		ItemManager->UpdateInventoryTextDelegate.AddUObject(this, &UMockAghud::Mock_UpdateInventoryTextEvent);
 	}
-}
-
-void UMockAghud::BindInventoryHandlers(UAdventureGameInstance* AdventureGameInstance)
-{
-	AdventureGameInstance->PlayerInventoryChanged.AddUniqueDynamic(this, &UMockAghud::HandleInventoryChanged);
 }
 
 void UMockAghud::BindScoreHandlers(AAdventureGameModeBase* AdventureGameMode)
 {
-	AdventureGameMode->ScoreDelegate.AddUniqueDynamic(this, &UMockAghud::HandleScoreChanged);
+	AdventureGameMode->ScoreDelegate.AddUniqueDynamic(this, &UMockAghud::Mock_HandleScoreChanged);
 }
 
 void UMockAghud::BindNotifierHandlers(UInteractionNotifier* Notifier)
 {   
-	Notifier->UserInteraction.AddUObject(this, &UMockAghud::OnUserInteracted);
+	Notifier->UserInteraction.AddUObject(this, &UMockAghud::Mock_OnUserInteracted);
 	// Notifier->PromptListOpenRequest.AddUObject(this, &UAdventureGameHUD::ShowPromptList);
 	// Notifier->PromptListCloseRequest.AddUObject(this, &UAdventureGameHUD::HidePromptList);
-}
-
-void UMockAghud::UpdateSaveGameIndicatorEvent(ESaveGameStatus SaveGameStatus, bool Success)
-{
-}
-
-void UMockAghud::UpdateInventoryTextEvent()
-{
-}
-
-void UMockAghud::HandleInventoryChanged(FName ItemKind, EItemDisposition Disposition)
-{
-}
-
-void UMockAghud::HandleScoreChanged(int32 Score)
-{
 }

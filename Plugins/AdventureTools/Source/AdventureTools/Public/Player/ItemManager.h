@@ -11,7 +11,8 @@
 #include "UObject/Object.h"
 #include "ItemManager.generated.h"
 
-class UInventory;
+struct IInventoryManager;
+class FInventory;
 class UItem;
 class UItemTypeDefs;
 class UItemSlot;
@@ -35,9 +36,6 @@ public:
 	UItemManager();
 	
 	virtual void BeginPlay() override;
-	
-	UFUNCTION()
-	void OnInventoryChanged(FName ItemKind, EItemDisposition ItemDisposition);
 	
 	//////////////////////////////////
 	///
@@ -87,7 +85,9 @@ public:
 private:
 	void CheckForCustomInventoryItem(FName ItemDef);
 	void CreateCustomInventoryItemHandler(FName ItemDef, UInventoryItem *InventoryItem);
-	void CreateDefaultInventoryItem(FName ItemDef);
+	UInventoryItem *CreateDefaultInventoryItem(FName ItemDef);
+	void UpdateTargetWithNewInventoryItem(UInventoryItem *InventoryItem);
+	void UpdateSourceWithNewInventoryItem(UInventoryItem *InventoryItem);
 	
 	/// Which item behaviours will be the <b>subject</b> of the current verb eg "Open Box"
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Items", meta=(AllowPrivateAccess=true))	
@@ -115,18 +115,14 @@ private:
 	
 	FGameplayTag GetTargetItemTag() const { return Target ? Target->ItemTypeDef : AdventureGameplayTags::Item; }
 
-	bool GetHasSourceItem() const { return !!Source; }
-	
-	bool GetHasTargetItem() const { return !!Target; }
-	
 	TArray<EVerbType> ItemActionQueue;
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetHasSourceItem")
-	bool HasSourceItem;
+	UFUNCTION(BlueprintCallable, Category="Items")
+	bool HasSourceItem() const;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", Getter="GetHasTargetItem")
-	bool HasTargetItem;
+	UFUNCTION(BlueprintCallable, Category="Items")
+	bool HasTargetItem() const;
 	
 	/// Item slot in the inventory either hovered or clicked.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Commands")
@@ -211,8 +207,7 @@ public:
 private:
 	TSet<FName> ItemsToRemove;
 	
-	UPROPERTY()
-	UInventory *Inventory;
+	TSharedPtr<IInventoryManager> InventoryManager;
 
 public:
 	/// Handle a mouse click on an item button.

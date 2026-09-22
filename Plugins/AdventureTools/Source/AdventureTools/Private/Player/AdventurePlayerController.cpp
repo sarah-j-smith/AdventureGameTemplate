@@ -269,17 +269,18 @@ void AAdventurePlayerController::SetupAIController(APawn* AttachToPawn)
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("       AAdventurePlayerController::SetupAIController"));
     AActor* AIControllerActor = UGameplayStatics::GetActorOfClass(GetWorld(), AAdventureAIController::StaticClass());
     AAdventureAIController* AdventureAIController = Cast<AAdventureAIController>(AIControllerActor);
-#if WITH_EDITOR
+
     if (!AdventureAIController)
     {
+#if WITH_EDITOR
         FString ErrorMessage = FString::Printf(TEXT("AIController not found on character %s - check its blueprint Pawn section"),
                                                *AttachToPawn->GetName());
         GEngine->AddOnScreenDebugMessage(ADVENTURE_CONTROLLER_SETUP_AI_KEY, 10.0, FColor::Red,
                                          *ErrorMessage, false, FVector2D(2.0, 2.0));
         UE_LOG(LogAdventureGame, Error, TEXT("SetupAIController missing! %s"), *ErrorMessage);
-    }
 #endif
-    check(AdventureAIController);
+        return;
+    }
     
     AdventureAIController->Possess(AttachToPawn);
 

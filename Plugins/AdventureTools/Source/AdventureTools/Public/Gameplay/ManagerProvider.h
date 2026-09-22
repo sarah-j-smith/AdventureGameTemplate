@@ -2,26 +2,17 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "UObject/Object.h"
-#include "ManagerProvider.generated.h"
+#include "IManagerProvider.h"
 
 class UItemManager;
 class ACommandManager;
 
-/**
- * 
- */
-UCLASS()
-class ADVENTURETOOLS_API UManagerProvider : public UObject
+class ADVENTURETOOLS_API FManagerProvider : public IManagerProvider
 {
-	GENERATED_BODY()
 public:
 	/// Get a pointer to an Item Manager instance
-	UFUNCTION(BlueprintCallable, Category = "ItemManager", meta = (WorldContext = "WorldContextObject"))
-	UItemManager *GetItemManager(UObject *WorldContextObject);
+	virtual UItemManager *GetItemManager(UObject *WorldContextObject) override;
     
 	/// Get a pointer to a Command Manager instance
-	UFUNCTION(BlueprintCallable, Category = "ItemManager", meta = (WorldContext = "WorldContextObject"))
-	ACommandManager *GetCommandManager(UObject *WorldContextObject);
+	virtual ACommandManager *GetCommandManager(UObject *WorldContextObject) override;
 };

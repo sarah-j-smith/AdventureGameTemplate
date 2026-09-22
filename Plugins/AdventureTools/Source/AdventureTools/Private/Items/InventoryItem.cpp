@@ -7,8 +7,8 @@
 #include "Constants.h"
 #include "AdventureTools.h"
 #include "Item.h"
+#include "Provider.h"
 #include "VerbType.h"
-#include "Gameplay/ManagerProvider.h"
 #include "Gameplay/BarkProvider.h"
 #include "Player/AdventurePlayerController.h"
 #include "Player/ItemManager.h"
@@ -22,9 +22,9 @@ FGameplayTagContainer& UInventoryItem::GetTagContainer()
 }
 
 UInventoryItem::UInventoryItem()
+    : ManagerProvider(UProvider::Get()->GetInstance<IManagerProvider>())
+    , BarkProvider(UProvider::Get()->GetInstance<IBarkProvider>())
 {
-    ManagerProvider = CreateDefaultSubobject<UManagerProvider>("ManagerProvider");
-    BarkProvider = CreateDefaultSubobject<UBarkProvider>("BarkProvider");
 }
 
 void UInventoryItem::PlayerBarkAndEnd(FText Text)
@@ -57,10 +57,8 @@ void UInventoryItem::OnItemActionSuccess_Implementation()
         {
             bHandled = true;
             ItemDataAsset->bHandled = false;
-            return;
         }
     }
-    OnItemActionSuccess();
 }
 
 void UInventoryItem::OnItemActionFailure_Implementation()
@@ -76,10 +74,8 @@ void UInventoryItem::OnItemActionFailure_Implementation()
         {
             bHandled = true;
             ItemDataAsset->bHandled = false;
-            return;
         }
     }
-    OnItemActionFailure();
 }
 
 UStoryAction* UInventoryItem::ItemDataAssetForAction(const EVerbType Verb) const

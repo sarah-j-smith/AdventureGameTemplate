@@ -16,10 +16,8 @@
 #include "Player/ItemManager.h"
 #include "Player/CommandManager.h"
 #include "Player/InteractionNotifier.h"
-
-#include "Gameplay/AdventureGameInstance.h"
+#include "Items/IInventoryManager.h"
 #include "Gameplay/AdventureGameMode.h"
-#include  "Gameplay/AdventureControllerProvider.h"
 
 #include "HUD/InteractionHUD.h"
 #include "HUD/PromptList.h"
@@ -31,6 +29,8 @@
 #include "DescribableItem.h"
 #include "Constants.h"
 #include "ItemDisposition.h"
+#include "Provider.h"
+
 
 void UAdventureGameHUD::NativeOnInitialized()
 {
@@ -38,7 +38,14 @@ void UAdventureGameHUD::NativeOnInitialized()
     {
         IsMobileTouch = true;
     }
-    ManagerProvider = NewObject<UManagerProvider>(this);
+    ManagerProvider = UProvider::Get()->GetInstance<IManagerProvider>();
+    InventoryManager = UProvider::Get()->GetInstance<IInventoryManager>();
+    
+    InventoryManager->NotifyInventoryChanged([this](FInventoryChangedDelegate Delegate)
+    {
+        Delegate.AddUObject(this, &UAdventureGameHUD::HandleInventoryChanged);
+    });
+    
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("UAdventureGameHUD::NativeOnInitialized"));
 }
 
@@ -70,11 +77,6 @@ void UAdventureGameHUD::BindCommandHandlers(ACommandManager *CommandManager)
     {
         ItemManager->UpdateInventoryTextDelegate.AddUObject(this, &UAdventureGameHUD::UpdateInventoryTextEvent);
     }
-}
-
-void UAdventureGameHUD::BindInventoryHandlers(UAdventureGameInstance* AdventureGameInstance)
-{
-    AdventureGameInstance->PlayerInventoryChanged.AddUniqueDynamic(this, &UAdventureGameHUD::HandleInventoryChanged);
 }
 
 void UAdventureGameHUD::BindScoreHandlers(AAdventureGameModeBase *AdventureGameMode)
