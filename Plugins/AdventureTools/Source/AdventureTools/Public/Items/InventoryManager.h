@@ -16,10 +16,9 @@ class UInventoryItem;
 UCLASS()
 class UInventoryManager : public UObject, public IInventoryManager
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 	
-	UInventoryManager();
-	
+public:
 	virtual ~UInventoryManager() override = default;
 
 	virtual void Init() override;
@@ -74,6 +73,8 @@ private:
 
 	TArray<FName> TableOperationsQueue;
 	TMap<FString, FName> ClassOperationsQueue;
+	
+	TSharedPtr<IItemTableProvider> GetItemTableProvider();
 
-	TSharedPtr<IItemTableProvider> ItemTableProvider;
+	TSharedPtr<IItemTableProvider> _ItemTableProvider;
 };

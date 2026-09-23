@@ -59,7 +59,7 @@ class ADVENTURETOOLS_API UAdventureGameInstance : public UGameInstance, public I
 	 * Must make a Blueprint class off UItemTableProvider and fill out 
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ItemManagement")
-	TSubclassOf<UItemTableProvider> ItemTableProviderClass;
+	TSubclassOf<UItemTableProvider> ItemTableProviderClass = UItemTableProvider::StaticClass();
 	
 	/// All the tags currently set in the game
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Save Game")
@@ -76,7 +76,7 @@ private:
 	bool bOKToCallItp = false;
 	
 public:
-	virtual void PostInitProperties() override { bOKToCallItp = true; };
+	virtual void PostInitProperties() override;
 	
 	//////////////////////////////////
 	///

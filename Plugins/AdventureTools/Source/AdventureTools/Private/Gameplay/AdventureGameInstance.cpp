@@ -28,6 +28,8 @@
 UAdventureGameInstance::UAdventureGameInstance(const FObjectInitializer &ObjectInitializer)
 	: UGameInstance(ObjectInitializer)
 {
+	UE_LOG(LogAdventureGame, Warning, TEXT("UAdventureGameInstance::UAdventureGameInstance"));
+	
 	// In unit tests can avoid this being called by simply not creating a UAdventureGameInstance
 	// in the test.
 	// 
@@ -62,6 +64,7 @@ void UAdventureGameInstance::SetupProviderRegistrations()
 	
 	UProvider::Get()->RegisterFactory<IItemTableProvider>([this]()
 	{
+		UE_LOG(LogAdventureGame, Warning, TEXT(">>> Constructing ItemTablProvider"));
 		// Note although this lambda is _registered_ with the provider in the Game Instance's constructor
 		// the lambda is only _called_ *after* the Game Instance construction is finished. Because of that
 		// it should be OK to refer to this member properties, eg `ItemTableProviderClass`.
@@ -77,6 +80,7 @@ void UAdventureGameInstance::SetupProviderRegistrations()
 		// Use polymorphic reference to return from factory.
 		IItemTableProvider* NewItemTableProvider = KnownItemTableProvider;
 		ItemTableProvider = MakeShareable(NewItemTableProvider);
+		UE_LOG(LogAdventureGame, Warning, TEXT("<<< Constructing ItemTablProvider"));
 		return MakeShareable(NewItemTableProvider);
 	});
 	
@@ -400,6 +404,13 @@ ADoor* UAdventureGameInstance::FindDoor(FName DoorLabel)
 
 void UAdventureGameInstance::LogSaveGameStatus(USaveGame* SaveGame)
 {
+}
+
+void UAdventureGameInstance::PostInitProperties()
+{
+	Super::PostInitProperties();
+	
+	bOKToCallItp = true;
 }
 
 void UAdventureGameInstance::LoadRoom(ADoor* FromDoor)

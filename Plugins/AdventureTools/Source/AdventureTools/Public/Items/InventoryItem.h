@@ -24,16 +24,19 @@ class ADVENTURETOOLS_API UInventoryItem : public UObject, public IVerbInteractio
     public IHistoryTagInterface, public IGameplayTagAssetInterface
 {
     GENERATED_BODY()
+
+    TSharedPtr<IManagerProvider> _ManagerProvider;
     
+    TSharedPtr<IBarkProvider> _BarkProvider;
+    
+    TSharedPtr<IManagerProvider> GetManagerProvider();
+    
+    TSharedPtr<IBarkProvider> GetBarkProvider();
+public:
+    bool bHandled = false;
+
     UStoryAction* ItemDataAssetForAction(EVerbType Verb) const;
     
-    TSharedPtr<IManagerProvider> ManagerProvider;
-    
-    TSharedPtr<IBarkProvider> BarkProvider;
-    
-    bool bHandled = false;
-    
-public:
     //////////////////////////////////
     ///
     /// GAME PLAY TAG COLLECTIONS
@@ -59,7 +62,6 @@ protected:
     virtual FGameplayTagContainer &GetTagContainer() override;
     
 public:
-    UInventoryItem();
     
     //////////////////////////////////
     ///

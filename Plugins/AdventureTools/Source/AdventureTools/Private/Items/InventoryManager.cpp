@@ -7,17 +7,6 @@
 #include "Items/InventoryItem.h"
 #include "Items/ItemData.h"
 
-UInventoryManager::UInventoryManager(FObjectInitializer const &Initializer)
-	: UObject(Initializer)
-	, ItemTableProvider(UProvider::Get()->GetInstance<IItemTableProvider>())
-{
-}
-
-UInventoryManager::UInventoryManager()
-	: ItemTableProvider(UProvider::Get()->GetInstance<IItemTableProvider>())
-{
-}
-
 void UInventoryManager::Init()
 {
 	CreateInventory();
@@ -62,7 +51,7 @@ void UInventoryManager::InventoryClassLoadCompleteHandler(const FSoftObjectPath&
 void UInventoryManager::GetCustomInventoryItemWithTable(FName ItemKind, UDataTable* DataTablePtr)
 {
 	ensureAlwaysMsgf(DataTablePtr, TEXT("GetCustomInventoryItemWithTable: Error, expected table to be loaded"));
-	const auto ItemBehavioursTable = ItemTableProvider->GetItemBehavioursTable();
+	const auto ItemBehavioursTable = GetItemTableProvider()->GetItemBehavioursTable();
 	const FItemData *ItemRow  = ItemBehavioursTable->FindRow<FItemData>(ItemKind, "GetCustomInventoryItemWithTable");
 	if (ItemRow == nullptr)
 	{
@@ -87,6 +76,13 @@ void UInventoryManager::GetCustomInventoryItemWithClass(FName ItemKind, const UC
 	ensureAlwaysMsgf(CustomInventoryItemLoadedDelegate.IsBound(), 
 		TEXT("GetCustomInventoryItemWithClass: CustomInventoryItem is not bound - forgot to call CustomInventoryItemLoaded?"));
 	CustomInventoryItemLoadedDelegate.Broadcast(ItemKind, InventoryItem);
+}
+
+TSharedPtr<IItemTableProvider> UInventoryManager::GetItemTableProvider()
+{
+	if (_ItemTableProvider.IsValid()) return _ItemTableProvider;
+	_ItemTableProvider = UProvider::Get()->GetInstance<IItemTableProvider>();
+	return _ItemTableProvider;
 }
 
 void UInventoryManager::AddItemToInventory(FName ItemKind)
@@ -143,7 +139,7 @@ int UInventoryManager::GetInventoryItemCount() const
 void UInventoryManager::GetCustomInventoryItem(FName ItemKind)
 {
 	UE_LOG(LogAdventureGame, VeryVerbose, TEXT("UAdventureGameInstance::GetCustomInventoryItem: %s"), *ItemKind.ToString());
-	const auto ItemBehavioursTable = ItemTableProvider->GetItemBehavioursTable();
+	const auto ItemBehavioursTable = GetItemTableProvider()->GetItemBehavioursTable();
 	if (UDataTable *Table = ItemBehavioursTable.Get())
 	{
 		GetCustomInventoryItemWithTable(ItemKind, Table);
