@@ -13,13 +13,12 @@
 #include "WalkDirection.h"
 #include "ItemDataList.h"
 
-#include "StoryAction.h"
-
 #include "HotSpot.generated.h"
 
-class UBarkProvider;
-class UManagerProvider;
+struct IBarkProvider;
+struct IManagerProvider;
 enum class EVerbType : uint8;
+
 class USphereComponent;
 class UAssetActionComponent;
 
@@ -241,9 +240,7 @@ protected:
 	bool HotSpotHidden = false;
 	bool Pickup = false;
 	
-	UPROPERTY()
-	UManagerProvider *ManagerProvider;
+	TSharedPtr<IManagerProvider> ManagerProvider;
 	
-	UPROPERTY()
-	UBarkProvider *BarkProvider;
+	TSharedPtr<IBarkProvider> BarkProvider;
 };

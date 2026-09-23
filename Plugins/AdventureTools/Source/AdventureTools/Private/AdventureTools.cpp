@@ -13,6 +13,8 @@ DEFINE_LOG_CATEGORY(LogAdventureGame);
 
 void FAdventureToolsModule::StartupModule()
 {
+	UE_LOG(LogAdventureGame, Warning, TEXT("FAdventureToolsModule::StartupModule"));
+	
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	FStringTableRegistry::Get().UnregisterStringTable(ITEM_STRINGS_KEY);
 	FStringTableRegistry::Get().UnregisterStringTable(ITEM_DESCRIPTIONS_KEY);

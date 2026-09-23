@@ -7,29 +7,39 @@
 #include "Constants.h"
 #include "AdventureTools.h"
 #include "Item.h"
+#include "Provider.h"
 #include "VerbType.h"
-#include "Gameplay/ManagerProvider.h"
 #include "Gameplay/BarkProvider.h"
 #include "Player/AdventurePlayerController.h"
 #include "Player/ItemManager.h"
 
 #include "Internationalization/StringTableRegistry.h"
 
+    
+
+
+TSharedPtr<IManagerProvider> UInventoryItem::GetManagerProvider()
+{
+    if (_ManagerProvider.IsValid()) return _ManagerProvider;
+    _ManagerProvider = UProvider::Get()->GetInstance<IManagerProvider>();
+    return _ManagerProvider;
+}
+
+TSharedPtr<IBarkProvider> UInventoryItem::GetBarkProvider()
+{
+    if (_BarkProvider.IsValid()) return _BarkProvider;
+    _BarkProvider = UProvider::Get()->GetInstance<IBarkProvider>();
+    return _BarkProvider;
+}
 
 FGameplayTagContainer& UInventoryItem::GetTagContainer()
 {
     return HistoryTags;
 }
 
-UInventoryItem::UInventoryItem()
-{
-    ManagerProvider = CreateDefaultSubobject<UManagerProvider>("ManagerProvider");
-    BarkProvider = CreateDefaultSubobject<UBarkProvider>("BarkProvider");
-}
-
 void UInventoryItem::PlayerBarkAndEnd(FText Text)
 {
-    BarkProvider->BarkAndEnd(Text, this);
+    _BarkProvider->BarkAndEnd(Text, this);
 }
 
 void UInventoryItem::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
@@ -48,7 +58,7 @@ void UInventoryItem::OnItemActionSuccess_Implementation()
 {
     UE_LOG(LogAdventureGame, Log, TEXT("OnItemUseSuccess Success - default."));
     bHandled = false;
-    const ACommandManager *Command = ManagerProvider->GetCommandManager(this);
+    const ACommandManager *Command = GetManagerProvider()->GetCommandManager(this);
     if (UStoryAction *ItemDataAsset = ItemDataAssetForAction(Command->CurrentVerb))
     {
         ItemDataAsset->bHandled = false;
@@ -57,17 +67,15 @@ void UInventoryItem::OnItemActionSuccess_Implementation()
         {
             bHandled = true;
             ItemDataAsset->bHandled = false;
-            return;
         }
     }
-    OnItemActionSuccess();
 }
 
 void UInventoryItem::OnItemActionFailure_Implementation()
 {
     UE_LOG(LogAdventureGame, Log, TEXT("OnItemUseSuccess Success - default."));
     bHandled = false;
-    const ACommandManager *Command = ManagerProvider->GetCommandManager(this);
+    const ACommandManager *Command = GetManagerProvider()->GetCommandManager(this);
     if (UStoryAction *ItemDataAsset = ItemDataAssetForAction(Command->CurrentVerb))
     {
         ItemDataAsset->bHandled = false;
@@ -76,10 +84,8 @@ void UInventoryItem::OnItemActionFailure_Implementation()
         {
             bHandled = true;
             ItemDataAsset->bHandled = false;
-            return;
         }
     }
-    OnItemActionFailure();
 }
 
 UStoryAction* UInventoryItem::ItemDataAssetForAction(const EVerbType Verb) const
@@ -100,7 +106,7 @@ void UInventoryItem::OnClose_Implementation()
     }
     if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On close"));
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "CloseDefaultText"), this);
+    GetBarkProvider()->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "CloseDefaultText"), this);
 }
 
 void UInventoryItem::OnOpen_Implementation()
@@ -116,14 +122,14 @@ void UInventoryItem::OnOpen_Implementation()
     }
     if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On open"));
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "OpenDefaultText"), this);
+    GetBarkProvider()->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "OpenDefaultText"), this);
 }
 
 void UInventoryItem::OnGive_Implementation()
 {
     IVerbInteractions::OnGive_Implementation();
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On give inventory item defaultasdfasdfasdf"));
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "GiveDefaultText"), this);
+    _BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "GiveDefaultText"), this);
 }
 
 void UInventoryItem::OnPickUp_Implementation()
@@ -132,7 +138,7 @@ void UInventoryItem::OnPickUp_Implementation()
     OnItemActionSuccess();
     if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On Pickup"));
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PickUpDefaultText"), this);
+    GetBarkProvider()->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PickUpDefaultText"), this);
 }
 
 void UInventoryItem::OnTalkTo_Implementation()
@@ -141,7 +147,7 @@ void UInventoryItem::OnTalkTo_Implementation()
     OnItemActionSuccess();
     if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On talk"));
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "TalkToDefaultText"), this);
+    GetBarkProvider()->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "TalkToDefaultText"), this);
 }
 
 void UInventoryItem::OnLookAt_Implementation()
@@ -152,11 +158,11 @@ void UInventoryItem::OnLookAt_Implementation()
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On look at"));
     if (ItemDetails->Description.IsEmpty())
     {
-        BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "LookAtDefaultText"), this);
+        GetBarkProvider()->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "LookAtDefaultText"), this);
     }
     else
     {
-        BarkProvider->BarkAndEnd(ItemDetails->Description, this);
+        GetBarkProvider()->BarkAndEnd(ItemDetails->Description, this);
     }
 }
 
@@ -166,7 +172,7 @@ void UInventoryItem::OnPull_Implementation()
     OnItemActionSuccess();
     if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On pull"));
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PullDefaultText"), this);
+    GetBarkProvider()->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PullDefaultText"), this);
 }
 
 void UInventoryItem::OnPush_Implementation()
@@ -175,7 +181,7 @@ void UInventoryItem::OnPush_Implementation()
     OnItemActionSuccess();
     if (bHandled) return;
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("On push"));
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PushDefaultText"), this);
+    GetBarkProvider()->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "PushDefaultText"), this);
 }
 
 void UInventoryItem::OnUse_Implementation()
@@ -189,7 +195,7 @@ void UInventoryItem::OnUse_Implementation()
 void UInventoryItem::OnWalkTo_Implementation()
 {
     IVerbInteractions::OnWalkTo_Implementation();
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "WalkToDefaultText"), this);
+    GetBarkProvider()->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "WalkToDefaultText"), this);
 }
 
 void UInventoryItem::OnItemUsed_Implementation()
@@ -198,14 +204,14 @@ void UInventoryItem::OnItemUsed_Implementation()
 
     // **this** InventoryItem is the target and ItemManager->SourceItem is the source of a Use
     // verb. Check that the Source can validly use on this.
-    if (UItemManager *ItemManager = ManagerProvider->GetItemManager(this))
+    if (UItemManager *ItemManager = GetManagerProvider()->GetItemManager(this))
     {
         if (ItemManager->CanInteractWith(ItemDetails->ItemTypeDef))
         {
             // Item is used on itself - failure - this should not be necessary,
             // but needed in the case that during game design this item mistakenly
             // has its interactable item set to another with the same item kind.
-            if (ACommandManager *Command = ManagerProvider->GetCommandManager(this))
+            if (ACommandManager *Command = GetManagerProvider()->GetCommandManager(this))
             {
                 Command->InterruptCurrentAction();
             }
@@ -244,5 +250,5 @@ void UInventoryItem::OnItemGiven_Implementation()
     
     // TODO Giving items to another not yet implemented - is there a use-case for this?
     // Usually we give an item to an NPC (a hot-spot) and giving it to another item is weird.
-    BarkProvider->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemGivenDefaultText"), this);
+    GetBarkProvider()->BarkAndEnd(LOCTABLE(ITEM_STRINGS_KEY, "ItemGivenDefaultText"), this);
 }

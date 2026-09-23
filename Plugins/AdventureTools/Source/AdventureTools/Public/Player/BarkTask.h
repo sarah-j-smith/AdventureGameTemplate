@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
+#include "Gameplay/IManagerProvider.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "BarkTask.generated.h"
 
 /// https://unrealcommunity.wiki/creating-asynchronous-blueprint-nodes-ctnmtj0q
 
-class UManagerProvider;
-class UBarkProvider;
+enum class EBarkRequestFinishedReason : uint8;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBarkOutputPin);
 
 /**
@@ -52,10 +52,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Barking")
     FText BarkText;
     
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Barking")
-    UManagerProvider* ManagerProvider;
-    
 private:
     UFUNCTION()
     void BarkCompleted(int32 UID, EBarkRequestFinishedReason Reason);
+    
+    TSharedPtr<IManagerProvider> ManagerProvider;
 };

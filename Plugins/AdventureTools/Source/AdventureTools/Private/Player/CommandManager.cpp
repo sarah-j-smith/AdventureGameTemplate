@@ -25,7 +25,7 @@
 #include "Player/Puck.h"
 #include "Player/TestBarkController.h"
 
-#include  "PositionProvider.h"
+#include "PositionProvider.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
@@ -277,14 +277,14 @@ void ACommandManager::PerformInstantAction()
 {
 #if WITH_EDITOR
     FString DebugString;
-    if (ItemManager->HasSourceItem) DebugString = ItemManager->SourceItemName.ToString();
+    if (ItemManager->HasSourceItem()) DebugString = ItemManager->SourceItemName.ToString();
     if (CurrentHotSpot && DebugString.IsEmpty()) DebugString = CurrentHotSpot->ShortDescription.ToString();
     UE_LOG(LogAdventureGame, Display, TEXT("PerformInstantAction %s - %s"),
            *VerbGetDescriptiveString(CurrentVerb).ToString(), *DebugString);
 #endif
 
     CurrentCommand = EPlayerCommand::InstantActive;
-    if (ItemManager->HasSourceItem)
+    if ( ItemManager->HasSourceItem())
     {
         // Clicking on something in your own inventory
         ItemManager->PerformItemAction(EVerbType::LookAt);
@@ -614,11 +614,7 @@ void ACommandManager::ConnectToPlayerHUD(UAdventureGameHUD* AAdventureGameHUD)
 
     AAdventureGameHUD->BindNotifierHandlers(InteractionNotifier);
     AAdventureGameHUD->BindCommandHandlers(this);
-
-    if (UAdventureGameInstance *AdventureGameInstance = GetAdventureGameInstance())
-    {
-        AAdventureGameHUD->BindInventoryHandlers(AdventureGameInstance);
-    }
+    
     if (AAdventureGameModeBase *GameMode = Cast<AAdventureGameModeBase>(UGameplayStatics::GetGameMode(this)))
     {
         AAdventureGameHUD->BindScoreHandlers(GameMode);
@@ -712,6 +708,23 @@ UAdventureGameInstance* ACommandManager::GetAdventureGameInstance() const
     return nullptr;
 }
 
+#if WITH_AUTOMATION_TESTS
+void ACommandManager::SetPlayerBarkManager(UPlayerBarkManager* APlayerBarkManager)
+{
+    this->PlayerBarkManager = APlayerBarkManager;
+}
+
+void ACommandManager::SetControllerProvider(UAdventureControllerProvider* AControllerProvider)
+{
+    this->ControllerProvider = AControllerProvider;
+}
+
+void ACommandManager::SetAdventureGameHUD(UAdventureGameHUD* AAdventureGameHUD)
+{
+    this->AdventureGameHUD = AAdventureGameHUD;
+}
+#endif
+
 void ACommandManager::UpdateMouseOverUI(const bool NewMouseIsOverUI)
 {
 #if WITH_EDITOR
@@ -767,6 +780,9 @@ void ACommandManager::HandleInventoryItemClicked(UItemSlot* ItemSlot)
     }
     if (ItemManager->MaybeHandleInventoryItemClicked(ItemSlot)) return;
 
+    UE_LOG(LogAdventureGame, Error, TEXT("HandleInventoryItemClicked: %s - %s"), 
+        *UEnum::GetValueAsString(CurrentCommand), *UEnum::GetValueAsString(CurrentVerb));
+    
     // This handler is only called if `HasItem` is true
     switch (CurrentCommand)
     {

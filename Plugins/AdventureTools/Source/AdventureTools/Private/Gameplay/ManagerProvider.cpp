@@ -5,7 +5,7 @@
 #include "AdventureTools.h"
 #include "Kismet/GameplayStatics.h"
 
-ACommandManager* UManagerProvider::GetCommandManager(UObject *WorldContextObject)
+ACommandManager* FManagerProvider::GetCommandManager(UObject *WorldContextObject)
 {
 	static TWeakObjectPtr<ACommandManager> CachedCommandManager;
 	if (ACommandManager* CommandManager = CachedCommandManager.Get()) return CommandManager;
@@ -22,7 +22,7 @@ ACommandManager* UManagerProvider::GetCommandManager(UObject *WorldContextObject
 	return CommandManager;
 }
 
-UItemManager* UManagerProvider::GetItemManager(UObject *WorldContextObject)
+UItemManager* FManagerProvider::GetItemManager(UObject *WorldContextObject)
 {
 	if (const ACommandManager* CommandManager = GetCommandManager(WorldContextObject)) return CommandManager->ItemManager;
 	return nullptr;

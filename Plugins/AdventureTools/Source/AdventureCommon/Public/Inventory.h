@@ -7,11 +7,8 @@
 #include "UObject/Object.h"
 #include "ItemTypeDef.h"
 
-#include "Inventory.generated.h"
-
 class UItemTypeDefs;
-class UItem;
-
+struct IItemTableProvider;
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryChanged, FName /* Identifier */, EItemDisposition /* Identifier */);
 
 /**
@@ -19,12 +16,14 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryChanged, FName /* Identifier */
  *
  * This could also be used for a list of items in a loot drop, or quest or similar.
  */
-UCLASS()
-class ADVENTURECOMMON_API UInventory : public UObject
+class ADVENTURECOMMON_API FInventory
 {
-	GENERATED_BODY()
-
-protected:
+public:
+	FInventory();
+	
+	~FInventory();
+	
+private:
 	/**
 	 * Use a Linked List here because the TArray throws exceptions
 	 * when you remove data from the middle of it due to the way it
@@ -68,10 +67,6 @@ protected:
 
 	/// Debugging tool.
 	void DumpInventoryToLog() const;
-
-	void RegisterWithGameInstance(UItem* InventoryItem);
-
-	void UnregisterFromGameInstance(UItem* InventoryItem);
 	
 public:
 	/// Bind to this delegate to be advised when this inventory changes by 
@@ -92,21 +87,16 @@ public:
 	/// Identifier for this inventory of items. If it was a separate list of items
 	/// for a loot drop, as opposed to the default (PlayerInventory) then it could be
 	/// for example "MyQuest_LootDrop"
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
 	FName Identifier = "PlayerInventory";
 
-	/// Table of class references for creating instances of items.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Configuration")
-	TSoftObjectPtr<UItemTypeDefs> InventoryDataTable;
-
 private:
+	TSharedRef<IItemTableProvider> ItemTableProvider;
+	
 	FLoadSoftObjectPathAsyncDelegate InventoryTableLoadCompleteDelegate;
 	FLoadSoftObjectPathAsyncDelegate ItemDetailsLoadCompleteDelegate;
 	
-	UFUNCTION()
 	void InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object);
 	
-	UFUNCTION()
 	void ItemDetailLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object);
 	
 	bool Loading = false;
@@ -127,22 +117,18 @@ public:
 	/// Test if the item identified by the given unique Item if in this inventory.
 	/// @param ItemName Unique name to search for
 	/// @returns true if the item is present and false otherwise
-    UFUNCTION(BlueprintCallable, Category = "Inventory")
     bool Contains(FName ItemName) const;
 
 	/// Find and return an item from the inventory with the given name, or `nullptr`
 	/// if the item is not present.
 	/// @param ItemName FName of the object to fetch
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	UItem *FindItemByName(FName ItemName) const;
 	
 	/// Test if this inventory is currently empty.
 	/// @returns true if it contains no items
-    UFUNCTION(BlueprintCallable, Category = "Inventory")
     bool IsEmpty() const { return InventorySize == 0; };
 
 	/// Count of items in the inventory.
-    UFUNCTION(BlueprintCallable, Category = "Inventory")
     int GetInventorySize() const { return InventorySize; };
 
     //////////////////////////////////
@@ -160,14 +146,12 @@ public:
     * 
     * @param ItemToAdd FName to create an InventoryItem instance of. 
     */
-    UFUNCTION(BlueprintCallable, Category = "Inventory")
     void AddItemInstanceByName(FName ItemToAdd);
 
     /**
      * Removes the given item from the inventory. 
      *  @param ItemToRemove FName to remove an InventoryItem instance of.
      */
-    UFUNCTION(BlueprintCallable, Category = "Inventory")
     void RemoveItemInstanceByName(FName ItemToRemove);
 
     /**
@@ -176,7 +160,6 @@ public:
      * from the `InventoryDataTable` and deletes them in the inventory UI
      * @param ItemsToRemove EItemKind set to remove an InventoryItem instances of.
      */
-    UFUNCTION(BlueprintCallable, Category = "Inventory")
     void RemoveItemKindsFromInventory(const TSet<FName>& ItemsToRemove);
 
     /// Copy pointers to the current inventory into the given array out argument.

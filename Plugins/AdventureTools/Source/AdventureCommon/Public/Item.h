@@ -17,7 +17,9 @@ class UPaperSprite;
 
 /**
  * An item in a game. This is instantiated based on an `FItemTypeDef`, which is uniquely identified
- * by the FName property `ItemTypeDef`.
+ * by the FName property `ItemTypeDef`. Lightweight properties required to support inventory and
+ * data uses. When entering play, the UItem is associated with an UInventoryItem that provides
+ * behaviour via story item data objects and blueprints.
  */
 UCLASS()
 class ADVENTURECOMMON_API UItem : public UObject, public IDescribableItem

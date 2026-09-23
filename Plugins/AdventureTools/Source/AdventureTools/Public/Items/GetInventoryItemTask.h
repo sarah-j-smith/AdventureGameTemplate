@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "IInventoryManager.h"
 
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "GetInventoryItemTask.generated.h"
@@ -38,7 +39,9 @@ public:
     
     UPROPERTY()
     const UObject* WorldContextObject;
-
+    
+    TSharedPtr<IInventoryManager> InventoryManager;
+    
     FName ItemKind;
 
     float WaitTime;
@@ -55,8 +58,5 @@ private:
     UFUNCTION()
     void OnPlayerInventoryChanged(FName ItemKind, EItemDisposition Disposition);
 
-    UAdventureGameInstance *GetAdventureGameInstance();
-    TWeakObjectPtr<UAdventureGameInstance> AdventureGameInstance;
-
-    bool CheckForSuccessCondition(UAdventureGameInstance *GameInstance);
+    bool CheckForSuccessCondition();
 };

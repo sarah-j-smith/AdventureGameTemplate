@@ -411,4 +411,14 @@ private:
     AAdventureAIController* GetAIController();
 
     UAdventureGameInstance* GetAdventureGameInstance() const;
+    
+#if WITH_AUTOMATION_TESTS
+public:
+    void SetPlayerBarkManager(UPlayerBarkManager *APlayerBarkManager);
+    
+    void SetControllerProvider(UAdventureControllerProvider *AControllerProvider);
+    
+    void SetAdventureGameHUD(UAdventureGameHUD *AAdventureGameHUD);
+#endif
+    
 };

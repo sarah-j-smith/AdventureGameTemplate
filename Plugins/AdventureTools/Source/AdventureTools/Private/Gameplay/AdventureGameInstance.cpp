@@ -11,25 +11,90 @@
 #include "HotSpots/Door.h"
 #include "HUD/AdventureGameHUD.h"
 #include "Player/CommandManager.h"
-#include "Inventory.h"
+#include "Provider.h"
 
 #include "GameFramework/SaveGame.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/SphereComponent.h"
+#include "Gameplay/BarkProvider.h"
+#include "Items/IInventoryManager.h"
+#include "Items/InventoryManager.h"
 #include "Gameplay/ManagerProvider.h"
-#include "Items/ItemData.h"
+#include "Items/ItemTableProvider.h"
+#include "Item.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Player/AdventureCharacter.h"
 
+UAdventureGameInstance::UAdventureGameInstance(const FObjectInitializer &ObjectInitializer)
+	: UGameInstance(ObjectInitializer)
+{
+	UE_LOG(LogAdventureGame, Warning, TEXT("UAdventureGameInstance::UAdventureGameInstance"));
+	
+	// In unit tests can avoid this being called by simply not creating a UAdventureGameInstance
+	// in the test.
+	// 
+	// In that case, in those tests, any object that relies on these registrations will barf, so read
+	// the below to see what mock versions of the below objects need to be registered.
+	SetupProviderRegistrations();
+}
+
+void UAdventureGameInstance::SetupProviderRegistrations()
+{
+	// Singleton instance of manager provider
+	static TSharedRef<FManagerProvider> ManagerProviderInstance = MakeShared<FManagerProvider>();
+	
+	// Singleton instance of inventory manager
+	static TSharedRef<UInventoryManager> InventoryManagerInstance = MakeShareable(NewObject<UInventoryManager>());
+		
+	UE_LOG(LogAdventureGame, Log, TEXT("Start: >>> Registering instances, classes & factories for dependency injection"));
+	
+	//////////////
+	/// 
+	///  Singleton Instances - every time the provider is asked, the same object is returned
+	///  
+	UProvider::Get()->RegisterInstance<IInventoryManager>(InventoryManagerInstance);
+	
+	UProvider::Get()->RegisterInstance<IManagerProvider>(ManagerProviderInstance);
+		
+	//////////////
+	/// 
+	///  Class & Factory - every time the provider is asked, a new object is returned
+	///  
+	UProvider::Get()->RegisterClass<IBarkProvider, FBarkProvider>();
+	
+	UProvider::Get()->RegisterFactory<IItemTableProvider>([this]()
+	{
+		UE_LOG(LogAdventureGame, Warning, TEXT(">>> Constructing ItemTablProvider"));
+		// Note although this lambda is _registered_ with the provider in the Game Instance's constructor
+		// the lambda is only _called_ *after* the Game Instance construction is finished. Because of that
+		// it should be OK to refer to this member properties, eg `ItemTableProviderClass`.
+		ensureAlwaysMsgf(bOKToCallItp, TEXT("Called ItemTableProvider factory before Game Instance constructed!"));
+		if (ItemTableProvider.IsValid())
+		{
+			IItemTableProvider *Temp = ItemTableProvider.Get();
+			return MakeShareable<IItemTableProvider>(Temp);
+		}
+		// While we know its a UItemTableProvider, set up implementation details: it has a weak pointer to this
+		UItemTableProvider *KnownItemTableProvider = NewObject<UItemTableProvider>(this, ItemTableProviderClass);
+		KnownItemTableProvider->GameInstance = this;
+		// Use polymorphic reference to return from factory.
+		IItemTableProvider* NewItemTableProvider = KnownItemTableProvider;
+		ItemTableProvider = MakeShareable(NewItemTableProvider);
+		UE_LOG(LogAdventureGame, Warning, TEXT("<<< Constructing ItemTablProvider"));
+		return MakeShareable(NewItemTableProvider);
+	});
+	
+	UE_LOG(LogAdventureGame, Log, TEXT("End: <<< Registering instances, classes & factories for dependency injection"));
+}
+
 void UAdventureGameInstance::Init()
 {
 	Super::Init();
-
-	ManagerProvider = NewObject<UManagerProvider>(this);
-	CreateInventory();
-	BindInventoryChangedHandlers();
+	
+	ManagerProvider = UProvider::Get()->GetInstance<IManagerProvider>();
+	InventoryManager = UProvider::Get()->GetInstance<IInventoryManager>();
+	ItemTableProvider = UProvider::Get()->GetInstance<IItemTableProvider>();
+	InventoryManager->Init();
 
 	if (ShouldCheckForSaveGameOnLoad && UGameplayStatics::DoesSaveGameExist(SAVE_GAME_NAME, 0))
 	{
@@ -39,9 +104,6 @@ void UAdventureGameInstance::Init()
 			LoadGame();
 		}
 	}
-	
-	LoadTableDelegate.BindUObject(this, &UAdventureGameInstance::InventoryTableLoadCompleteHandler);
-	LoadClassDelegate.BindUObject(this, &UAdventureGameInstance::InventoryClassLoadCompleteHandler);
 }
 
 void UAdventureGameInstance::OnSaveHotSpot(AHotSpot* HotSpot)
@@ -76,122 +138,6 @@ void UAdventureGameInstance::OnLoadHotSpot(AHotSpot* HotSpot)
 			break;
 		}
 	}
-}
-
-void UAdventureGameInstance::AddItemToInventory(FName ItemKind)
-{
-	if (Inventory)
-	{
-		Inventory->AddItemInstanceByName(ItemKind);
-	}
-}
-
-void UAdventureGameInstance::RemoveItemFromInventory(FName ItemKind)
-{
-	if (Inventory)
-	{
-		Inventory->RemoveItemInstanceByName(ItemKind);
-	}
-}
-
-void UAdventureGameInstance::RemoveItemsFromInventory(const TSet<FName>& ItemsToRemove)
-{
-	if (Inventory)
-	{
-		Inventory->RemoveItemKindsFromInventory(ItemsToRemove);
-	}
-}
-
-
-bool UAdventureGameInstance::IsInInventory(const FName& ItemToCheck) const
-{
-	return (Inventory && Inventory->Contains(ItemToCheck));
-}
-
-UItem* UAdventureGameInstance::GetItemFromInventory(const FName& ItemToCheck)
-{
-	if (Inventory)
-	{
-		return Inventory->FindItemByName(ItemToCheck);
-	}
-	return nullptr;
-}
-
-void UAdventureGameInstance::GetInventoryItems(TArray<UItem*>& Items)
-{
-	if (Inventory)
-	{
-		Inventory->GetInventoryItemsArray(Items);
-	}
-}
-
-int UAdventureGameInstance::GetInventoryItemCount() const
-{
-	return Inventory ? Inventory->GetInventorySize() : 0;
-}
-
-void UAdventureGameInstance::GetCustomInventoryItem(FName ItemName)
-{
-	if (UDataTable *Table = ItemBehavioursTable.Get())
-	{
-		GetCustomInventoryItemWithTable(ItemName, Table);
-		return;
-	}
-	if (ItemBehavioursTable.IsPending())
-	{
-		TableOperationsQueue.Push(ItemName);
-		int32 _ = ItemBehavioursTable.LoadAsync(LoadTableDelegate);
-		return;
-	}
-	/// There is no custom UInventoryItems at all, because there is no table
-	UE_LOG(LogAdventureGame, Warning, TEXT("AdventureGameInstance::GetCustomInventoryItem: No ItemBehavioursTable set."));
-	CustomInventoryItemLoadedDelegate.Execute(ItemName, nullptr);
-}
-
-void UAdventureGameInstance::InventoryTableLoadCompleteHandler(const FSoftObjectPath& Path, UObject* Object)
-{
-	const TSoftObjectPtr<UDataTable> DataTablePtr(Path);
-	ensureAlwaysMsgf(DataTablePtr.IsValid(), TEXT("InventoryTableLoadCompleteHandler: DataTable is not valid"));
-	while (!TableOperationsQueue.IsEmpty())
-	{
-		const FName ItemName = TableOperationsQueue.Pop();
-		GetCustomInventoryItemWithTable(ItemName, DataTablePtr.Get());
-	}
-}
-
-void UAdventureGameInstance::InventoryClassLoadCompleteHandler(const FSoftObjectPath& Path, UObject* /* Object */)
-{
-	const TSoftClassPtr<UInventoryItem> InventoryItemClassPtr(Path);
-	const UClass* InventoryItemClass = InventoryItemClassPtr.Get();
-	ensureAlwaysMsgf(InventoryItemClass, TEXT("InventoryClassLoadCompleteHandler: InventoryItemClass is not valid"));
-	const FName ItemName = ClassOperationsQueue.FindAndRemoveChecked(Path.ToString());
-	GetCustomInventoryItemWithClass(ItemName, InventoryItemClass);
-}
-
-void UAdventureGameInstance::GetCustomInventoryItemWithTable(FName ItemName, UDataTable* DataTablePtr)
-{
-	ensureAlwaysMsgf(DataTablePtr, TEXT("GetCustomInventoryItemWithTable: Error, expected table to be loaded"));
-	const FItemData *ItemRow  = ItemBehavioursTable->FindRow<FItemData>(ItemName, "GetCustomInventoryItemWithTable");
-	if (ItemRow == nullptr)
-	{
-		/// There is no custom UInventoryItem for this ItemName
-		CustomInventoryItemLoadedDelegate.Execute(ItemName, nullptr);
-	}
-	if (const UClass *InventoryItemClass = ItemRow->ItemClass.Get())
-	{
-		GetCustomInventoryItemWithClass(ItemName, InventoryItemClass);
-		return;
-	}
-	const FSoftObjectPath ItemClassPath = ItemRow->ItemClass.ToSoftObjectPath();
-	ClassOperationsQueue.Add(ItemClassPath.ToString(), ItemName);
-	int32 _ = ItemRow->ItemClass.LoadAsync(LoadClassDelegate);
-}
-
-void UAdventureGameInstance::GetCustomInventoryItemWithClass(FName ItemName, const UClass* InventoryItemClass)
-{
-	UInventoryItem *InventoryItem = NewObject<UInventoryItem>(this, InventoryItemClass, ItemName);
-	ensureAlwaysMsgf(CustomInventoryItemLoadedDelegate.IsBound(), TEXT("GetCustomInventoryItemWithClass: CustomInventoryItem is not bound"));
-	CustomInventoryItemLoadedDelegate.Execute(ItemName, InventoryItem);
 }
 
 void UAdventureGameInstance::OnLoadRoom()
@@ -323,8 +269,8 @@ void UAdventureGameInstance::SaveGame()
 	CurrentSaveGame->StartingDoorLabel = CurrentDoor->DoorLabel;
 
 	TArray<UItem*> Items;
-	CurrentSaveGame->Inventory.Reset(Inventory->GetInventorySize());
-	Inventory->GetInventoryItemsArray(Items);
+	InventoryManager->GetInventoryItems(Items);
+	CurrentSaveGame->Inventory.Reset(InventoryManager->GetInventoryItemCount());
 	for (const UItem* Item : Items)
 	{
 		CurrentSaveGame->Inventory.Add(Item->ItemTypeDef.GetTagLeafName());
@@ -357,14 +303,7 @@ void UAdventureGameInstance::LoadGame()
 		SetLoadTarget(CurrentSaveGame->StartingLevel, CurrentSaveGame->StartingDoorLabel);
 	}
 
-	DestroyInventory();
-	CreateInventory();
-	for (const FName Item : CurrentSaveGame->Inventory)
-	{
-		Inventory->AddItemInstanceByName(Item);
-	}
-	BindInventoryChangedHandlers();
-	PlayerInventoryChanged.Broadcast(NAME_None, EItemDisposition::Reloaded);
+	InventoryManager->RegenerateInventory(CurrentSaveGame->Inventory);
 
 	GameplayTags = CurrentSaveGame->AdventureTags;
 
@@ -408,13 +347,6 @@ void UAdventureGameInstance::LoadRoom()
 
 void UAdventureGameInstance::UnloadRoom()
 {
-	if (Inventory)
-	{
-		if (UAdventureGameHUD* Hud = GetHUD())
-		{
-			Inventory->OnInventoryChanged.Remove(OnInventoryChangedHandle);
-		}
-	}
 	RoomTransitionPhase = ERoomTransitionPhase::UnloadOldRoom;
 	RoomTransitionedDelegate.Broadcast(RoomTransitionPhase);
 	const FLatentActionInfo LatentActionInfo = GetLatentActionForHandler(OnRoomUnloadedName);
@@ -474,37 +406,11 @@ void UAdventureGameInstance::LogSaveGameStatus(USaveGame* SaveGame)
 {
 }
 
-void UAdventureGameInstance::CreateInventory()
+void UAdventureGameInstance::PostInitProperties()
 {
-	if (!Inventory)
-	{
-		Inventory = NewObject<UInventory>(this, TEXT(PLAYER_INVENTORY_NAME));
-		Inventory->SetupHandlers();
-		UE_LOG(LogAdventureGame, Log, TEXT("Created new inventory."));
-		Inventory->Identifier = PLAYER_INVENTORY_NAME;
-		Inventory->InventoryDataTable = ItemDefinitionsTable;
-	}
-}
-
-void UAdventureGameInstance::DestroyInventory()
-{
-	Inventory->OnInventoryChanged.Remove(OnInventoryChangedHandle);
-	Inventory->TearDownHandlers();
-	Inventory = nullptr;
-}
-
-void UAdventureGameInstance::BindInventoryChangedHandlers()
-{
-	if (!Inventory->OnInventoryChanged.IsBound())
-	{
-		OnInventoryChangedHandle = Inventory->OnInventoryChanged.AddUObject(this, &UAdventureGameInstance::InventoryChanged);
-	}
-}
-
-void UAdventureGameInstance::InventoryChanged(FName ItemKind,
-                                              EItemDisposition ItemDisposition)
-{
-	PlayerInventoryChanged.Broadcast(ItemKind, ItemDisposition);
+	Super::PostInitProperties();
+	
+	bOKToCallItp = true;
 }
 
 void UAdventureGameInstance::LoadRoom(ADoor* FromDoor)

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ItemSlot.h"
 #include "Blueprint/UserWidget.h"
+#include "Items/IInventoryManager.h"
 
 #include "InventoryUI.generated.h"
 
@@ -17,6 +18,8 @@ UCLASS()
 class ADVENTURETOOLS_API UInventoryUI : public UUserWidget
 {
 	GENERATED_BODY()
+	
+	TSharedPtr<IInventoryManager> InventoryManager;
 	
 protected:
 	virtual void NativeOnInitialized() override;

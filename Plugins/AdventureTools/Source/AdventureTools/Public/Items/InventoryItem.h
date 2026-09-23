@@ -5,16 +5,15 @@
 #include "CoreMinimal.h"
 
 #include "Gameplay/VerbInteractions.h"
-#include "DescribableItem.h"
 #include "GameplayTagAssetInterface.h"
 #include "HistoryTagInterface.h"
 #include "StoryAction.h"
 #include "ItemDataList.h"
+#include "Gameplay/IManagerProvider.h"
+#include "Gameplay/IBarkProvider.h"
 
 #include "InventoryItem.generated.h"
 
-class UBarkProvider;
-class UManagerProvider;
 class UItem;
 
 /**
@@ -25,18 +24,19 @@ class ADVENTURETOOLS_API UInventoryItem : public UObject, public IVerbInteractio
     public IHistoryTagInterface, public IGameplayTagAssetInterface
 {
     GENERATED_BODY()
+
+    TSharedPtr<IManagerProvider> _ManagerProvider;
     
+    TSharedPtr<IBarkProvider> _BarkProvider;
+    
+    TSharedPtr<IManagerProvider> GetManagerProvider();
+    
+    TSharedPtr<IBarkProvider> GetBarkProvider();
+public:
+    bool bHandled = false;
+
     UStoryAction* ItemDataAssetForAction(EVerbType Verb) const;
     
-    UPROPERTY()
-    UManagerProvider* ManagerProvider;
-    
-    UPROPERTY()
-    UBarkProvider* BarkProvider;
-    
-    bool bHandled = false;
-    
-public:
     //////////////////////////////////
     ///
     /// GAME PLAY TAG COLLECTIONS
@@ -62,7 +62,6 @@ protected:
     virtual FGameplayTagContainer &GetTagContainer() override;
     
 public:
-    UInventoryItem();
     
     //////////////////////////////////
     ///

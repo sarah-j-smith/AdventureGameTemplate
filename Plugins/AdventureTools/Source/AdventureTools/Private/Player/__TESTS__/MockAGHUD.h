@@ -1,4 +1,6 @@
 #pragma once
+#include "ItemDisposition.h"
+#include "HUD/AdventureGameHUD.h"
 
 #include "MockAGHUD.generated.h"
 
@@ -9,47 +11,59 @@ class UInteractionNotifier;
 enum class ESaveGameStatus : uint8;
 
 UCLASS(MinimalAPI)
-class UMockAghud: public UObject
+class UMockAghud: public UAdventureGameHUD
 {
 	GENERATED_BODY()
 public:
-	void BeginDestroy() override;
+	virtual void BeginDestroy() override;
 	
 	/// Subscribe to messages for command & action updates to show in the interaction display.
-	void BindCommandHandlers(ACommandManager *CommandManager);
-
-	/// Subscribe to messages for changes in the player inventory to show in the inventory UI
-	void BindInventoryHandlers(UAdventureGameInstance* AdventureGameInstance);
+	virtual void BindCommandHandlers(ACommandManager *CommandManager) override;
 
 	/// Subscribe to messages for changes in the player score to show in the score UI
-	void BindScoreHandlers(AAdventureGameModeBase* AdventureGameMode);
+	virtual void BindScoreHandlers(AAdventureGameModeBase* AdventureGameMode) override;
 
 	/// Subscribe to messages for commands from the player, used to open or close
 	/// the conversation UI, or signal that a UI interaction happened to dismiss the
 	/// current bark or NPC conversation
-	void BindNotifierHandlers(UInteractionNotifier* Notifier);
+	virtual void BindNotifierHandlers(UInteractionNotifier* Notifier) override;
+	
+	TArray<FString> EventsReceived;
 	
 	UFUNCTION()
-	void BeginActionEvent() {}
+	void Mock_BeginActionEvent() { EventsReceived.Push("BeginActionEvent"); }
 	
 	UFUNCTION()
-	void UpdateInteractionTextEvent() {}
+	void Mock_UpdateInteractionTextEvent() { EventsReceived.Push("UpdateInteractionTextEvent"); }
 	
 	UFUNCTION()
-	void InterruptActionEvent() {}
+	void Mock_InterruptActionEvent() { EventsReceived.Push("InterruptActionEvent"); }
     
 	UFUNCTION()
-	void OnUserInteracted() {}
+	void Mock_OnUserInteracted() { EventsReceived.Push("OnUserInteracted"); }
 	
 	UFUNCTION()
-	void UpdateSaveGameIndicatorEvent(ESaveGameStatus SaveGameStatus, bool Success);
+	void Mock_UpdateSaveGameIndicatorEvent(ESaveGameStatus SaveGameStatus, bool Success) { 
+		EventsReceived.Push(
+		FString::Printf(TEXT("UpdateSaveGameIndicatorEvent - %s - %s"), 
+			*UEnum::GetValueAsString(SaveGameStatus), 
+			Success ? TEXT("Success") : TEXT("Failure"))); 
+	}
 
 	UFUNCTION()
-	void UpdateInventoryTextEvent();
+	void Mock_UpdateInventoryTextEvent() { EventsReceived.Push("UpdateInventoryTextEvent"); }
 	
 	UFUNCTION()
-	void HandleInventoryChanged(FName ItemKind, EItemDisposition Disposition);
+	void Mock_HandleInventoryChanged(FName ItemKind, EItemDisposition Disposition) { 
+		EventsReceived.Push(
+		FString::Printf(TEXT("HandleInventoryChanged - %s - %s"), 
+			*ItemKind.ToString(),
+			*UEnum::GetValueAsString(Disposition))); 
+	}
 
 	UFUNCTION()
-	void HandleScoreChanged(int32 Score);
+	void Mock_HandleScoreChanged(int32 Score)
+	{
+		EventsReceived.Push(FString::Printf(TEXT("HandleScoreChanged - %d"), Score));
+	}
 };

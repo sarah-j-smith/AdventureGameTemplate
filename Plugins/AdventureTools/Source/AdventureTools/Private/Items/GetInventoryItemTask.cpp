@@ -4,6 +4,7 @@
 #include "Items/InventoryItem.h"
 #include "ItemDisposition.h"
 #include "AdventureTools.h"
+#include "Provider.h"
 #include "Gameplay/AdventureGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,6 +15,7 @@ UGetInventoryItemTask* UGetInventoryItemTask::DoGetInventoryItemTask(
     Task->WorldContextObject = WorldContextObject;
     Task->ItemKind = ItemKind;
     Task->WaitTime = WaitTime;
+    Task->InventoryManager = UProvider::Get()->GetInstance<IInventoryManager>();
 
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("GetInventoryItemTask created for %s"), *ItemKind.ToString());
     Task->RegisterWithGameInstance(WorldContextObject);
@@ -26,20 +28,15 @@ void UGetInventoryItemTask::Activate()
 
     UE_LOG(LogAdventureGame, VeryVerbose, TEXT("GetInventoryItemTask::Activate - %s"), *ItemKind.ToString());
 
-    if (UAdventureGameInstance *GameInstance = GetAdventureGameInstance())
+    if (UItem *Item = InventoryManager->GetItemFromInventory(ItemKind))
     {
-        if (UItem *Item = GameInstance->GetItemFromInventory(ItemKind))
-        {
-            if (CheckForSuccessCondition(GameInstance)) return;
-        }
-        GameInstance->PlayerInventoryChanged.AddUniqueDynamic(this, &UGetInventoryItemTask::OnPlayerInventoryChanged);
-        StartWaitTimer();
+        if (CheckForSuccessCondition()) return;
     }
-    else
+    InventoryManager->NotifyInventoryChanged([this](FInventoryChangedDelegate &Delegate)
     {
-        UE_LOG(LogAdventureGame, Error, TEXT("Could not find Adventure Game Instance in %hs"), __FUNCTION__);
-        TaskFailed.Broadcast();
-    }
+        Delegate.AddUObject(this, &UGetInventoryItemTask::OnPlayerInventoryChanged);
+    });
+    StartWaitTimer();
 }
 
 void UGetInventoryItemTask::StartWaitTimer()
@@ -52,43 +49,25 @@ void UGetInventoryItemTask::StartWaitTimer()
 
 void UGetInventoryItemTask::WaitTimerTimeout()
 {
-    if (UAdventureGameInstance *GameInstance = GetAdventureGameInstance())
-    {
-        // Check one last time in case its there, but if not fail
-        if (CheckForSuccessCondition(GameInstance)) return;
-    }
+    // Check one last time in case its there, but if not fail
+    if (CheckForSuccessCondition()) return;
     TaskFailed.Broadcast();
     SetReadyToDestroy();
 }
 
 void UGetInventoryItemTask::OnPlayerInventoryChanged(FName ChangedItemKind, EItemDisposition Disposition)
 {
-    if (UAdventureGameInstance *GameInstance = GetAdventureGameInstance())
-    {
-        if (CheckForSuccessCondition(GameInstance)) return;
-        
-        // Not what we are looking for, keep waiting but log it in case somehow misconfigured
-        UE_LOG(LogAdventureGame, Display, TEXT("Waiting for %s - but saw - %s - %s"),
-            *ItemKind.ToString(), *UEnum::GetValueAsString(Disposition),
-            *ChangedItemKind.ToString());
-    }
+    if (CheckForSuccessCondition()) return;
+    
+    // Not what we are looking for, keep waiting but log it in case somehow misconfigured
+    UE_LOG(LogAdventureGame, Display, TEXT("Waiting for %s - but saw - %s - %s"),
+        *ItemKind.ToString(), *UEnum::GetValueAsString(Disposition),
+        *ChangedItemKind.ToString());
 }
 
-UAdventureGameInstance* UGetInventoryItemTask::GetAdventureGameInstance()
+bool UGetInventoryItemTask::CheckForSuccessCondition()
 {
-    if (UAdventureGameInstance* Instance = AdventureGameInstance.Get()) return Instance;
-    if (UAdventureGameInstance* Instance = Cast<UAdventureGameInstance>(UGameplayStatics::GetGameInstance(WorldContextObject)))
-    {
-        AdventureGameInstance = Instance;
-        return Instance;
-    }
-    UE_LOG(LogAdventureGame, Warning, TEXT("Could not find AdventureGameInstance in %hs"), __FUNCTION__);
-    return nullptr;
-}
-
-bool UGetInventoryItemTask::CheckForSuccessCondition(UAdventureGameInstance* GameInstance)
-{
-    if (UItem *Item = GameInstance->GetItemFromInventory(ItemKind))
+    if (UItem *Item = InventoryManager->GetItemFromInventory(ItemKind))
     {
         TaskSuccessful.Broadcast(Item);
         SetReadyToDestroy();

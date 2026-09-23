@@ -8,6 +8,7 @@
 
 #include "Player/AdventurePlayerController.h"
 #include "AdventureGameplayTags.h"
+#include "Provider.h"
 #include "Components/SphereComponent.h"
 #include "Gameplay/AdventureGameInstance.h"
 #include "Gameplay/ManagerProvider.h"
@@ -20,6 +21,8 @@
 #include "Kismet/GameplayStatics.h"
 
 AHotSpot::AHotSpot()
+	: ManagerProvider(UProvider::Get()->GetInstance<IManagerProvider>())
+	, BarkProvider(UProvider::Get()->GetInstance<IBarkProvider>())
 {
 	// This is not a "real" sphere - it's not a mesh, its just a collision volume defined by dimensions
 	WalkToPoint = CreateDefaultSubobject<USphereComponent>(TEXT("PlayerDetectorSphere"));
@@ -27,8 +30,6 @@ AHotSpot::AHotSpot()
 	WalkToPoint->SetSphereRadius(4.0f);
 	
 	AssetActionComponent = CreateDefaultSubobject<UAssetActionComponent>(TEXT("AssetActionComponent"));
-	ManagerProvider = CreateDefaultSubobject<UManagerProvider>(TEXT("ManagerProvider"));
-	BarkProvider = CreateDefaultSubobject<UBarkProvider>("BarkProvider");
 }
 
 void AHotSpot::BeginPlay()

@@ -3,53 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Object.h"
-#include "BarkProvider.generated.h"
 
-class UManagerProvider;
-/**
- * 
- */
-UCLASS()
-class ADVENTURETOOLS_API UBarkProvider : public UObject
+#include "IBarkProvider.h"
+#include "IManagerProvider.h"
+
+class ADVENTURETOOLS_API FBarkProvider : public IBarkProvider
 {
-	GENERATED_BODY()
-	
-	UPROPERTY()
-	UManagerProvider *ManagerProvider;
+	TSharedRef<IManagerProvider> ManagerProvider;
 
 public:	
-	UBarkProvider();
+	FBarkProvider();
 	
-	/// Clear any current bark, and immediately bark a message.
-	/// Player barks a message and then ends any action sequence
-	/// they were doing, unblocked & allowing user input again.
-	/// Use when the blueprint event logic should end with a bark.
-	/// @param BarkText FText for the player to bark. Should be translatable.
-	/// @param WorldContextObject
-	UFUNCTION(BlueprintCallable, Category = "PlayerBark", meta = (WorldContext = "WorldContextObject"))
-	virtual void BarkAndEnd(FText BarkText, UObject* WorldContextObject);
+	virtual ~FBarkProvider() override;
+	
+	virtual void BarkAndEnd(FText BarkText, UObject* WorldContextObject) override;
 
-	/// Player barks a message and continues on any action sequence
-	/// they were doing. Use when the event logic should continue
-	/// and, user interaction should remain blocked.
-	///
-	/// Queues the bark to happen after any current barks. 
-	/// @param BarkText FText for the player to bark. Should be translatable.
-	/// @param WorldContextObject 
-	UFUNCTION(BlueprintCallable, Category = "PlayerBark", meta = (WorldContext = "WorldContextObject"))
-	virtual void Bark(FText BarkText, UObject* WorldContextObject);
+	virtual void Bark(FText BarkText, UObject* WorldContextObject) override;
 
-	/// Player barks a series of messages and continues on any action sequence
-	/// they were doing. Use when the event logic should continue
-	/// and, user interaction should remain blocked.
-	///
-	/// Queues the bark to happen after any current barks. 
-	UFUNCTION(BlueprintCallable, Category = "PlayerBark", meta = (WorldContext = "WorldContextObject"))
-	virtual void BarkLines(TArray<FText> BarkTextArray, UObject* WorldContextObject);
+	virtual void BarkLines(TArray<FText> BarkTextArray, UObject* WorldContextObject) override;
 
-	/// Clear any current bark messages being displayed, including
-	/// all queued messages.
-	UFUNCTION(BlueprintCallable, Category = "PlayerBark", meta = (WorldContext = "WorldContextObject"))
-	virtual void ClearBark(UObject* WorldContextObject);
+	virtual void ClearBark(UObject* WorldContextObject) override;
 };
